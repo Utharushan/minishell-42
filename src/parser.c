@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/31 13:39:56 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/03/31 13:39:56 by tuthayak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_command	*new_command(void)
@@ -19,9 +31,9 @@ t_command	*new_command(void)
 
 void	add_argument(t_command *cmd, char *arg)
 {
-	int	count;
+	int		count;
 	char	**new_args;
-	int	i;
+	int		i;
 
 	count = 0;
 	while (cmd->args && cmd->args[count])
@@ -31,7 +43,7 @@ void	add_argument(t_command *cmd, char *arg)
 	new_args = malloc(sizeof(char *) * (count + 2));
 	if (!new_args)
 	{
-		return;
+		return ;
 	}
 	i = 0;
 	while (i < count)
@@ -52,7 +64,7 @@ static void	handle_redirection(t_command *cmd, t_token **tokens)
 	next_token = (*tokens)->next;
 	if (!next_token || next_token->type != TOKEN_WORD)
 	{
-		return;
+		return ;
 	}
 	if ((*tokens)->type == TOKEN_REDIRECT_IN)
 	{
@@ -89,7 +101,8 @@ t_command	*parse_tokens(t_token *tokens)
 		{
 			cmd = handle_pipe(cmd);
 		}
-		else if (tokens->type == TOKEN_REDIRECT_IN || tokens->type == TOKEN_REDIRECT_OUT
+		else if (tokens->type == TOKEN_REDIRECT_IN
+			|| tokens->type == TOKEN_REDIRECT_OUT
 			|| tokens->type == TOKEN_REDIRECT_APPEND)
 		{
 			handle_redirection(cmd, &tokens);

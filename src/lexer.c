@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/31 13:39:54 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/03/31 13:39:54 by tuthayak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_token	*new_token(char *value, t_token_type type)
@@ -11,7 +23,7 @@ t_token	*new_token(char *value, t_token_type type)
 	}
 	token->value = value;
 	token->type = type;
-	token->next = NULL;
+	token->next = (NULL);
 	return (token);
 }
 
@@ -23,7 +35,7 @@ void	add_token(t_token **tokens, char *value, t_token_type type)
 	new = new_token(value, type);
 	if (!new)
 	{
-		return;
+		return ;
 	}
 	if (!*tokens)
 	{

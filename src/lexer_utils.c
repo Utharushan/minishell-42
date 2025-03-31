@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/31 13:39:52 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/03/31 13:39:52 by tuthayak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_token_type	get_token_type(char *input, int *i)
@@ -32,8 +44,8 @@ void	extract_word(char *input, int *i, t_token **tokens)
 	int	start;
 
 	start = *i;
-	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' &&
-		   input[*i] != '<' && input[*i] != '>')
+	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
+		&& input[*i] != '<' && input[*i] != '>')
 	{
 		(*i)++;
 	}
