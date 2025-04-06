@@ -19,6 +19,7 @@ SRCS		=	src/libft/ft_str/ft_atoi.c \
 				src/libft/ft_is/ft_isascii.c \
 				src/libft/ft_is/ft_isdigit.c \
 				src/libft/ft_is/ft_isprint.c \
+				src/libft/ft_is/ft_isspace.c \
 				src/libft/ft_str/ft_itoa.c \
 				src/libft/ft_mem/ft_memchr.c \
 				src/libft/ft_mem/ft_memcmp.c \
@@ -56,8 +57,7 @@ SRCS		=	src/libft/ft_str/ft_atoi.c \
 				src/libft/ft_lst/ft_lstsize.c \
 				src/ft_printf/ft_printf.c \
 				src/ft_printf/ft_printf_utils.c \
-				src/get_next_line/get_next_line.c \
-				src/get_next_line/get_next_line_utils.c
+				src/get_next_line/get_next_line.c
 OBJS		= $(SRCS:.c=.o)
 
 CC			= cc

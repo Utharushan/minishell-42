@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static void	handle_token(char *input, int *i, t_token **tokens)
+void	handle_token(char *input, int *i, t_token **tokens)
 {
 	t_token_type	type;
 	int				length;

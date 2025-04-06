@@ -18,14 +18,13 @@ t_command	*new_command(void)
 
 	cmd = malloc(sizeof(t_command));
 	if (!cmd)
-	{
 		return (NULL);
-	}
 	cmd->args = NULL;
-	cmd->next = NULL;
 	cmd->input = NULL;
 	cmd->output = NULL;
-	cmd->append = 0;
+	cmd->append = false;
+	cmd->next_op = OP_NONE;
+	cmd->next = NULL;
 	return (cmd);
 }
 
@@ -57,29 +56,9 @@ void	add_argument(t_command *cmd, char *arg)
 	cmd->args = new_args;
 }
 
-static void	handle_redirection(t_command *cmd, t_token **tokens)
+t_command	*handle_pipe(t_command *cmd)
 {
-	t_token	*next_token;
-
-	next_token = (*tokens)->next;
-	if (!next_token || next_token->type != TOKEN_WORD)
-	{
-		return ;
-	}
-	if ((*tokens)->type == TOKEN_REDIRECT_IN)
-	{
-		cmd->input = next_token->value;
-	}
-	else
-	{
-		cmd->output = next_token->value;
-		cmd->append = ((*tokens)->type == TOKEN_REDIRECT_APPEND);
-	}
-	*tokens = next_token;
-}
-
-static t_command	*handle_pipe(t_command *cmd)
-{
+	cmd->next_op = OP_PIPE;
 	cmd->next = new_command();
 	return (cmd->next);
 }
