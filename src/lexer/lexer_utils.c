@@ -1,54 +1,53 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/31 13:39:52 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/03/31 13:39:52 by tuthayak         ###   ########.fr       */
+/*   Created: 2025/03/31 13:39:54 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/03/31 13:39:54 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token_type	get_token_type(char *input, int *i)
+t_token	*new_token(char *value, t_token_type type)
 {
-	if (input[*i] == '|')
+	t_token	*token;
+
+	token = malloc(sizeof(t_token));
+	if (!token)
 	{
-		return (TOKEN_PIPE);
+		return (NULL);
 	}
-	else if (input[*i] == '<')
-	{
-		if (input[*i + 1] == '<')
-		{
-			(*i)++;
-			return (TOKEN_HEREDOC);
-		}
-		return (TOKEN_REDIRECT_IN);
-	}
-	else if (input[*i] == '>')
-	{
-		if (input[*i + 1] == '>')
-		{
-			(*i)++;
-			return (TOKEN_REDIRECT_APPEND);
-		}
-		return (TOKEN_REDIRECT_OUT);
-	}
-	return (TOKEN_WORD);
+	token->value = value;
+	token->type = type;
+	token->next = (NULL);
+	return (token);
 }
 
-void	extract_word(char *input, int *i, t_token **tokens)
+void	add_token(t_token **tokens, char *value, t_token_type type)
 {
-	int	start;
+	t_token	*new;
+	t_token	*temp;
 
-	start = *i;
-	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-		&& input[*i] != '<' && input[*i] != '>')
+	new = new_token(value, type);
+	if (!new)
 	{
-		(*i)++;
+		return ;
 	}
-	add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD);
-	(*i)--;
+	if (!*tokens)
+	{
+		*tokens = new;
+	}
+	else
+	{
+		temp = *tokens;
+		while (temp->next)
+		{
+			temp = temp->next;
+		}
+		temp->next = new;
+	}
 }
