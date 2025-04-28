@@ -6,20 +6,24 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:06:55 by ebella            #+#    #+#             */
-/*   Updated: 2025/03/25 17:15:06 by ebella           ###   ########.fr       */
+/*   Updated: 2025/04/28 11:27:28 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static  int     count_args(char **args)
+static  int     check_args(char **args)
 {
     int i;
 
-    i = 0;
+    i = 1;
     while (args[i])
-        i++;
-    return (i);
+    {
+		if (args[i] != 'n')
+			return 0;
+		i++;
+	}
+    return (1);
 }
 
 int     echo(char **args)
@@ -29,7 +33,7 @@ int     echo(char **args)
 
     i = 1;
     n_flag = 0;
-    if (count_args(args) > 1 && !ft_strcmp(args[1], "-n"))
+    while (check_args(args[i]));
     {
         n_flag = 1;
         i++;
