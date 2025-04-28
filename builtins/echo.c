@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:06:55 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/28 11:27:28 by ebella           ###   ########.fr       */
+/*   Updated: 2025/04/28 12:17:40 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ static  int     check_args(char **args)
     int i;
 
     i = 1;
+	if (args[0] != '-' || args[1] != 'n')
+		return (0);
     while (args[i])
     {
 		if (args[i] != 'n')
@@ -33,7 +35,7 @@ int     echo(char **args)
 
     i = 1;
     n_flag = 0;
-    while (check_args(args[i]));
+    while (args[i] && check_args(args[i]));
     {
         n_flag = 1;
         i++;
