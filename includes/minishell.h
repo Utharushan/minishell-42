@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/04/06 18:58:36 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:05:01 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ typedef enum e_operator
 typedef struct s_command
 {
 	char				**args;
+	char				**path;
 	char				*input;
 	char				*output;
 	bool				append;
@@ -94,5 +95,9 @@ void				handle_redirection(t_command *cmd, t_token **tokens);
 
 void				print_tokens(t_token *tokens);
 void				print_commands(t_command *cmds);
+
+// --- TESTING EXEC ---
+int					exec_command(t_command *cmd, char **envp);
+int					command_exist(t_command *cmd, char **envp);
 
 #endif
