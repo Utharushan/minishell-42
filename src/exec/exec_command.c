@@ -6,16 +6,16 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/29 17:49:00 by ebella           ###   ########.fr       */
+/*   Updated: 2025/04/30 20:10:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int command_exist(t_command *cmd, char **envp)
+int	command_exist(t_command *cmd, char **envp)
 {
-    int     i;
-    char    *tmp;
+	int		i;
+	char	*tmp;
 	char	**tmp2;
 
 	i = 0;
@@ -38,30 +38,30 @@ int command_exist(t_command *cmd, char **envp)
 		i++;
 	}
 	return (0);
-} 
+}
 
-int		exec_command(t_command *cmd, char **envp)
+int	exec_command(t_command *cmd, char **envp)
 {
-    int     i;
-    char    *tmp;
-    char    *full_path;
-	
-    i = 0;
-    while (cmd->path[i])
-    {
-        tmp = ft_strjoin(cmd->path[i], "/");
-        full_path = ft_strjoin(tmp, cmd->args[0]);
-        free(tmp);
-        if (access(full_path, F_OK | X_OK) == 0)
-        {
-            execve(full_path, cmd->args, envp);
-			perror("Error:");
-            free(full_path);
-            return (1);
-        }
-        free(full_path);
-        i++;
-    }
-	perror("Error:");
-    return (0);
+	int		i;
+	char	*tmp;
+	char	*full_path;
+
+	i = 0;
+	while (cmd->path[i])
+	{
+		tmp = ft_strjoin(cmd->path[i], "/");
+		full_path = ft_strjoin(tmp, cmd->args[0]);
+		free(tmp);
+		if (access(full_path, F_OK | X_OK) == 0)
+		{
+			execve(full_path, cmd->args, envp);
+			perror("Error");
+			free(full_path);
+			return (1);
+		}
+		free(full_path);
+		i++;
+	}
+	perror("Error");
+	return (0);
 }

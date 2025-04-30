@@ -2,15 +2,19 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   test_main.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
+/*                                                    +:+ +:+        
+	+:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+      
+	+#+        */
+/*                                                +#+#+#+#+#+  
+	+#+           */
 /*   Created: 2025/04/06 15:37:01 by tuthayak          #+#    #+#             */
 /*   Updated: 2025/04/06 15:37:01 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../includes/minishell.h"
+
 
 void	print_tokens(t_token *tokens)
 {
@@ -23,7 +27,7 @@ void	print_tokens(t_token *tokens)
 
 void	print_commands(t_command *cmds)
 {
-	int	i;
+	int i;
 
 	while (cmds)
 	{
@@ -46,32 +50,61 @@ void	print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
-
-int	main(int argc, char **argv)
+int	is_builtins(t_command *cmds)
 {
-	t_token		*tokens;
-	t_command	*cmds;
+	if (!ft_strncmp(cmds->args[0], "echo", 4))
+		ft_echo(cmds);
+	else if (!ft_strncmp(cmds->args[0], "pwd", 3))
+		ft_pwd();
+	else
+		return (0);
+	return (1);
+}
+int	check_input(char *input)
+{
+	int i;
 
-	if (argc != 2)
-	{
-		ft_printf("Usage: %s \"command line\"\n", argv[0]);
+	i = 0;
+	while (input[i] == ' ' || input[i] == '\t')
+		i++;
+	if (input[i] == '\0')
 		return (1);
-	}
-	tokens = lexer(argv[1]);
-	if (!tokens)
+	return (0);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	t_token *tokens;
+	t_command *cmds;
+	char *input;
+	pid_t pid;
+	int status;
+
+	(void)argv;
+	(void)argc;
+	(void)envp;
+	while (1)
 	{
-		ft_printf("Lexer failed.\n");
-		return (1);
+		input = readline("minishell>");
+		if (!check_input(input))
+		{
+			tokens = lexer(input);
+			cmds = parse_tokens(tokens);
+			command_exist(cmds, envp);
+			// print_commands(cmds);
+			if (is_builtins(cmds))
+				;
+			else
+				pid = fork();
+			if (pid == 0)
+			{
+				if (ft_strncmp(cmds->args[0], "exit", 4))
+					exec_command(cmds, envp);
+			}
+			cmds->status = waitpid(pid, &status, WUNTRACED);
+			if (!ft_strncmp(cmds->args[0], "exit", 4))
+				ft_exit(cmds->status, cmds);
+		}
 	}
-	ft_printf("==== Tokens ====\n");
-	print_tokens(tokens);
-	cmds = parse_tokens(tokens);
-	if (!cmds)
-	{
-		ft_printf("Parser failed.\n");
-		return (1);
-	}
-	ft_printf("\n==== Commands ====\n");
-	print_commands(cmds);
 	return (0);
 }

@@ -6,17 +6,31 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/04/29 18:05:01 by ebella           ###   ########.fr       */
+/*   Updated: 2025/04/30 20:07:20 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stddef.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <stdbool.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <dirent.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <termios.h>
+# include <sys/ioctl.h>
+# include <string.h>
+# include <errno.h>
+# include <curses.h>
+# include <term.h>
+# include <stddef.h>
 # include "../libftprintf/inc/libft.h"
 # include "../libftprintf/inc/ft_printf.h"
 # include "../libftprintf/inc/get_next_line.h"
@@ -69,6 +83,7 @@ typedef struct s_command
 	char				*input;
 	char				*output;
 	bool				append;
+	int					status;
 	t_operator			next_op;
 	struct s_command	*next;
 }	t_command;
@@ -99,5 +114,10 @@ void				print_commands(t_command *cmds);
 // --- TESTING EXEC ---
 int					exec_command(t_command *cmd, char **envp);
 int					command_exist(t_command *cmd, char **envp);
+
+// --- BUILTINS ---
+void     			ft_echo(t_command *cmds);
+int     			ft_pwd(void);
+int					ft_exit(int status, t_command	*cmds);
 
 #endif
