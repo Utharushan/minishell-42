@@ -6,32 +6,32 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:06:55 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/30 13:43:32 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/01 09:44:40 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-static int	check_args(char **args)
+static int	check_args(char *arg)
 {
-	int	i;
+    int	i;
 
-	i = 1;
-	if (args[0] != '-' || args[1] != 'n')
-		return (0);
-	while (args[i])
-	{
-		if (args[i] != 'n')
-			return (0);
-		i++;
-	}
-	return (1);
+    if (arg[0] != '-' || arg[1] != 'n')
+        return (0);
+    i = 1;
+    while (arg[i])
+    {
+        if (arg[i] != 'n')
+            return (0);
+        i++;
+    }
+    return (1);
 }
 
-void     ft_echo(t_command *cmds)
+void	ft_echo(t_command *cmds)
 {
-	int	i;
-	int	n_flag;
+    int	i;
+    int	n_flag;
 
     i = 1;
     n_flag = 0;
