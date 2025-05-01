@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec_command.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
 /*   Updated: 2025/04/30 20:10:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 int	command_exist(t_command *cmd, char **envp)
 {

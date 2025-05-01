@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/04/30 13:46:11 by tuthayak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
 int		free_struct(t_command *cmds)
@@ -27,4 +39,3 @@ int	ft_exit(int status,	t_command	*cmds)
 	exit(status);
 	return (0);
 }
- 

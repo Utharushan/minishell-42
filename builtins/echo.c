@@ -3,35 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:06:55 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/30 20:08:06 by ebella           ###   ########.fr       */
+/*   Updated: 2025/04/30 13:43:32 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-static  int     check_args(char *args)
+static int	check_args(char **args)
 {
-    int i;
+	int	i;
 
-    i = 1;
+	i = 1;
 	if (args[0] != '-' || args[1] != 'n')
 		return (0);
-    while (args[i])
-    {
+	while (args[i])
+	{
 		if (args[i] != 'n')
-			return 0;
+			return (0);
 		i++;
 	}
-    return (1);
+	return (1);
 }
 
 void     ft_echo(t_command *cmds)
 {
-    int i;
-    int n_flag;
+	int	i;
+	int	n_flag;
 
     i = 1;
     n_flag = 0;

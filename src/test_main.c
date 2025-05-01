@@ -15,7 +15,6 @@
 
 #include "../includes/minishell.h"
 
-
 void	print_tokens(t_token *tokens)
 {
 	while (tokens)
