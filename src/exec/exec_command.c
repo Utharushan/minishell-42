@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/30 13:52:48 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/04/30 20:10:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,13 @@ int	exec_command(t_command *cmd, char **envp)
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			execve(full_path, cmd->args, envp);
-			perror("Error:");
+			perror("Error");
 			free(full_path);
 			return (1);
 		}
 		free(full_path);
 		i++;
 	}
-	perror("Error:");
+	perror("Error");
 	return (0);
 }

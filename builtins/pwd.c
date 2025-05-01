@@ -6,11 +6,11 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:20:50 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/30 13:40:23 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/04/30 20:14:07 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../includes/minishell.h"
 
 int	ft_pwd(void)
 {

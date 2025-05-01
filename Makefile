@@ -17,14 +17,19 @@ INCLUDES	= -Iincludes -Ilibftprintf/inc
 LIBFTPRINTF	= libftprintf/libftprintf.a
 LIBFTPRINTF_DIR	= libftprintf
 
-SRC_DIR		= src
-OBJ_DIR		= obj_test
+SRC_DIR			= src
+OBJ_DIR			= obj_test
+BUILTINS_DIR	= builtins
 
 SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/lexer/lexer_utils.c \
 			  $(SRC_DIR)/parser/parser.c \
 			  $(SRC_DIR)/parser/syntax_error_handling.c \
-			  $(SRC_DIR)/test_main.c
+			  $(SRC_DIR)/test_main.c \
+			  $(SRC_DIR)/exec/exec_command.c \
+			  $(BUILTINS_DIR)/echo.c \
+			  $(BUILTINS_DIR)/pwd.c \
+			  $(BUILTINS_DIR)/exit.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
@@ -38,7 +43,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(NAME): $(LIBFTPRINTF) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFTPRINTF) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFTPRINTF) -lreadline -o $(NAME)
 
 clean:
 	@rm -rf $(OBJ_DIR)
