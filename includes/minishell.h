@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/04/30 20:07:20 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/01 10:00:05 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,8 @@ int					exec_command(t_command *cmd, char **envp);
 int					command_exist(t_command *cmd, char **envp);
 
 // --- BUILTINS ---
-void     			ft_echo(t_command *cmds);
-int     			ft_pwd(void);
+void				ft_echo(t_command *cmds);
+int					ft_pwd(void);
 int					ft_exit(int status, t_command	*cmds);
 
 #endif

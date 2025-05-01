@@ -26,7 +26,7 @@ void	print_tokens(t_token *tokens)
 
 void	print_commands(t_command *cmds)
 {
-	int i;
+	int	i;
 
 	while (cmds)
 	{
@@ -49,6 +49,7 @@ void	print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
+
 int	is_builtins(t_command *cmds)
 {
 	if (!ft_strncmp(cmds->args[0], "echo", 4))
@@ -59,9 +60,10 @@ int	is_builtins(t_command *cmds)
 		return (0);
 	return (1);
 }
+
 int	check_input(char *input)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (input[i] == ' ' || input[i] == '\t')
@@ -73,11 +75,11 @@ int	check_input(char *input)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_token *tokens;
-	t_command *cmds;
-	char *input;
-	pid_t pid;
-	int status;
+	t_token		*tokens;
+	t_command	*cmds;
+	char		*input;
+	pid_t		pid;
+	int			status;
 
 	(void)argv;
 	(void)argc;
