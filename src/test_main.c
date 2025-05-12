@@ -2,11 +2,11 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   test_main.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+        
+/*                                                    +:+ +:+
 	+:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+      
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+
 	+#+        */
-/*                                                +#+#+#+#+#+  
+/*                                                +#+#+#+#+#+
 	+#+           */
 /*   Created: 2025/04/06 15:37:01 by tuthayak          #+#    #+#             */
 /*   Updated: 2025/04/06 15:37:01 by tuthayak         ###   ########.fr       */
@@ -15,7 +15,9 @@
 
 #include "../includes/minishell.h"
 
-void	print_tokens(t_token *tokens)
+int g_signal_status = 0;
+
+void print_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -24,9 +26,9 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
-void	print_commands(t_command *cmds)
+void print_commands(t_command *cmds)
 {
-	int	i;
+	int i;
 
 	while (cmds)
 	{
@@ -50,20 +52,66 @@ void	print_commands(t_command *cmds)
 	}
 }
 
-int	is_builtins(t_command *cmds)
+int is_builtins(t_command *cmds)
 {
-	if (!ft_strncmp(cmds->args[0], "echo", 4))
-		ft_echo(cmds);
-	else if (!ft_strncmp(cmds->args[0], "pwd", 3))
-		ft_pwd();
+	if (!cmds || !cmds->args || !cmds->args[0])
+		return (0);
+
+	if (!ft_strncmp(cmds->args[0], "echo", 5))
+	{
+		if (cmds->args[1] && !ft_strncmp(cmds->args[1], "$?", 3))
+		{
+			ft_putnbr_fd(g_signal_status, 1);
+			ft_putchar_fd('\n', 1);
+			g_signal_status = 0;
+		}
+		else
+			g_signal_status = ft_echo(cmds);
+	}
+	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
+		g_signal_status = ft_pwd();
+	else if (!ft_strncmp(cmds->args[0], "exit", 5))
+	{
+		ft_exit(cmds->args);
+		cmds->status = g_signal_status;
+	}
 	else
 		return (0);
 	return (1);
 }
 
-int	check_input(char *input)
+int find_cmd_in_path(t_command *cmds)
 {
-	int	i;
+	char *full_path;
+	int i;
+
+	if (!cmds || !cmds->path || !cmds->args[0])
+		return (1);
+
+	i = 0;
+	while (cmds->path[i])
+	{
+		full_path = ft_strjoin(cmds->path[i], "/");
+		if (!full_path)
+			return (1);
+		char *tmp = ft_strjoin(full_path, cmds->args[0]);
+		free(full_path);
+		if (!tmp)
+			return (1);
+		if (access(tmp, F_OK | X_OK) == 0)
+		{
+			free(tmp);
+			return (0);
+		}
+		free(tmp);
+		i++;
+	}
+	return (1);
+}
+
+int check_input(char *input)
+{
+	int i;
 
 	i = 0;
 	while (input[i] == ' ' || input[i] == '\t')
@@ -73,17 +121,17 @@ int	check_input(char *input)
 	return (0);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	t_token		*tokens;
-	t_command	*cmds;
-	char		*input;
-	pid_t		pid;
-	int			status;
+	t_token *tokens = NULL;
+	t_command *cmds = NULL;
+	char *input;
+	pid_t pid;
+	int status;
 
-	(void)argv;
 	(void)argc;
-	(void)envp;
+	(void)argv;
+
 	while (1)
 	{
 		input = readline("minishell>");
@@ -91,21 +139,36 @@ int	main(int argc, char **argv, char **envp)
 		{
 			tokens = lexer(input);
 			cmds = parse_tokens(tokens);
-			command_exist(cmds, envp);
-			// print_commands(cmds);
+			init_command_path(cmds, envp);
+			free(input);
+
 			if (is_builtins(cmds))
-				;
-			else
-				pid = fork();
-			if (pid == 0)
+				g_signal_status = cmds->status;
+			else if (find_cmd_in_path(cmds))
 			{
-				if (ft_strncmp(cmds->args[0], "exit", 4))
-					exec_command(cmds, envp);
+				ft_putstr_fd(cmds->args[0], 2);
+				ft_putstr_fd(": command not found\n", 2);
+				g_signal_status = 127;
 			}
-			cmds->status = waitpid(pid, &status, WUNTRACED);
-			if (!ft_strncmp(cmds->args[0], "exit", 4))
-				ft_exit(cmds->status, cmds);
+			else
+			{
+				pid = fork();
+				if (pid == 0)
+				{
+					exec_command(cmds, envp);
+					ft_exit(cmds->args);
+				}
+				waitpid(pid, &status, 0);
+				if (WIFEXITED(status))
+					g_signal_status = WEXITSTATUS(status);
+				else
+					g_signal_status = 1;
+			}
+			free_struct(cmds);
+			cmds = NULL;
 		}
+		else
+			free(input);
 	}
 	return (0);
 }

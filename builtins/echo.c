@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 17:06:55 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/01 10:01:11 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/09 16:12:52 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-static int	check_args(char *arg)
+static int check_args(char *arg)
 {
-	int	i;
+	int i;
 
 	if (arg[0] != '-' || arg[1] != 'n')
 		return (0);
@@ -28,10 +28,10 @@ static int	check_args(char *arg)
 	return (1);
 }
 
-void	ft_echo(t_command *cmds)
+int ft_echo(t_command *cmds)
 {
-	int	i;
-	int	n_flag;
+	int i;
+	int n_flag;
 
 	i = 1;
 	n_flag = 0;
@@ -49,4 +49,5 @@ void	ft_echo(t_command *cmds)
 	}
 	if (!n_flag)
 		ft_putstr_fd("\n", 1);
+	return (0);
 }

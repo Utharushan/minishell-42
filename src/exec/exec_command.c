@@ -3,65 +3,71 @@
 /*                                                        :::      ::::::::   */
 /*   exec_command.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/04/30 20:10:13 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/09 15:34:07 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	command_exist(t_command *cmd, char **envp)
+int init_command_path(t_command *cmd, char **envp)
 {
-	int		i;
-	char	*tmp;
-	char	**tmp2;
+	int i;
 
 	i = 0;
-	tmp2 = ft_split(cmd->args[0], ' ');
+	if (!cmd || !envp)
+		return (1);
 	while (envp[i])
 	{
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
 			cmd->path = ft_split(envp[i] + 5, ':');
-			break ;
+			if (!cmd->path)
+				return (1);
+			return (0);
 		}
 		i++;
 	}
-	i = 0;
-	while (cmd->path[i])
-	{
-		tmp = ft_strjoin(cmd->path[i], "/");
-		tmp = ft_strjoin(tmp, tmp2[0]);
-		free(tmp);
-		i++;
-	}
+	cmd->path = NULL;
 	return (0);
 }
 
-int	exec_command(t_command *cmd, char **envp)
+char *build_full_path(char *dir, char *cmd)
 {
-	int		i;
-	char	*tmp;
-	char	*full_path;
+	char *tmp;
+	char *full_path;
+
+	tmp = ft_strjoin(dir, "/");
+	if (!tmp)
+		return (NULL);
+	full_path = ft_strjoin(tmp, cmd);
+	free(tmp);
+	return (full_path);
+}
+
+int exec_command(t_command *cmd, char **envp)
+{
+	int i;
+	char *full_path;
 
 	i = 0;
-	while (cmd->path[i])
+	while (cmd->path && cmd->path[i])
 	{
-		tmp = ft_strjoin(cmd->path[i], "/");
-		full_path = ft_strjoin(tmp, cmd->args[0]);
-		free(tmp);
+		full_path = build_full_path(cmd->path[i], cmd->args[0]);
+		if (!full_path)
+			return (1);
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			execve(full_path, cmd->args, envp);
-			perror("Error");
+			perror("execve");
 			free(full_path);
-			return (1);
+			return (127);
 		}
 		free(full_path);
 		i++;
 	}
-	perror("Error");
-	return (0);
+	perror(cmd->args[0]);
+	return (127);
 }

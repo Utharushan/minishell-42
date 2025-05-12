@@ -3,46 +3,49 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/01 10:00:05 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/09 16:36:21 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-# define MINISHELL_H
+#define MINISHELL_H
 
-# include <readline/readline.h>
-# include <readline/history.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <dirent.h>
-# include <sys/wait.h>
-# include <signal.h>
-# include <termios.h>
-# include <sys/ioctl.h>
-# include <string.h>
-# include <errno.h>
-# include <curses.h>
-# include <term.h>
-# include <stddef.h>
-# include "../libftprintf/inc/libft.h"
-# include "../libftprintf/inc/ft_printf.h"
-# include "../libftprintf/inc/get_next_line.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <string.h>
+#include <errno.h>
+#include <curses.h>
+#include <term.h>
+#include <stddef.h>
+#include "../libftprintf/inc/libft.h"
+#include "../libftprintf/inc/ft_printf.h"
+#include "../libftprintf/inc/get_next_line.h"
+
+// --- GLOBAL VAR ---
+extern int g_signal_status;
 
 // --- ENV LINKED LIST ---
 
 typedef struct s_env
 {
-	char			*name;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+	char *name;
+	char *value;
+	struct s_env *next;
+} t_env;
 
 // --- TOKEN TYPES ---
 
@@ -55,16 +58,16 @@ typedef enum e_token_type
 	TOKEN_REDIRECT_APPEND,
 	TOKEN_HEREDOC,
 	TOKEN_EOF
-}	t_token_type;
+} t_token_type;
 
 // --- TOKEN LINKED LIST ---
 
 typedef struct s_token
 {
-	char			*value;
-	t_token_type	type;
-	struct s_token	*next;
-}	t_token;
+	char *value;
+	t_token_type type;
+	struct s_token *next;
+} t_token;
 
 // --- COMMAND STRUCTURE ---
 
@@ -74,50 +77,52 @@ typedef enum e_operator
 	OP_PIPE,
 	OP_AND,
 	OP_OR
-}	t_operator;
+} t_operator;
 
 typedef struct s_command
 {
-	char				**args;
-	char				**path;
-	char				*input;
-	char				*output;
-	bool				append;
-	int					status;
-	t_operator			next_op;
-	struct s_command	*next;
-}	t_command;
+	char **args;
+	char **path;
+	char *input;
+	char *output;
+	bool append;
+	int status;
+	t_operator next_op;
+	struct s_command *next;
+} t_command;
 
 // --- LEXER ---
 
-t_token				*new_token(char *value, t_token_type type);
-void				add_token(t_token **tokens, char *value, t_token_type type);
-void				handle_token(char *input, int *i, t_token **tokens);
-t_token				*lexer(char *input);
-t_token_type		get_token_type(char *input, int *i);
-void				extract_word(char *input, int *i, t_token **tokens);
+t_token *new_token(char *value, t_token_type type);
+void add_token(t_token **tokens, char *value, t_token_type type);
+void handle_token(char *input, int *i, t_token **tokens);
+t_token *lexer(char *input);
+t_token_type get_token_type(char *input, int *i);
+void extract_word(char *input, int *i, t_token **tokens);
 
 // --- PARSER (examples) ---
 
-t_command			*new_command(void);
-void				add_argument(t_command *cmd, char *arg);
-t_command			*handle_pipe(t_command *cmd);
-t_command			*parse_tokens(t_token *tokens);
-int					check_syntax_errors(t_token *tokens);
-void				handle_redirection(t_command *cmd, t_token **tokens);
+t_command *new_command(void);
+void add_argument(t_command *cmd, char *arg);
+t_command *handle_pipe(t_command *cmd);
+t_command *parse_tokens(t_token *tokens);
+int check_syntax_errors(t_token *tokens);
+void handle_redirection(t_command *cmd, t_token **tokens);
 
 // --- UTILS TEST MAIN ---
 
-void				print_tokens(t_token *tokens);
-void				print_commands(t_command *cmds);
+void print_tokens(t_token *tokens);
+void print_commands(t_command *cmds);
 
 // --- TESTING EXEC ---
-int					exec_command(t_command *cmd, char **envp);
-int					command_exist(t_command *cmd, char **envp);
+int exec_command(t_command *cmd, char **envp);
+int init_command_path(t_command *cmd, char **envp);
 
 // --- BUILTINS ---
-void				ft_echo(t_command *cmds);
-int					ft_pwd(void);
-int					ft_exit(int status, t_command	*cmds);
+int ft_echo(t_command *cmds);
+int ft_pwd(void);
+void ft_exit(char **args);
+int free_struct(t_command *cmds);
+char *build_full_path(char *dir, char *cmd);
 
 #endif

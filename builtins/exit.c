@@ -3,40 +3,90 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/01 10:00:50 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:57:05 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	free_struct(t_command *cmds)
+extern int g_last_status;
+
+void free_command(t_command *cmd)
 {
-	t_command	*tmp;
-	int			i;
+	int i = 0;
+
+	if (!cmd)
+		return;
+	if (cmd->args)
+	{
+		while (cmd->args[i])
+			free(cmd->args[i++]);
+		free(cmd->args);
+	}
+	i = 0;
+	if (cmd->path)
+	{
+		while (cmd->path[i])
+			free(cmd->path[i++]);
+		free(cmd->path);
+	}
+	free(cmd);
+}
+
+int free_struct(t_command *cmds)
+{
+	t_command *tmp;
 
 	while (cmds)
 	{
 		tmp = cmds->next;
-		i = 0;
-		while (cmds->args && cmds->args[i])
-			free(cmds->args[i++]);
-		i = 0;
-		while (cmds->path && cmds->path[i])
-			free(cmds->path[i++]);
-		free(cmds->args);
-		free(cmds->path);
-		free(cmds);
+		free_command(cmds);
 		cmds = tmp;
 	}
 	return (0);
 }
 
-int	ft_exit(int status,	t_command	*cmds)
+int is_numeric(const char *str)
 {
-	free_struct(cmds);
-	exit(status);
-	return (0);
+	if (!str || *str == '\0')
+		return (0);
+	if (*str == '-' || *str == '+')
+		str++;
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
+void ft_exit(char **args)
+{
+	int exit_code;
+
+	if (args && args[1])
+	{
+		if (!is_numeric(args[1]))
+		{
+			ft_putstr_fd("exit: numeric argument required\n", 2);
+			g_signal_status = 2;
+			exit(g_signal_status);
+		}
+		else if (args[2])
+		{
+			ft_putstr_fd("exit: too many arguments\n", 2);
+			g_signal_status = 1;
+			return;
+		}
+		else
+			exit_code = ft_atoi(args[1]) % 256;
+	}
+	else
+		exit_code = g_signal_status;
+	ft_putstr_fd("exit\n", 1);
+	exit(exit_code);
 }
