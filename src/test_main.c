@@ -15,9 +15,10 @@
 
 #include "../includes/minishell.h"
 
-int g_signal_status = 0;
 
-void print_tokens(t_token *tokens)
+int			g_signal_status = 0;
+
+void	print_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -26,7 +27,7 @@ void print_tokens(t_token *tokens)
 	}
 }
 
-void print_commands(t_command *cmds)
+void	print_commands(t_command *cmds)
 {
 	int i;
 
@@ -52,7 +53,7 @@ void print_commands(t_command *cmds)
 	}
 }
 
-int is_builtins(t_command *cmds)
+int	is_builtins(t_command *cmds)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (0);
@@ -80,7 +81,7 @@ int is_builtins(t_command *cmds)
 	return (1);
 }
 
-int find_cmd_in_path(t_command *cmds)
+int	find_cmd_in_path(t_command *cmds)
 {
 	char *full_path;
 	int i;
@@ -109,7 +110,7 @@ int find_cmd_in_path(t_command *cmds)
 	return (1);
 }
 
-int check_input(char *input)
+int	check_input(char *input)
 {
 	int i;
 
@@ -121,51 +122,75 @@ int check_input(char *input)
 	return (0);
 }
 
-int main(int argc, char **argv, char **envp)
+t_command	*init(t_token *tokens, t_command *cmds, char **envp, char *input)
 {
-	t_token *tokens = NULL;
-	t_command *cmds = NULL;
-	char *input;
-	pid_t pid;
+	tokens = lexer(input);
+	cmds = parse_tokens(tokens);
+	init_command_path(cmds, envp);
+	free(input);
+	return (cmds);
+}
+void	run(t_command *cmds, char **envp, pid_t pid, int status)
+{
+	if (is_builtins(cmds))
+		g_signal_status = cmds->status;
+	else if (find_cmd_in_path(cmds))
+	{
+		printf("%c", cmds->args[0][0]);
+		ft_putstr_fd(cmds->args[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
+		g_signal_status = 127;
+	}
+	else
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			exec_command(cmds, envp);
+			ft_exit(cmds->args);
+		}
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			g_signal_status = WEXITSTATUS(status);
+		else
+			g_signal_status = 1;
+	}
+	free_struct(cmds);
+	cmds = NULL;
+}
+void	run_pipe(t_command *cmds)
+{
+	if (pipe(cmds->fd) == -1)
+		ft_exit(cmds->args);
+	cmds->pid = open("outfile", O_WRONLY | O_CREAT, 0777);
+	if (cmds->pid == 0)
+	{
+		close(cmds->fd[0]);
+		dup2(cmds->fd[1], STDOUT_FILENO);
+		close(cmds->fd[1]);
+	}
+}
+int	main(int argc, char **argv, char **envp)
+{
+	t_token *tokens;
+	t_command *cmds;
 	int status;
+	char *input;
 
 	(void)argc;
 	(void)argv;
-
+	cmds = NULL;
+	status = 0;
+	tokens = NULL;
 	while (1)
 	{
 		input = readline("minishell>");
 		if (!check_input(input))
 		{
-			tokens = lexer(input);
-			cmds = parse_tokens(tokens);
-			init_command_path(cmds, envp);
-			free(input);
-
-			if (is_builtins(cmds))
-				g_signal_status = cmds->status;
-			else if (find_cmd_in_path(cmds))
-			{
-				ft_putstr_fd(cmds->args[0], 2);
-				ft_putstr_fd(": command not found\n", 2);
-				g_signal_status = 127;
-			}
-			else
-			{
-				pid = fork();
-				if (pid == 0)
-				{
-					exec_command(cmds, envp);
-					ft_exit(cmds->args);
-				}
-				waitpid(pid, &status, 0);
-				if (WIFEXITED(status))
-					g_signal_status = WEXITSTATUS(status);
-				else
-					g_signal_status = 1;
-			}
-			free_struct(cmds);
-			cmds = NULL;
+			cmds = init(tokens, cmds, envp, input);
+			if (cmds->next_op)
+				run_pipe(cmds);
+			run(cmds, envp, cmds->pid, status);
 		}
 		else
 			free(input);

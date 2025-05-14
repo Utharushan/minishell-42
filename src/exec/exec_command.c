@@ -6,15 +6,15 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/09 15:34:07 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/14 12:41:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int init_command_path(t_command *cmd, char **envp)
+int	init_command_path(t_command *cmd, char **envp)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!cmd || !envp)
@@ -34,10 +34,10 @@ int init_command_path(t_command *cmd, char **envp)
 	return (0);
 }
 
-char *build_full_path(char *dir, char *cmd)
+char	*build_full_path(char *dir, char *cmd)
 {
-	char *tmp;
-	char *full_path;
+	char	*tmp;
+	char	*full_path;
 
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
@@ -47,10 +47,10 @@ char *build_full_path(char *dir, char *cmd)
 	return (full_path);
 }
 
-int exec_command(t_command *cmd, char **envp)
+int	exec_command(t_command *cmd, char **envp)
 {
-	int i;
-	char *full_path;
+	int		i;
+	char	*full_path;
 
 	i = 0;
 	while (cmd->path && cmd->path[i])
