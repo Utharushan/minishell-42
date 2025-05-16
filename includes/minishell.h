@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/14 15:57:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/16 10:57:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,8 +124,10 @@ int						init_command_path(t_command *cmd, char **envp);
 // --- BUILTINS ---
 int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
-void					ft_exit(char **args);
+void					ft_exit(char **args, t_command *cmds);
 int						free_struct(t_command *cmds);
 char					*build_full_path(char *dir, char *cmd);
-
+void					run_pipe(t_command *cmds, char **envp);
+int						find_cmd_in_path(t_command *cmds);
+int						is_builtins(t_command *cmds);
 #endif

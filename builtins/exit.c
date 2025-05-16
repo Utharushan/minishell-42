@@ -6,13 +6,11 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/09 17:57:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/16 10:04:16 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-extern int g_last_status;
 
 void free_command(t_command *cmd)
 {
@@ -64,7 +62,7 @@ int is_numeric(const char *str)
 	return (1);
 }
 
-void ft_exit(char **args)
+void ft_exit(char **args, t_command *cmds)
 {
 	int exit_code;
 
@@ -73,20 +71,20 @@ void ft_exit(char **args)
 		if (!is_numeric(args[1]))
 		{
 			ft_putstr_fd("exit: numeric argument required\n", 2);
-			g_signal_status = 2;
-			exit(g_signal_status);
+			cmds->status = 2;
+			exit(cmds->status);
 		}
 		else if (args[2])
 		{
 			ft_putstr_fd("exit: too many arguments\n", 2);
-			g_signal_status = 1;
+			cmds->status = 1;
 			return;
 		}
 		else
 			exit_code = ft_atoi(args[1]) % 256;
 	}
 	else
-		exit_code = g_signal_status;
+		exit_code = cmds->status;
 	ft_putstr_fd("exit\n", 1);
 	exit(exit_code);
 }

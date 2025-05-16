@@ -27,6 +27,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/parser/syntax_error_handling.c \
 			  $(SRC_DIR)/test_main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
+			  $(SRC_DIR)/exec/run_pipe.c \
 			  $(BUILTINS_DIR)/echo.c \
 			  $(BUILTINS_DIR)/pwd.c \
 			  $(BUILTINS_DIR)/exit.c
