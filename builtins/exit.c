@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/16 10:04:16 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/17 14:01:04 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void ft_exit(char **args, t_command *cmds)
 	}
 	else
 		exit_code = cmds->status;
-	ft_putstr_fd("exit\n", 1);
+	if (isatty(STDIN_FILENO))
+		ft_putstr_fd("exit\n", 1);
 	exit(exit_code);
 }

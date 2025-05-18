@@ -15,10 +15,9 @@
 
 #include "../includes/minishell.h"
 
+int g_signal_status = 0;
 
-int			g_signal_status = 0;
-
-void	print_tokens(t_token *tokens)
+void print_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -27,7 +26,7 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
-void	print_commands(t_command *cmds)
+void print_commands(t_command *cmds)
 {
 	int i;
 
@@ -53,7 +52,7 @@ void	print_commands(t_command *cmds)
 	}
 }
 
-int	is_builtins(t_command *cmds)
+int is_builtins(t_command *cmds)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (0);
@@ -78,7 +77,7 @@ int	is_builtins(t_command *cmds)
 	return (1);
 }
 
-int	find_cmd_in_path(t_command *cmds)
+int find_cmd_in_path(t_command *cmds)
 {
 	char *full_path;
 	int i;
@@ -107,7 +106,7 @@ int	find_cmd_in_path(t_command *cmds)
 	return (1);
 }
 
-int	check_input(char *input)
+int check_input(char *input)
 {
 	int i;
 
@@ -119,7 +118,7 @@ int	check_input(char *input)
 	return (0);
 }
 
-t_command	*init(t_token *tokens, t_command *cmds, char **envp, char *input)
+t_command *init(t_token *tokens, t_command *cmds, char **envp, char *input)
 {
 	tokens = lexer(input);
 	cmds = parse_tokens(tokens);
@@ -128,17 +127,15 @@ t_command	*init(t_token *tokens, t_command *cmds, char **envp, char *input)
 	return (cmds);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
 	t_token *tokens;
 	t_command *cmds;
-	int status;
 	char *input;
 
 	(void)argc;
 	(void)argv;
 	cmds = NULL;
-	status = 0;
 	tokens = NULL;
 	while (1)
 	{
