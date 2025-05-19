@@ -127,6 +127,11 @@ t_command *init(t_token *tokens, t_command *cmds, char **envp, char *input)
 	return (cmds);
 }
 
+void sig_handle(int sig)
+{
+	(void)sig;
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	t_token *tokens;
@@ -140,6 +145,11 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		input = readline("minishell>");
+		if (!input)
+		{
+			ft_putstr_fd("exit", 1);
+			break;
+		}
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, envp, input);

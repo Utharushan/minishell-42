@@ -6,11 +6,11 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/18 14:04:46 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/18 15:55:46 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 /*
 If the current command is followed by a pipe (cmds->next_op == OP_PIPE),
@@ -107,6 +107,8 @@ void handle_child_process(t_command *cmds, char **envp, int in_fd, int *pipe_fd)
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 	}
+	if (command_redirections(cmds) == 0)
+		exit(cmds->status);
 	if (!is_builtins(cmds))
 	{
 		if (!cmds->path)

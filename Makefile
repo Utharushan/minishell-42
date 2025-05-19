@@ -28,6 +28,8 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/test_main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
 			  $(SRC_DIR)/exec/run_pipe.c \
+			  $(SRC_DIR)/exec/redirections.c \
+			  $(SRC_DIR)/exec/here_document.c \
 			  $(BUILTINS_DIR)/echo.c \
 			  $(BUILTINS_DIR)/pwd.c \
 			  $(BUILTINS_DIR)/exit.c
