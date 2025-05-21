@@ -26,6 +26,7 @@ src/
       ft_isascii.c
       ft_isdigit.c
       ft_isprint.c
+      ft_isspace.c
       ft_tolower.c
       ft_toupper.c
     ft_mem/
@@ -54,6 +55,7 @@ src/
       ft_strlcpy.c
       ft_strlen.c
       ft_strmapi.c
+      ft_strcmp.c
       ft_strncmp.c
       ft_strnstr.c
       ft_strrchr.c
@@ -74,7 +76,6 @@ src/
     ft_printf_utils.c
   get_next_line/
     get_next_line.c
-    get_next_line_utils.c
 inc/
   libft.h
   ft_printf.h

@@ -25,6 +25,7 @@ t_command	*new_command(void)
 	cmd->append = false;
 	cmd->next_op = OP_NONE;
 	cmd->next = NULL;
+	cmd->heredoc_delim = NULL;
 	return (cmd);
 }
 
@@ -85,6 +86,15 @@ t_command	*parse_tokens(t_token *tokens)
 			|| tokens->type == TOKEN_REDIRECT_APPEND)
 		{
 			handle_redirection(cmd, &tokens);
+		}
+		else if (tokens->type == TOKEN_HEREDOC)
+		{
+			tokens = tokens->next;
+			if (tokens && tokens->type == TOKEN_WORD)
+			{
+				cmd->here_doc = TOKEN_HEREDOC;
+				cmd->heredoc_delim = tokens->value;
+			}
 		}
 		tokens = tokens->next;
 	}
