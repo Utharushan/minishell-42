@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_document.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/19 14:24:18 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/21 22:07:56 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ int here_doc(const char *delim)
     while (1)
     {
         line = readline(">");
-        if (!line || ft_strncmp(line, delim, ft_strlen(delim)))
+        if (!line)
+            break;
+        if (ft_strcmp(line, delim) == 0)
         {
             free(line);
             break;

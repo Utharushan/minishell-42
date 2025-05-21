@@ -39,6 +39,7 @@ SRCS		=	src/libft/ft_str/ft_atoi.c \
 				src/libft/ft_str/ft_strlcpy.c \
 				src/libft/ft_str/ft_strlen.c \
 				src/libft/ft_str/ft_strmapi.c \
+				src/libft/ft_str/ft_strcmp.c \
 				src/libft/ft_str/ft_strncmp.c \
 				src/libft/ft_str/ft_strnstr.c \
 				src/libft/ft_str/ft_strrchr.c \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/19 14:18:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/21 22:12:24 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,9 +81,9 @@ int command_redirections(t_command *cmd)
         if (redirect_output(cmd->output, cmd->append) == 0)
             return (0);
     }
-    if (cmd->here_doc == TOKEN_HEREDOC)
+    if (cmd->here_doc == TOKEN_HEREDOC && cmd->heredoc_delim)
     {
-        fd = here_doc(cmd->args[1]); // j'ai essayer ca, mais je pense que le parsing doit etre refait. Quand on detect << tu met pas le deuxieme arguemt dans args[1], pcq sinon ca va essayer de le lancer comme une cmd, au lieu de juste le mettre dans ma fonction comme delim.
+        fd = here_doc(cmd->heredoc_delim);
         if (fd == -1)
             return (0);
         dup2(fd, STDIN_FILENO);
