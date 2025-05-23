@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/18 15:55:46 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/23 13:50:08 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*
 If the current command is followed by a pipe (cmds->next_op == OP_PIPE),
 this function creates a pipe.
-The pipe() function stores the read and write file descriptors in pipe_fd.
+The	pipe(void) function stores the read and write file descriptors in pipe_fd.
 
 If pipe creation fails, it prints an error message and exits.
 
@@ -24,7 +24,7 @@ that no pipe was created.
 
 Returns 1 if a pipe was created, 0 otherwise.
 */
-int create_pipe(t_command *cmds, int *pipe_fd)
+int	create_pipe(t_command *cmds, int *pipe_fd)
 {
 	if (cmds->next_op == OP_PIPE)
 	{
@@ -43,9 +43,10 @@ int create_pipe(t_command *cmds, int *pipe_fd)
 Create a child process by using fork().
 Returns the process ID, so we can know if we are in a child process.
 */
-int create_child_process(void)
+int	create_child_process(void)
 {
-	pid_t pid;
+	pid_t	pid;
+
 	pid = fork();
 	if (pid == -1)
 	{
@@ -66,24 +67,25 @@ for the next command.
 
 it connects the command through the pipes.
 */
-void handle_parent_process(t_command *cmds, int *in_fd, int *pipe_fd, pid_t pid)
+void	wait_for_pids(t_command *cmds, pid_t *pid)
 {
-	int status;
+	int	i;
+		int status;
 
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		cmds->status = WEXITSTATUS(status);
-	if (*in_fd != 0)
-		close(*in_fd);
-	if (cmds->next_op == OP_PIPE)
+	i = 0;
+	while (cmds)
 	{
-		close(pipe_fd[1]);
-		*in_fd = pipe_fd[0];
+		waitpid(pid[i], &status, 0);
+		if (WIFEXITED(status))
+			cmds->status = WEXITSTATUS(status);
+		cmds = cmds->next;
+		i++;
 	}
 }
 /*
 Check's if in_fd is not equal to zero, that means that we need to redirect stdin
-into our pipe in_fd, so the command read's from the pipe instead of the terminal.
+into our pipe in_fd,
+	so the command read's from the pipe instead of the terminal.
 close in_fd because we dont need it anymore.
 
 Next if the next op is a pipe, we change our stdout to go into our pipe.
@@ -94,7 +96,8 @@ If everything is good we execute it.
 
 and we exit with the current exit code.
 */
-void handle_child_process(t_command *cmds, char **envp, int in_fd, int *pipe_fd)
+void	handle_child_process(t_command *cmds, char **envp, int in_fd,
+		int *pipe_fd)
 {
 	if (in_fd != 0)
 	{
@@ -132,25 +135,33 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void run_pipe(t_command *cmds, char **envp)
+void	run_pipe(t_command *cmds, char **envp)
 {
-	int pipe_fd[2];
-	int in_fd;
-	pid_t pid;
-	t_command *first_cmds;
+	int			pipe_fd[2];
+	int			in_fd;
+	pid_t		*pid;
+	t_command	*first_cmds;
+	int			i;
 
+	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
+	if (!pid)
+		return ;
 	first_cmds = cmds;
 	in_fd = 0;
+	i = 0;
 	while (cmds)
 	{
-		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
+		if (first_cmds && !first_cmds->next && first_cmds->args
+			&& !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
 		create_pipe(cmds, pipe_fd);
-		pid = create_child_process();
-		if (pid == 0)
+		pid[i] = create_child_process();
+		if (pid[i++] == 0)
 			handle_child_process(cmds, envp, in_fd, pipe_fd);
 		else
-			handle_parent_process(cmds, &in_fd, pipe_fd, pid);
+			close_fd(&in_fd, cmds, pipe_fd);
 		cmds = cmds->next;
 	}
+	cmds = first_cmds;
+	wait_for_pids(cmds, pid);
 }

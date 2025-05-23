@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/21 21:55:37 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/23 17:16:57 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,5 +142,7 @@ int find_cmd_in_path(t_command *cmds);
 int is_builtins(t_command *cmds);
 int command_redirections(t_command *cmd);
 int here_doc(const char *delim);
+int		count_cmds(t_command *cmds);
+void	close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
 
 #endif

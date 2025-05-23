@@ -156,8 +156,7 @@ int main(int argc, char **argv, char **envp)
 			run_pipe(cmds, envp);
 			free_struct(cmds);
 		}
-		else
-			free(input);
+		// free(input);
 	}
 	return (0);
 }

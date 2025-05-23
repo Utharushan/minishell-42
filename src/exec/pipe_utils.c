@@ -1,41 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   here_document.c                                    :+:      :+:    :+:   */
+/*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/23 17:25:57 by ebella           ###   ########.fr       */
+/*   Created: 2025/05/20 11:46:46 by ebella            #+#    #+#             */
+/*   Updated: 2025/05/23 11:30:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	here_doc(const char *delim)
+int		count_cmds(t_command *cmds)
 {
-	int		pipe_fd[2];
-	char	*line;
+	int i;
 
-	if (pipe(pipe_fd) == -1)
-	{
-		perror("pipe");
+	if (!cmds)
 		return (0);
-	}
-	while (1)
+	i = 0;
+	while (cmds)
 	{
-		line = readline("> ");
-		if (!line)
-			break ;
-		if (!ft_strcmp(line, delim))
-		{
-			free(line);
-			break ;
-		}
-		ft_putstr_fd(line, pipe_fd[1]);
-		ft_putstr_fd("\n", pipe_fd[1]);
-		free(line);
+		i++;
+		cmds = cmds->next;
 	}
-	close(pipe_fd[1]);
-	return (pipe_fd[0]);
+	return (i);
+}
+
+void	close_fd(int *in_fd, t_command *cmds, int *pipe_fd)
+{
+	if (*in_fd != 0)
+		close(*in_fd);
+	if (cmds->next_op == OP_PIPE)
+	{
+		close(pipe_fd[1]);
+		*in_fd = pipe_fd[0];
+	}
 }
