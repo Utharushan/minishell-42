@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/23 17:16:57 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/25 13:36:05 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,14 +135,16 @@ int init_command_path(t_command *cmd, char **envp);
 int ft_echo(t_command *cmds);
 int ft_pwd(void);
 void ft_exit(char **args, t_command *cmds);
+void ft_env(char **envp);
 int free_struct(t_command *cmds);
 char *build_full_path(char *dir, char *cmd);
 void run_pipe(t_command *cmds, char **envp);
 int find_cmd_in_path(t_command *cmds);
-int is_builtins(t_command *cmds);
+int is_builtins(t_command *cmds, char **envp);
 int command_redirections(t_command *cmd);
 int here_doc(const char *delim);
-int		count_cmds(t_command *cmds);
-void	close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
+int count_cmds(t_command *cmds);
+void close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
+void init_env(char **envp, t_env **env);
 
 #endif
