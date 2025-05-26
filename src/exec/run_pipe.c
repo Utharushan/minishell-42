@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/25 12:59:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/26 12:22:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ If everything is good we execute it.
 and we exit with the current exit code.
 */
 void handle_child_process(t_command *cmds, char **envp, int in_fd,
-						  int *pipe_fd)
+						  int *pipe_fd, t_env *env)
 {
 	if (in_fd != 0)
 	{
@@ -112,7 +112,7 @@ void handle_child_process(t_command *cmds, char **envp, int in_fd,
 	}
 	if (command_redirections(cmds) == 0)
 		exit(cmds->status);
-	if (!is_builtins(cmds, envp))
+	if (!is_builtins(cmds, env))
 	{
 		if (!cmds->path)
 			init_command_path(cmds, envp);
@@ -135,7 +135,7 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void run_pipe(t_command *cmds, char **envp)
+void run_pipe(t_command *cmds, char **envp, t_env *env)
 {
 	int pipe_fd[2];
 	int in_fd;
@@ -156,7 +156,7 @@ void run_pipe(t_command *cmds, char **envp)
 		create_pipe(cmds, pipe_fd);
 		pid[i] = create_child_process();
 		if (pid[i++] == 0)
-			handle_child_process(cmds, envp, in_fd, pipe_fd);
+			handle_child_process(cmds, envp, in_fd, pipe_fd, env);
 		else
 			close_fd(&in_fd, cmds, pipe_fd);
 		cmds = cmds->next;

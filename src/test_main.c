@@ -52,7 +52,7 @@ void print_commands(t_command *cmds)
 	}
 }
 
-int is_builtins(t_command *cmds, char **envp)
+int is_builtins(t_command *cmds, t_env *env)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (0);
@@ -73,7 +73,9 @@ int is_builtins(t_command *cmds, char **envp)
 	else if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, cmds);
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
-		ft_env(envp);
+		ft_env(env);
+	else if (!ft_strncmp(cmds->args[0], "export", 7))
+		ft_export(env, cmds->args[1]);
 	else
 		return (0);
 	return (1);
@@ -133,14 +135,6 @@ void sig_handle(int sig)
 {
 	(void)sig;
 }
-void print_env_list(t_env *env)
-{
-	while (env)
-	{
-		printf("%s=%s\n", env->name, env->value);
-		env = env->next;
-	}
-}
 
 int main(int argc, char **argv, char **envp)
 {
@@ -165,9 +159,8 @@ int main(int argc, char **argv, char **envp)
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, envp, input);
-			init_env(envp, &env);
-			print_env_list(env);
-			run_pipe(cmds, envp);
+			env = init_env(envp, env);
+			run_pipe(cmds, envp, env);
 			free_struct(cmds);
 		}
 		// free(input);
