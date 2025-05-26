@@ -52,7 +52,7 @@ void print_commands(t_command *cmds)
 	}
 }
 
-int is_builtins(t_command *cmds)
+int is_builtins(t_command *cmds, char **envp)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (0);
@@ -72,6 +72,8 @@ int is_builtins(t_command *cmds)
 		cmds->status = ft_pwd();
 	else if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, cmds);
+	else if (!ft_strncmp(cmds->args[0], "env", 4))
+		ft_env(envp);
 	else
 		return (0);
 	return (1);
@@ -131,17 +133,27 @@ void sig_handle(int sig)
 {
 	(void)sig;
 }
+void print_env_list(t_env *env)
+{
+	while (env)
+	{
+		printf("%s=%s\n", env->name, env->value);
+		env = env->next;
+	}
+}
 
 int main(int argc, char **argv, char **envp)
 {
 	t_token *tokens;
 	t_command *cmds;
 	char *input;
+	t_env *env;
 
 	(void)argc;
 	(void)argv;
 	cmds = NULL;
 	tokens = NULL;
+	env = NULL;
 	while (1)
 	{
 		input = readline("minishell>");
@@ -153,6 +165,8 @@ int main(int argc, char **argv, char **envp)
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, envp, input);
+			init_env(envp, &env);
+			print_env_list(env);
 			run_pipe(cmds, envp);
 			free_struct(cmds);
 		}
