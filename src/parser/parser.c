@@ -12,6 +12,11 @@
 
 #include "../../includes/minishell.h"
 
+/*
+Allocates and initializes a new command structure.
+Sets all fields to default values (NULL, false, OP_NONE).
+Returns a pointer to the new command, or NULL if allocation fails.
+*/
 t_command	*new_command(void)
 {
 	t_command	*cmd;
@@ -29,6 +34,12 @@ t_command	*new_command(void)
 	return (cmd);
 }
 
+/*
+Adds an argument to the command's argument list.
+Allocates a new array with space for the new argument and NULL terminator.
+Copies existing arguments and appends the new one.
+Frees the old argument array.
+*/
 void	add_argument(t_command *cmd, char *arg)
 {
 	int		count;
@@ -57,6 +68,11 @@ void	add_argument(t_command *cmd, char *arg)
 	cmd->args = new_args;
 }
 
+/*
+Handles a pipe operator in the command list.
+Sets the current command's next_op to OP_PIPE and creates a new command for the next segment.
+Returns a pointer to the new command.
+*/
 t_command	*handle_pipe(t_command *cmd)
 {
 	cmd->next_op = OP_PIPE;
@@ -64,6 +80,11 @@ t_command	*handle_pipe(t_command *cmd)
 	return (cmd->next);
 }
 
+/*
+Parses a list of tokens into a linked list of command structures.
+Handles arguments, pipes, redirections, and heredocs.
+Returns the head of the command list.
+*/
 t_command	*parse_tokens(t_token *tokens)
 {
 	t_command	*cmd;
