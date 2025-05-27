@@ -51,11 +51,10 @@ void print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
-
-int is_builtins(t_command *cmds, t_env *env)
+void run_builtins(t_command *cmds, t_env *env)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
-		return (0);
+		return ;
 
 	if (!ft_strncmp(cmds->args[0], "echo", 5))
 	{
@@ -74,9 +73,22 @@ int is_builtins(t_command *cmds, t_env *env)
 		ft_env(env);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
 		ft_export(env, cmds->args[1]);
-	else
+}
+int is_builtins(t_command *cmds)
+{
+	if (!cmds || !cmds->args || !cmds->args[0])
+		return (1);
+
+	if (!ft_strncmp(cmds->args[0], "echo", 5))
 		return (0);
-	return (1);
+	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
+		return (0);
+	else if (!ft_strncmp(cmds->args[0], "env", 4))
+		return (0);
+	else if (!ft_strncmp(cmds->args[0], "export", 7))
+		return (0);
+	else
+		return (1);
 }
 
 int find_cmd_in_path(t_command *cmds)
@@ -149,6 +161,7 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		input = readline("minishell>");
+		add_history(input);
 		if (!input)
 		{
 			ft_putstr_fd("exit", 1);
