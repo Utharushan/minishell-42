@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/26 15:09:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/27 10:30:36 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ t_env	*new_env_node(char *name, char *value)
 void	add_env_back(t_env **env, t_env *new)
 {
 	t_env	*tmp;
-
+		
 	if (!*env)
 	{
 		*env = new;

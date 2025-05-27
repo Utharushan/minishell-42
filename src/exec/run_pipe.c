@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/26 12:22:51 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/27 10:40:11 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ If everything is good we execute it.
 and we exit with the current exit code.
 */
 void handle_child_process(t_command *cmds, char **envp, int in_fd,
-						  int *pipe_fd, t_env *env)
+						  int *pipe_fd)
 {
 	if (in_fd != 0)
 	{
@@ -112,19 +112,16 @@ void handle_child_process(t_command *cmds, char **envp, int in_fd,
 	}
 	if (command_redirections(cmds) == 0)
 		exit(cmds->status);
-	if (!is_builtins(cmds, env))
+	if (!cmds->path)
+		init_command_path(cmds, envp);
+	if (find_cmd_in_path(cmds))
 	{
-		if (!cmds->path)
-			init_command_path(cmds, envp);
-		if (find_cmd_in_path(cmds))
-		{
-			ft_putstr_fd(cmds->args[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
-			cmds->status = 127;
-		}
-		else
-			exec_command(cmds, envp);
+		ft_putstr_fd(cmds->args[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
+		cmds->status = 127;
 	}
+	else
+		exec_command(cmds, envp);
 	exit(cmds->status);
 }
 /*
@@ -153,13 +150,17 @@ void run_pipe(t_command *cmds, char **envp, t_env *env)
 	{
 		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		create_pipe(cmds, pipe_fd);
-		pid[i] = create_child_process();
-		if (pid[i++] == 0)
-			handle_child_process(cmds, envp, in_fd, pipe_fd, env);
-		else
-			close_fd(&in_fd, cmds, pipe_fd);
-		cmds = cmds->next;
+		if (!is_builtins(cmds, env))
+		{
+			create_pipe(cmds, pipe_fd);
+			pid[i] = create_child_process();
+			if (pid[i++] == 0)
+				handle_child_process(cmds, envp, in_fd, pipe_fd);
+			else
+				close_fd(&in_fd, cmds, pipe_fd);
+			cmds = cmds->next;
+		}else
+			return;
 	}
 	cmds = first_cmds;
 	wait_for_pids(cmds, pid);

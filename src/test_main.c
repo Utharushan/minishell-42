@@ -70,8 +70,6 @@ int is_builtins(t_command *cmds, t_env *env)
 	}
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
 		cmds->status = ft_pwd();
-	else if (!ft_strncmp(cmds->args[0], "exit", 5))
-		ft_exit(cmds->args, cmds);
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
 		ft_env(env);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
@@ -147,7 +145,7 @@ int main(int argc, char **argv, char **envp)
 	(void)argv;
 	cmds = NULL;
 	tokens = NULL;
-	env = NULL;
+	env = init_env(envp, NULL);
 	while (1)
 	{
 		input = readline("minishell>");
@@ -159,7 +157,6 @@ int main(int argc, char **argv, char **envp)
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, envp, input);
-			env = init_env(envp, env);
 			run_pipe(cmds, envp, env);
 			free_struct(cmds);
 		}

@@ -6,13 +6,13 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:09:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/26 15:38:50 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/27 10:33:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	ft_export(t_env *env, char *str)
+int		ft_export(t_env *env, char *str)
 {
 	int i;
 	char	*name;
@@ -21,8 +21,8 @@ void	ft_export(t_env *env, char *str)
 	t_env	*new_env;
 
 	i = 0;
-	if (!env)
-		return;
+	if (!env || !str)
+		return (1);
 	equal_position = ft_strchr(str, '=');
 	if (equal_position)
 	{
@@ -31,4 +31,5 @@ void	ft_export(t_env *env, char *str)
 		new_env = new_env_node(name, value);
 		add_env_back(&env, new_env);
 	}
+	return (0);
 }
