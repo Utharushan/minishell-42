@@ -12,6 +12,10 @@
 
 #include "../../includes/minishell.h"
 
+/*
+Handles the extraction and addition of a token from the input string at position *i.
+Determines the token type and calls extract_word or adds a token accordingly.
+*/
 void	handle_token(char *input, int *i, t_token **tokens)
 {
 	t_token_type	type;
@@ -32,6 +36,12 @@ void	handle_token(char *input, int *i, t_token **tokens)
 	}
 }
 
+/*
+Tokenizes the input string into a linked list of tokens.
+Skips whitespace and processes each token using handle_token.
+Appends a TOKEN_EOF at the end.
+Returns the head of the token list.
+*/
 t_token	*lexer(char *input)
 {
 	t_token	*tokens;
@@ -53,6 +63,12 @@ t_token	*lexer(char *input)
 	return (tokens);
 }
 
+/*
+Determines the type of token at the current position in the input string.
+Handles special cases for heredoc and append redirections.
+Advances the index for multi-character tokens.
+Returns the detected token type.
+*/
 t_token_type	get_token_type(char *input, int *i)
 {
 	if (input[*i] == '|')
@@ -80,6 +96,11 @@ t_token_type	get_token_type(char *input, int *i)
 	return (TOKEN_WORD);
 }
 
+/*
+Extracts a word token from the input string starting at position *i.
+Continues until a special character or whitespace is found.
+Adds the extracted word as a token and updates the index.
+*/
 void	extract_word(char *input, int *i, t_token **tokens)
 {
 	int	start;

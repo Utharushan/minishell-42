@@ -12,6 +12,10 @@
 
 #include "../../includes/minishell.h"
 
+/*
+Checks the token list for syntax errors related to redirections and pipes.
+Returns 1 if a syntax error is found, 0 otherwise.
+*/
 int	check_syntax_errors(t_token *tokens)
 {
 	while (tokens)
@@ -27,6 +31,11 @@ int	check_syntax_errors(t_token *tokens)
 	return (0);
 }
 
+/*
+Handles input and output redirections for a command.
+Updates the command's input/output fields based on the redirection type.
+Advances the token pointer to the next token.
+*/
 void	handle_redirection(t_command *cmd, t_token **tokens)
 {
 	t_token_type	type;
