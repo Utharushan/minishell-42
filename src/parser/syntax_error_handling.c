@@ -38,17 +38,23 @@ Advances the token pointer to the next token.
 */
 void	handle_redirection(t_command *cmd, t_token **tokens)
 {
-	t_token_type	type;
+    t_token_type	type;
 
-	type = (*tokens)->type;
-	*tokens = (*tokens)->next;
-	if (!(*tokens) || (*tokens)->type != TOKEN_WORD)
-		return ;
-	if (type == TOKEN_REDIRECT_IN)
-		cmd->input = (*tokens)->value;
-	else
-	{
-		cmd->output = (*tokens)->value;
-		cmd->append = (type == TOKEN_REDIRECT_APPEND);
-	}
+    type = (*tokens)->type;
+    *tokens = (*tokens)->next;
+    if (!(*tokens) || (*tokens)->type != TOKEN_WORD)
+        return ;
+    if (type == TOKEN_REDIRECT_IN)
+    {
+        if (cmd->input)
+            free(cmd->input);
+        cmd->input = ft_strdup((*tokens)->value);
+    }
+    else
+    {
+        if (cmd->output)
+            free(cmd->output);
+        cmd->output = ft_strdup((*tokens)->value);
+        cmd->append = (type == TOKEN_REDIRECT_APPEND);
+    }
 }

@@ -42,38 +42,35 @@ Frees the old argument array.
 */
 void	add_argument(t_command *cmd, char *arg)
 {
-    int		count;
-    char	**new_args;
-    int		i;
-    char	*stripped_arg;
+	int		count;
+	char	**new_args;
+	int		i;
+	char	*stripped_arg;
 
-    count = 0;
-    while (cmd->args && cmd->args[count])
-    {
-        count++;
-    }
-    if ((arg[0] == '"' && arg[ft_strlen(arg) - 1] == '"') ||
-        (arg[0] == '\'' && arg[ft_strlen(arg) - 1] == '\''))
-        stripped_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
-    else
-        stripped_arg = arg;
-    new_args = malloc(sizeof(char *) * (count + 2));
-    if (!new_args)
-    {
-        if (stripped_arg != arg)
-            free(stripped_arg);
-        return ;
-    }
-    i = 0;
-    while (i < count)
-    {
-        new_args[i] = cmd->args[i];
-        i++;
-    }
-    new_args[count] = stripped_arg;
-    new_args[count + 1] = NULL;
-    free(cmd->args);
-    cmd->args = new_args;
+	count = 0;
+	while (cmd->args && cmd->args[count])
+		count++;
+	if ((arg[0] == '"' && arg[ft_strlen(arg) - 1] == '"') ||
+		(arg[0] == '\'' && arg[ft_strlen(arg) - 1] == '\''))
+		stripped_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
+	else
+		stripped_arg = ft_strdup(arg);
+	new_args = malloc(sizeof(char *) * (count + 2));
+	if (!new_args)
+	{
+		free(stripped_arg);
+		return ;
+	}
+	i = 0;
+	while (i < count)
+	{
+		new_args[i] = cmd->args[i];
+		i++;
+	}
+	new_args[count] = stripped_arg;
+	new_args[count + 1] = NULL;
+	free(cmd->args);
+	cmd->args = new_args;
 }
 
 /*
@@ -93,7 +90,7 @@ Parses a list of tokens into a linked list of command structures.
 Handles arguments, pipes, redirections, and heredocs.
 Returns the head of the command list.
 */
-t_command	*parse_tokens(t_token *tokens)
+t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
 	t_command	*cmd;
 	t_command	*head;
@@ -104,7 +101,9 @@ t_command	*parse_tokens(t_token *tokens)
 	{
 		if (tokens->type == TOKEN_WORD)
 		{
-			add_argument(cmd, tokens->value);
+			char *expanded = expand_token_value(tokens->value, env, g_signal_status);
+			add_argument(cmd, expanded);
+			free(expanded);
 		}
 		else if (tokens->type == TOKEN_PIPE)
 		{
@@ -122,7 +121,13 @@ t_command	*parse_tokens(t_token *tokens)
 			if (tokens && tokens->type == TOKEN_WORD)
 			{
 				cmd->here_doc = TOKEN_HEREDOC;
-				cmd->heredoc_delim = tokens->value;
+				if (cmd->heredoc_delim)
+					free(cmd->heredoc_delim);
+				cmd->heredoc_delim = ft_strdup(tokens->value);
+				if (tokens->value[0] != '\'' && tokens->value[0] != '"')
+					cmd->heredoc_expand = 1;
+				else
+					cmd->heredoc_expand = 0;
 			}
 		}
 		tokens = tokens->next;

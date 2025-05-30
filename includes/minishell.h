@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/30 11:49:39 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 14:14:20 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ typedef struct s_command
 	bool				append;
 	int					status;
 	int					fd[2];
+	int					heredoc_expand;
 	pid_t				pid;
 	t_redir				*redir;
 	t_operator			next_op;
@@ -113,15 +114,16 @@ t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
 void					extract_word(char *input, int *i, t_token **tokens);
 
-// --- PARSER (examples) ---
+// --- PARSER ---
 
 t_command				*new_command(void);
 void					add_argument(t_command *cmd, char *arg);
 t_command				*handle_pipe(t_command *cmd);
-t_command				*parse_tokens(t_token *tokens);
+t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-
+char					*expand_token_value(const char *str, t_env *env,
+							int last_status);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
@@ -143,8 +145,8 @@ void					ft_unset(t_env *env, char *name);
 
 //--- PIPES ---
 void					run_pipe(t_command *cmds, char **envp, t_env *env);
-int						command_redirections(t_command *cmd);
-int						here_doc(const char *delim);
+int						command_redirections(t_command *cmd, t_env *env);
+int						here_doc(const char *delim, int heredoc_expand, t_env *env);
 
 //--- ENV ---
 t_env					*new_env_node(char *name, char *value);
@@ -153,6 +155,7 @@ t_env					*init_env(char **envp, t_env *env);
 
 //--- UTILS ---
 int						free_struct(t_command *cmds);
+void					free_command_list(t_command *cmd);
 char					*build_full_path(char *dir, char *cmd);
 int						find_cmd_in_path(t_command *cmds);
 int						count_cmds(t_command *cmds);

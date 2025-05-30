@@ -12,13 +12,6 @@
 
 #include "../../includes/minishell.h"
 
-char *ft_strjoin_free(char *s1, char *s2)
-{
-    char *joined = ft_strjoin(s1, s2);
-    free(s1);
-    return joined;
-}
-
 /*
 Handles the extraction and addition of a token from the input string at position *i.
 Determines the token type and calls extract_word or adds a token accordingly.
@@ -126,7 +119,7 @@ void	extract_word(char *input, int *i, t_token **tokens)
             while (input[*i] && input[*i] != quote)
                 (*i)++;
             segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin_free(result, segment);
+            result = ft_strjoin(result, segment);
             free(segment);
             if (input[*i] == quote)
                 (*i)++;
@@ -138,7 +131,7 @@ void	extract_word(char *input, int *i, t_token **tokens)
 					&& input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
                 (*i)++;
             segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin_free(result, segment);
+            result = ft_strjoin(result, segment);
             free(segment);
         }
     }

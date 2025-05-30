@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   here_document.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/23 17:25:57 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 13:50:07 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	here_doc(const char *delim)
+int	here_doc(const char *delim, int heredoc_expand, t_env *env)
 {
 	int		pipe_fd[2];
 	char	*line;
@@ -32,8 +32,15 @@ int	here_doc(const char *delim)
 			free(line);
 			break ;
 		}
-		ft_putstr_fd(line, pipe_fd[1]);
-		ft_putstr_fd("\n", pipe_fd[1]);
+		if (heredoc_expand)
+		{
+			char *expanded = expand_token_value(line, env, g_signal_status);
+			write(pipe_fd[1], expanded, ft_strlen(expanded));
+			free(expanded);
+		}
+		else
+			write(pipe_fd[1], line, ft_strlen(line));
+		write(pipe_fd[1], "\n", 1);
 		free(line);
 	}
 	close(pipe_fd[1]);

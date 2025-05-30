@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_pipe.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/27 12:48:56 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 13:54:59 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ void handle_child_process(t_command *cmds, char **envp, int in_fd,
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 	}
-	if (command_redirections(cmds) == 0)
+	if (command_redirections(cmds, env) == 0)
 		exit(cmds->status);
 	if (!cmds->path)
 		init_command_path(cmds, envp);

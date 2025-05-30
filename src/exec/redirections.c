@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/25 12:29:30 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 13:52:40 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int redirect_output(char *outfile, bool append)
 	return (1);
 }
 
-int command_redirections(t_command *cmd)
+int command_redirections(t_command *cmd, t_env *env)
 {
 	int fd;
 
@@ -73,7 +73,7 @@ int command_redirections(t_command *cmd)
 	}
 	if (cmd->here_doc == TOKEN_HEREDOC && cmd->heredoc_delim)
 	{
-		fd = here_doc(cmd->heredoc_delim);
+		fd = here_doc(cmd->heredoc_delim, cmd->heredoc_expand, env);
 		if (fd == -1)
 			return (0);
 		dup2(fd, STDIN_FILENO);

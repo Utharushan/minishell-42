@@ -136,10 +136,10 @@ int check_input(char *input)
 	return (0);
 }
 
-t_command *init(t_token *tokens, t_command *cmds, char **envp, char *input)
+t_command *init(t_token *tokens, t_command *cmds, char **envp, char *input, t_env *env)
 {
 	tokens = lexer(input);
-	cmds = parse_tokens(tokens);
+	cmds = parse_tokens(tokens, env);
 	init_command_path(cmds, envp);
 	free(input);
 	return (cmds);
@@ -173,9 +173,9 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (!check_input(input))
 		{
-			cmds = init(tokens, cmds, envp, input);
+			cmds = init(tokens, cmds, envp, input, env);
 			run_pipe(cmds, envp, env);
-			free_struct(cmds);
+			free_command_list(cmds);
 		}
 		// free(input);
 	}

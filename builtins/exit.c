@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/17 14:01:04 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 14:15:06 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,35 @@ int free_struct(t_command *cmds)
 		cmds = tmp;
 	}
 	return (0);
+}
+
+void	free_command_list(t_command *cmd)
+{
+	t_command *tmp;
+	int i;
+
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->args)
+		{
+			i = 0;
+			while (cmd->args[i])
+			{
+				free(cmd->args[i]);
+				i++;
+			}
+			free(cmd->args);
+		}
+		if (cmd->input)
+			free(cmd->input);
+		if (cmd->output)
+			free(cmd->output);
+		if (cmd->heredoc_delim)
+			free(cmd->heredoc_delim);
+		free(cmd);
+		cmd = tmp;
+	}
 }
 
 int is_numeric(const char *str)
