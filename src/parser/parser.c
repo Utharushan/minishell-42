@@ -42,30 +42,38 @@ Frees the old argument array.
 */
 void	add_argument(t_command *cmd, char *arg)
 {
-	int		count;
-	char	**new_args;
-	int		i;
+    int		count;
+    char	**new_args;
+    int		i;
+    char	*stripped_arg;
 
-	count = 0;
-	while (cmd->args && cmd->args[count])
-	{
-		count++;
-	}
-	new_args = malloc(sizeof(char *) * (count + 2));
-	if (!new_args)
-	{
-		return ;
-	}
-	i = 0;
-	while (i < count)
-	{
-		new_args[i] = cmd->args[i];
-		i++;
-	}
-	new_args[count] = arg;
-	new_args[count + 1] = NULL;
-	free(cmd->args);
-	cmd->args = new_args;
+    count = 0;
+    while (cmd->args && cmd->args[count])
+    {
+        count++;
+    }
+    if ((arg[0] == '"' && arg[ft_strlen(arg) - 1] == '"') ||
+        (arg[0] == '\'' && arg[ft_strlen(arg) - 1] == '\''))
+        stripped_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
+    else
+        stripped_arg = arg;
+    new_args = malloc(sizeof(char *) * (count + 2));
+    if (!new_args)
+    {
+        if (stripped_arg != arg)
+            free(stripped_arg);
+        return ;
+    }
+    i = 0;
+    while (i < count)
+    {
+        new_args[i] = cmd->args[i];
+        i++;
+    }
+    new_args[count] = stripped_arg;
+    new_args[count + 1] = NULL;
+    free(cmd->args);
+    cmd->args = new_args;
 }
 
 /*

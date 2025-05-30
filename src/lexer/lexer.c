@@ -12,6 +12,13 @@
 
 #include "../../includes/minishell.h"
 
+char *ft_strjoin_free(char *s1, char *s2)
+{
+    char *joined = ft_strjoin(s1, s2);
+    free(s1);
+    return joined;
+}
+
 /*
 Handles the extraction and addition of a token from the input string at position *i.
 Determines the token type and calls extract_word or adds a token accordingly.
@@ -103,14 +110,38 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-	int	start;
+    int		start;
+    char	quote;
+    char	*result;
+    char	*segment;
 
-	start = *i;
-	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-		&& input[*i] != '<' && input[*i] != '>')
-	{
-		(*i)++;
-	}
-	add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD);
-	(*i)--;
+    result = ft_strdup("");
+    while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
+    {
+        if (input[*i] == '"' || input[*i] == '\'')
+        {
+            quote = input[*i];
+            (*i)++;
+            start = *i;
+            while (input[*i] && input[*i] != quote)
+                (*i)++;
+            segment = ft_substr(input, start, *i - start);
+            result = ft_strjoin_free(result, segment);
+            free(segment);
+            if (input[*i] == quote)
+                (*i)++;
+        }
+        else
+        {
+            start = *i;
+            while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
+					&& input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
+                (*i)++;
+            segment = ft_substr(input, start, *i - start);
+            result = ft_strjoin_free(result, segment);
+            free(segment);
+        }
+    }
+    add_token(tokens, result, TOKEN_WORD);
+    (*i)--;
 }

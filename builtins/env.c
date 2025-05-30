@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/30 11:56:40 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 13:00:59 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,8 @@ t_env	*init_env(char **envp, t_env *env)
 
 void	ft_env(t_env *env)
 {
-	int	i;
-
 	if (!env)
 		return ;
-	i = 0;
 	while (env)
 	{
 		if (env->name && env->value)
