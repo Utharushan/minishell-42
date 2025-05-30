@@ -72,7 +72,9 @@ void run_builtins(t_command *cmds, t_env *env)
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
 		ft_env(env);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
-		ft_export(env, cmds->args[1]);
+		ft_export(env, cmds->args);
+	else if (!ft_strncmp(cmds->args[0], "unset", 6))
+		ft_unset(env, cmds->args[1]);
 }
 int is_builtins(t_command *cmds)
 {
@@ -86,6 +88,8 @@ int is_builtins(t_command *cmds)
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
 		return (0);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
+		return (0);
+	else if (!ft_strncmp(cmds->args[0], "unset", 6))
 		return (0);
 	else
 		return (1);

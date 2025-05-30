@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/27 10:30:36 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 11:56:40 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ t_env	*init_env(char **envp, t_env *env)
 		if (equal_position)
 		{
 			name = ft_substr(envp[i], 0, equal_position - envp[i]);
-			value = ft_strdup(equal_position);
+			value = ft_strdup(equal_position + 1);
 			new_env = new_env_node(name, value);
 			if (!new_env)
 			{
@@ -77,9 +77,10 @@ void	ft_env(t_env *env)
 	i = 0;
 	while (env)
 	{
-		if (ft_strchr(env->value, '='))
+		if (env->name && env->value)
 		{
 			ft_putstr_fd(env->name, 1);
+			ft_putchar_fd('=', 1);
 			ft_putstr_fd(env->value, 1);
 			ft_putchar_fd('\n', 1);
 		}

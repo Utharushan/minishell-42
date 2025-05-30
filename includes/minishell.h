@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/27 12:43:57 by ebella           ###   ########.fr       */
+/*   Updated: 2025/05/30 11:49:39 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
 void					ft_exit(char **args, t_command *cmds);
 void					ft_env(t_env *env);
-int						ft_export(t_env *env, char *str);
+int						ft_export(t_env *env, char **args);
+void					ft_unset(t_env *env, char *name);
 
 //--- PIPES ---
 void					run_pipe(t_command *cmds, char **envp, t_env *env);
@@ -156,5 +157,6 @@ char					*build_full_path(char *dir, char *cmd);
 int						find_cmd_in_path(t_command *cmds);
 int						count_cmds(t_command *cmds);
 void					close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
+int						env_found(t_env *env, char *name);
 
 #endif
