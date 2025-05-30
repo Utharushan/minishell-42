@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/30 14:14:20 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:34:59 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ void					ft_exit(char **args, t_command *cmds);
 void					ft_env(t_env *env);
 int						ft_export(t_env *env, char **args);
 void					ft_unset(t_env *env, char *name);
+int						ft_cd(t_command *cmds, t_env *env);
 
 //--- PIPES ---
 void					run_pipe(t_command *cmds, char **envp, t_env *env);
@@ -152,7 +153,8 @@ int						here_doc(const char *delim, int heredoc_expand, t_env *env);
 t_env					*new_env_node(char *name, char *value);
 void					add_env_back(t_env **env, t_env *new);
 t_env					*init_env(char **envp, t_env *env);
-
+char					*ft_getenv(t_env *env, const char *name);
+void					ft_setenv(t_env *env, const char *name, const char *value);
 //--- UTILS ---
 int						free_struct(t_command *cmds);
 void					free_command_list(t_command *cmd);

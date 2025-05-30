@@ -56,7 +56,9 @@ void run_builtins(t_command *cmds, t_env *env)
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return ;
 
-	if (!ft_strncmp(cmds->args[0], "echo", 5))
+	if (!ft_strncmp(cmds->args[0], "cd", 3))
+		cmds->status = ft_cd(cmds, env);
+	else if (!ft_strncmp(cmds->args[0], "echo", 5))
 	{
 		if (cmds->args[1] && !ft_strncmp(cmds->args[1], "$?", 3))
 		{
@@ -81,7 +83,9 @@ int is_builtins(t_command *cmds)
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (1);
 
-	if (!ft_strncmp(cmds->args[0], "echo", 5))
+	if (!ft_strncmp(cmds->args[0], "cd", 3))
+		return (0);
+	else if (!ft_strncmp(cmds->args[0], "echo", 5))
 		return (0);
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
 		return (0);
