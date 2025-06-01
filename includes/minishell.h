@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/30 14:34:59 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/01 14:30:12 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,8 +140,8 @@ int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
 void					ft_exit(char **args, t_command *cmds);
 void					ft_env(t_env *env);
-int						ft_export(t_env *env, char **args);
-void					ft_unset(t_env *env, char *name);
+void					ft_export(t_env *env, char **args);
+void					ft_unset(t_env **env, char *name);
 int						ft_cd(t_command *cmds, t_env *env);
 
 //--- PIPES ---
@@ -163,5 +163,9 @@ int						find_cmd_in_path(t_command *cmds);
 int						count_cmds(t_command *cmds);
 void					close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
 int						env_found(t_env *env, char *name);
-
+void					export_error(char *arg);
+char					*find_plus_equal(char *str);
+void					append_env_value(t_env *env, char *name, char *to_append);
+int						handle_plus_equal(t_env *env, char *arg);
+int						argv_parsed(char *name);
 #endif

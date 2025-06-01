@@ -39,7 +39,8 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(BUILTINS_DIR)/cd.c \
 			  $(BUILTINS_DIR)/env_utils.c \
 			  $(BUILTINS_DIR)/export.c \
-			  $(BUILTINS_DIR)/unset.c 
+			  $(BUILTINS_DIR)/unset.c \
+			  $(BUILTINS_DIR)/export_utils.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
