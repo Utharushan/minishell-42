@@ -58,3 +58,14 @@ void	handle_redirection(t_command *cmd, t_token **tokens)
         cmd->append = (type == TOKEN_REDIRECT_APPEND);
     }
 }
+
+int	validate_quotes(const char *input, int start, char quote)
+{
+	while (input[start])
+	{
+		if (input[start] == quote)
+			return (1);
+		start++;
+	}
+	return (0);
+}

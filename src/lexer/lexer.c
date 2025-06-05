@@ -18,22 +18,22 @@ Determines the token type and calls extract_word or adds a token accordingly.
 */
 void	handle_token(char *input, int *i, t_token **tokens)
 {
-	t_token_type	type;
-	int				length;
+    t_token_type	type;
+    int				length;
 
-	type = get_token_type(input, i);
-	if (type == TOKEN_WORD)
-	{
-		extract_word(input, i, tokens);
-	}
-	else
-	{
-		if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
-			length = 2;
-		else
-			length = 1;
-		add_token(tokens, ft_substr(input, *i, length), type);
-	}
+    type = get_token_type(input, i);
+    if (type == TOKEN_WORD)
+    {
+        extract_word(input, i, tokens);
+    }
+    else
+    {
+        if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
+            length = 2;
+        else
+            length = 1;
+        add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED);
+    }
 }
 
 /*
@@ -44,23 +44,23 @@ Returns the head of the token list.
 */
 t_token	*lexer(char *input)
 {
-	t_token	*tokens;
-	int		i;
+    t_token	*tokens;
+    int		i;
 
-	tokens = NULL;
-	i = 0;
-	while (input[i])
-	{
-		if (ft_isspace(input[i]))
-		{
-			i++;
-			continue ;
-		}
-		handle_token(input, &i, &tokens);
-		i++;
-	}
-	add_token(&tokens, NULL, TOKEN_EOF);
-	return (tokens);
+    tokens = NULL;
+    i = 0;
+    while (input[i])
+    {
+        if (ft_isspace(input[i]))
+        {
+            i++;
+            continue ;
+        }
+        handle_token(input, &i, &tokens);
+        i++;
+    }
+    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED);
+    return (tokens);
 }
 
 /*
@@ -103,17 +103,27 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-    int		start;
-    char	quote;
-    char	*result;
-    char	*segment;
+    int			start;
+    char		quote;
+    char		*result;
+    char		*segment;
+    t_word_type	wt = WORD_UNQUOTED;
+    int			quoted = 0;
 
     result = ft_strdup("");
     while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
     {
-        if (input[*i] == '"' || input[*i] == '\'')
+        if ((input[*i] == '"' || input[*i] == '\'') && !quoted)
         {
             quote = input[*i];
+            if (!validate_quotes(input, *i + 1, quote))
+            {
+                ft_printf("minishell: syntax error: unmatched %c\n", quote);
+                free(result);
+                return;
+            }
+            quoted = 1;
+            wt = (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED;
             (*i)++;
             start = *i;
             while (input[*i] && input[*i] != quote)
@@ -128,13 +138,14 @@ void	extract_word(char *input, int *i, t_token **tokens)
         {
             start = *i;
             while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-					&& input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
+                    && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
                 (*i)++;
             segment = ft_substr(input, start, *i - start);
             result = ft_strjoin(result, segment);
             free(segment);
         }
     }
-    add_token(tokens, result, TOKEN_WORD);
+    add_token(tokens, result, TOKEN_WORD, wt);
     (*i)--;
 }
+
