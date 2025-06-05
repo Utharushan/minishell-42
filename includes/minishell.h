@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/01 14:30:12 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/05 17:54:05 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,13 +83,13 @@ typedef struct s_redir
 {
 	char				*file;
 	int					type;
+	int					heredoc_expand;
 	struct s_redir		*next;
 }						t_redir;
 
 typedef struct s_command
 {
 	char				**args;
-	char				**path;
 	char				*input;
 	char				*output;
 	bool				append;
@@ -130,8 +130,7 @@ void					print_tokens(t_token *tokens);
 void					print_commands(t_command *cmds);
 
 // --- TESTING EXEC ---
-int						exec_command(t_command *cmd, char **envp);
-int						init_command_path(t_command *cmd, char **envp);
+int						exec_command(t_command *cmd, t_env *env);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
@@ -145,7 +144,7 @@ void					ft_unset(t_env **env, char *name);
 int						ft_cd(t_command *cmds, t_env *env);
 
 //--- PIPES ---
-void					run_pipe(t_command *cmds, char **envp, t_env *env);
+void					run_pipe(t_command *cmds, t_env *env);
 int						command_redirections(t_command *cmd, t_env *env);
 int						here_doc(const char *delim, int heredoc_expand, t_env *env);
 
@@ -156,10 +155,9 @@ t_env					*init_env(char **envp, t_env *env);
 char					*ft_getenv(t_env *env, const char *name);
 void					ft_setenv(t_env *env, const char *name, const char *value);
 //--- UTILS ---
-int						free_struct(t_command *cmds);
 void					free_command_list(t_command *cmd);
 char					*build_full_path(char *dir, char *cmd);
-int						find_cmd_in_path(t_command *cmds);
+int						find_cmd_in_path(t_command *cmds, t_env *env);
 int						count_cmds(t_command *cmds);
 void					close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
 int						env_found(t_env *env, char *name);
@@ -168,4 +166,11 @@ char					*find_plus_equal(char *str);
 void					append_env_value(t_env *env, char *name, char *to_append);
 int						handle_plus_equal(t_env *env, char *arg);
 int						argv_parsed(char *name);
+char 					**env_to_envp(t_env *env);
+char 					**get_path_dirs(t_env *env);
+void 					free_env_list(t_env *env);
+void 					free_token_list(t_token *tokens);
+
+
+
 #endif

@@ -12,6 +12,29 @@
 
 #include "../../includes/minishell.h"
 
+static void	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
+{
+    t_redir *new;
+	t_redir *tmp;
+
+	new = malloc(sizeof(t_redir));
+    if (!new)
+        return;
+    new->file = ft_strdup(file);
+    new->type = type;
+    new->heredoc_expand = heredoc_expand;
+    new->next = NULL;
+    if (!cmd->redir)
+        cmd->redir = new;
+    else
+    {
+        tmp = cmd->redir;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = new;
+    }
+}
+
 /*
 Allocates and initializes a new command structure.
 Sets all fields to default values (NULL, false, OP_NONE).
@@ -31,6 +54,7 @@ t_command	*new_command(void)
 	cmd->next_op = OP_NONE;
 	cmd->next = NULL;
 	cmd->heredoc_delim = NULL;
+	cmd->redir = NULL;
 	return (cmd);
 }
 
@@ -94,6 +118,9 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
 	t_command	*cmd;
 	t_command	*head;
+	char 		*expanded;
+	int 		expand;
+	t_token_type type;
 
 	cmd = new_command();
 	head = cmd;
@@ -101,7 +128,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	{
 		if (tokens->type == TOKEN_WORD)
 		{
-			char *expanded = expand_token_value(tokens->value, env, g_signal_status);
+			 expanded = expand_token_value(tokens->value, env, g_signal_status);
 			add_argument(cmd, expanded);
 			free(expanded);
 		}
@@ -113,21 +140,18 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 			|| tokens->type == TOKEN_REDIRECT_OUT
 			|| tokens->type == TOKEN_REDIRECT_APPEND)
 		{
-			handle_redirection(cmd, &tokens);
+			type = tokens->type;
+			tokens = tokens->next;
+			if (tokens && tokens->type == TOKEN_WORD)
+				add_redir(cmd, type, tokens->value, 0);
 		}
 		else if (tokens->type == TOKEN_HEREDOC)
 		{
 			tokens = tokens->next;
 			if (tokens && tokens->type == TOKEN_WORD)
 			{
-				cmd->here_doc = TOKEN_HEREDOC;
-				if (cmd->heredoc_delim)
-					free(cmd->heredoc_delim);
-				cmd->heredoc_delim = ft_strdup(tokens->value);
-				if (tokens->value[0] != '\'' && tokens->value[0] != '"')
-					cmd->heredoc_expand = 1;
-				else
-					cmd->heredoc_expand = 0;
+				expand = (tokens->value[0] != '\'' && tokens->value[0] != '"');
+				add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
 			}
 		}
 		tokens = tokens->next;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_pipe.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/30 13:54:59 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/05 18:44:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void wait_for_pids(t_command *cmds, pid_t *pid)
 		i++;
 	}
 }
+
 /*
 Check's if in_fd is not equal to zero, that means that we need to redirect stdin
 into our pipe in_fd,
@@ -96,7 +97,7 @@ If everything is good we execute it.
 
 and we exit with the current exit code.
 */
-void handle_child_process(t_command *cmds, char **envp, int in_fd,
+void handle_child_process(t_command *cmds, int in_fd,
 						  int *pipe_fd, t_env *env)
 {
 	if (in_fd != 0)
@@ -112,22 +113,20 @@ void handle_child_process(t_command *cmds, char **envp, int in_fd,
 	}
 	if (command_redirections(cmds, env) == 0)
 		exit(cmds->status);
-	if (!cmds->path)
-		init_command_path(cmds, envp);
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, cmds);
 	if (is_builtins(cmds) == 0)
 		run_builtins(cmds, env);
-	else 
+	else
 	{
-		if (find_cmd_in_path(cmds))
+		if (find_cmd_in_path(cmds, env))
 		{
 			ft_putstr_fd(cmds->args[0], 2);
 			ft_putstr_fd(": command not found\n", 2);
 			cmds->status = 127;
 		}
 		else
-			exec_command(cmds, envp);
+			exec_command(cmds, env);
 	}
 	exit(cmds->status);
 }
@@ -139,7 +138,7 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void run_pipe(t_command *cmds, char **envp, t_env *env)
+void run_pipe(t_command *cmds, t_env *env)
 {
 	int pipe_fd[2];
 	int in_fd;
@@ -157,22 +156,23 @@ void run_pipe(t_command *cmds, char **envp, t_env *env)
 	{
 		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE)
-			|| is_builtins(cmds) == 1)
+		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE) || is_builtins(cmds) == 1)
 		{
 			create_pipe(cmds, pipe_fd);
 			pid[i] = create_child_process();
 			if (pid[i++] == 0)
-				handle_child_process(cmds, envp, in_fd, pipe_fd, env);
+				handle_child_process(cmds, in_fd, pipe_fd, env);
 			else
 				close_fd(&in_fd, cmds, pipe_fd);
 			cmds = cmds->next;
-		}else
+		}
+		else
 		{
 			run_builtins(cmds, env);
-			return ;
+			return;
 		}
 	}
 	cmds = first_cmds;
 	wait_for_pids(cmds, pid);
+	free(pid);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/30 13:52:40 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/05 18:33:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,39 +55,56 @@ int redirect_output(char *outfile, bool append)
 	return (1);
 }
 
-int command_redirections(t_command *cmd, t_env *env)
+int	command_redirections(t_command *cmd, t_env *env)
 {
-	int fd;
+    int		fd = -1;
+    t_redir	*redir;
+    t_redir	*last_heredoc;
 
-	if (cmd->input)
-	{
-		fd = open(cmd->input, O_RDONLY);
-		if (fd == -1)
-		{
-			perror(cmd->input);
-			cmd->status = 1;
-			exit(cmd->status);
-		}
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	if (cmd->here_doc == TOKEN_HEREDOC && cmd->heredoc_delim)
-	{
-		fd = here_doc(cmd->heredoc_delim, cmd->heredoc_expand, env);
-		if (fd == -1)
-			return (0);
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	if (cmd->input && cmd->here_doc != TOKEN_HEREDOC)
-	{
-		if (redirect_input(cmd->input) == 0)
-			return (0);
-	}
-	if (cmd->output)
-	{
-		if (redirect_output(cmd->output, cmd->append) == 0)
-			return (0);
-	}
-	return (1);
+	redir = cmd->redir;
+	last_heredoc = NULL;
+    while (redir)
+    {
+        if (redir->type == TOKEN_HEREDOC)
+            last_heredoc = redir;
+        redir = redir->next;
+    }
+
+    redir = cmd->redir;
+    while (redir)
+    {
+        if (redir->type == TOKEN_REDIRECT_IN)
+        {
+            if (redirect_input(redir->file) == 0)
+                return (0);
+        }
+        else if (redir->type == TOKEN_REDIRECT_OUT)
+        {
+            if (redirect_output(redir->file, false) == 0)
+                return (0);
+        }
+        else if (redir->type == TOKEN_REDIRECT_APPEND)
+        {
+            if (redirect_output(redir->file, true) == 0)
+                return (0);
+        }
+        else if (redir->type == TOKEN_HEREDOC)
+        {
+            fd = here_doc(redir->file, redir->heredoc_expand, env);
+            if (fd == -1)
+                return (0);
+            if (redir == last_heredoc)
+            {
+                if (dup2(fd, STDIN_FILENO) == -1)
+                {
+                    perror("dup2");
+                    close(fd);
+                    return (0);
+                }
+            }
+            close(fd);
+        }
+        redir = redir->next;
+    }
+    return (1);
 }

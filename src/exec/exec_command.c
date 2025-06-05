@@ -6,38 +6,16 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/16 12:03:48 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/05 18:11:16 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	init_command_path(t_command *cmd, char **envp)
+char *build_full_path(char *dir, char *cmd)
 {
-	int	i;
-
-	i = 0;
-	if (!cmd || !envp)
-		return (1);
-	while (envp[i])
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-		{
-			cmd->path = ft_split(envp[i] + 5, ':');
-			if (!cmd->path)
-				return (1);
-			return (0);
-		}
-		i++;
-	}
-	cmd->path = NULL;
-	return (0);
-}
-
-char	*build_full_path(char *dir, char *cmd)
-{
-	char	*tmp;
-	char	*full_path;
+	char *tmp;
+	char *full_path;
 
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
@@ -47,26 +25,51 @@ char	*build_full_path(char *dir, char *cmd)
 	return (full_path);
 }
 
-int	exec_command(t_command *cmd, char **envp)
+int exec_command(t_command *cmd, t_env *env)
 {
-	int		i;
-	char	*full_path;
+	int i;
+	char *full_path;
+	char **envp;
+	char **path_dirs;
 
-	i = 0;
-	while (cmd->path && cmd->path[i])
+	envp = env_to_envp(env);
+	path_dirs = get_path_dirs(env);
+	if (ft_strchr(cmd->args[0], '/'))
 	{
-		full_path = build_full_path(cmd->path[i], cmd->args[0]);
+		execve(cmd->args[0], cmd->args, envp);
+		perror("execve");
+		free(envp);
+		return (127);
+	}
+	i = 0;
+	while (path_dirs && path_dirs[i])
+	{
+		full_path = build_full_path(path_dirs[i], cmd->args[0]);
 		if (!full_path)
-			return (1);
+			break;
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			execve(full_path, cmd->args, envp);
 			perror("execve");
 			free(full_path);
-			return (127);
+			break;
 		}
 		free(full_path);
 		i++;
+	}
+	if (path_dirs)
+	{
+		i = 0;
+		while (path_dirs[i])
+			free(path_dirs[i++]);
+		free(path_dirs);
+	}
+	if (envp)
+	{
+		i = 0;
+		while (envp[i])
+			free(envp[i++]);
+		free(envp);
 	}
 	perror(cmd->args[0]);
 	return (127);

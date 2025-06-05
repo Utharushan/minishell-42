@@ -32,6 +32,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/exec/redirections.c \
 			  $(SRC_DIR)/exec/here_document.c \
 			  $(SRC_DIR)/exec/pipe_utils.c \
+			  $(SRC_DIR)/exec/free_utils.c \
 			  $(BUILTINS_DIR)/echo.c \
 			  $(BUILTINS_DIR)/pwd.c \
 			  $(BUILTINS_DIR)/exit.c \
@@ -40,7 +41,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(BUILTINS_DIR)/env_utils.c \
 			  $(BUILTINS_DIR)/export.c \
 			  $(BUILTINS_DIR)/unset.c \
-			  $(BUILTINS_DIR)/export_utils.c
+			  $(BUILTINS_DIR)/export_utils.c 
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 

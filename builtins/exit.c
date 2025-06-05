@@ -3,77 +3,57 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/05/30 14:15:06 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/05 17:45:06 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void free_command(t_command *cmd)
+void	free_redir(t_redir *redir)
 {
-	int i = 0;
-
-	if (!cmd)
-		return;
-	if (cmd->args)
-	{
-		while (cmd->args[i])
-			free(cmd->args[i++]);
-		free(cmd->args);
-	}
-	i = 0;
-	if (cmd->path)
-	{
-		while (cmd->path[i])
-			free(cmd->path[i++]);
-		free(cmd->path);
-	}
-	free(cmd);
-}
-
-int free_struct(t_command *cmds)
-{
-	t_command *tmp;
-
-	while (cmds)
-	{
-		tmp = cmds->next;
-		free_command(cmds);
-		cmds = tmp;
-	}
-	return (0);
+    t_redir *tmp;
+    while (redir)
+    {
+        tmp = redir;
+        if (redir->file)
+            free(redir->file);		
+		redir = redir->next;
+        free(tmp);
+    }
 }
 
 void	free_command_list(t_command *cmd)
 {
-	t_command *tmp;
-	int i;
+    t_command *tmp;
+    int i;
 
-	while (cmd)
-	{
-		tmp = cmd->next;
-		if (cmd->args)
+    while (cmd)
+    {
+        tmp = cmd->next;
+        if (cmd->args)
+        {
+            i = 0;
+            while (cmd->args[i])
+                free(cmd->args[i++]);
+            free(cmd->args);
+        }
+        if (cmd->input)
+            free(cmd->input);
+        if (cmd->output)
+            free(cmd->output);
+        if (cmd->heredoc_delim)
+            free(cmd->heredoc_delim);
+		if (cmd->redir)
 		{
-			i = 0;
-			while (cmd->args[i])
-			{
-				free(cmd->args[i]);
-				i++;
-			}
-			free(cmd->args);
+			free_redir(cmd->redir);
+			cmd->redir = NULL;
 		}
-		if (cmd->input)
-			free(cmd->input);
-		if (cmd->output)
-			free(cmd->output);
-		if (cmd->heredoc_delim)
-			free(cmd->heredoc_delim);
-		free(cmd);
-		cmd = tmp;
-	}
+        free(cmd);
+        cmd = tmp;
+    }
 }
 
 int is_numeric(const char *str)

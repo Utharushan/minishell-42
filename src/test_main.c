@@ -54,7 +54,7 @@ void print_commands(t_command *cmds)
 void run_builtins(t_command *cmds, t_env *env)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
-		return ;
+		return;
 
 	if (!ft_strncmp(cmds->args[0], "cd", 3))
 		cmds->status = ft_cd(cmds, env);
@@ -99,32 +99,42 @@ int is_builtins(t_command *cmds)
 		return (1);
 }
 
-int find_cmd_in_path(t_command *cmds)
+int find_cmd_in_path(t_command *cmd, t_env *env)
 {
 	char *full_path;
+	char **path_dirs;
 	int i;
 
-	if (!cmds || !cmds->path || !cmds->args[0])
+	if (!cmd || !cmd->args || !cmd->args[0])
+		return (1);
+	if (ft_strchr(cmd->args[0], '/'))
+		return (access(cmd->args[0], F_OK | X_OK) == 0 ? 0 : 1);
+
+	path_dirs = get_path_dirs(env);
+	if (!path_dirs)
 		return (1);
 
 	i = 0;
-	while (cmds->path[i])
+	while (path_dirs[i])
 	{
-		full_path = ft_strjoin(cmds->path[i], "/");
+		full_path = build_full_path(path_dirs[i], cmd->args[0]);
 		if (!full_path)
-			return (1);
-		char *tmp = ft_strjoin(full_path, cmds->args[0]);
-		free(full_path);
-		if (!tmp)
-			return (1);
-		if (access(tmp, F_OK | X_OK) == 0)
+			break;
+		if (access(full_path, F_OK | X_OK) == 0)
 		{
-			free(tmp);
+			free(full_path);
+			while (path_dirs[i])
+				free(path_dirs[i++]);
+			free(path_dirs);
 			return (0);
 		}
-		free(tmp);
+		free(full_path);
 		i++;
 	}
+	i = 0;
+	while (path_dirs[i])
+		free(path_dirs[i++]);
+	free(path_dirs);
 	return (1);
 }
 
@@ -140,18 +150,23 @@ int check_input(char *input)
 	return (0);
 }
 
-t_command *init(t_token *tokens, t_command *cmds, char **envp, char *input, t_env *env)
+t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 {
 	tokens = lexer(input);
 	cmds = parse_tokens(tokens, env);
-	init_command_path(cmds, envp);
+	free_token_list(tokens);
 	free(input);
 	return (cmds);
 }
 
-void sig_handle(int sig)
+void sigint_handler(int sig)
 {
 	(void)sig;
+	g_signal_status = 130;
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 int main(int argc, char **argv, char **envp)
@@ -166,9 +181,11 @@ int main(int argc, char **argv, char **envp)
 	cmds = NULL;
 	tokens = NULL;
 	env = init_env(envp, NULL);
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
-		input = readline("minishell>");
+		input = readline("minishell> ");
 		add_history(input);
 		if (!input)
 		{
@@ -177,11 +194,17 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (!check_input(input))
 		{
-			cmds = init(tokens, cmds, envp, input, env);
-			run_pipe(cmds, envp, env);
+			cmds = init(tokens, cmds, input, env);
+			run_pipe(cmds, env);
 			free_command_list(cmds);
+			free_token_list(tokens);
+			if (g_signal_status == 130)
+			{
+				g_signal_status = 0;
+				continue;
+			}
 		}
-		// free(input);
 	}
+	free_env_list(env);
 	return (0);
 }

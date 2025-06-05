@@ -1,20 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_errors.c                                     :+:      :+:    :+:   */
+/*   free_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/20 11:13:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:11:33 by ebella           ###   ########.fr       */
+/*   Created: 2025/06/05 17:46:20 by ebella            #+#    #+#             */
+/*   Updated: 2025/06/05 18:11:25 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void print_error(t_command *cmds)
+void free_token_list(t_token *tokens)
 {
-	ft_putstr_fd(cmds->args[0], 2);
-	ft_putstr_fd(": command not found\n", 2);
-	cmds->status = 127;
+	t_token *tmp;
+	while (tokens)
+	{
+		tmp = tokens->next;
+		free(tokens->value);
+		free(tokens);
+		tokens = tmp;
+	}
+}
+
+void free_env_list(t_env *env)
+{
+	t_env *tmp;
+	while (env)
+	{
+		tmp = env->next;
+		free(env->name);
+		free(env->value);
+		free(env);
+		env = tmp;
+	}
 }
