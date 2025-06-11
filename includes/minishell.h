@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/11 22:37:42 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 22:39:08 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ typedef struct s_token
 {
     char			*value;
     t_token_type	type;
-    t_word_type		word_type; // <-- add this
+    t_word_type		word_type;
     struct s_token	*next;
 }	t_token;
 
@@ -181,6 +181,8 @@ char 					**get_path_dirs(t_env *env);
 void 					free_env_list(t_env *env);
 void 					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start, char quote);
+void 					sigint_handler(int sig);
+int 					prepare_heredocs(t_command *cmds, t_env *env);
 
 
 #endif
