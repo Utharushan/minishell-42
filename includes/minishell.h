@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/11 14:15:59 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 22:37:42 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,14 +60,24 @@ typedef enum e_token_type
 	TOKEN_EOF
 }						t_token_type;
 
+// --- WORD TYPES ---
+
+typedef enum e_word_type
+{
+    WORD_UNQUOTED,
+    WORD_SINGLE_QUOTED,
+    WORD_DOUBLE_QUOTED
+}	t_word_type;
+
 // --- TOKEN LINKED LIST ---
 
 typedef struct s_token
 {
-	char				*value;
-	t_token_type		type;
-	struct s_token		*next;
-}						t_token;
+    char			*value;
+    t_token_type	type;
+    t_word_type		word_type; // <-- add this
+    struct s_token	*next;
+}	t_token;
 
 // --- COMMAND STRUCTURE ---
 
@@ -107,9 +117,8 @@ typedef struct s_command
 
 // --- LEXER ---
 
-t_token					*new_token(char *value, t_token_type type);
-void					add_token(t_token **tokens, char *value,
-							t_token_type type);
+t_token					*new_token(char *value, t_token_type type, t_word_type word_type);
+void					add_token(t_token **tokens, char *value, t_token_type type, t_word_type word_type);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
@@ -171,9 +180,7 @@ char 					**env_to_envp(t_env *env);
 char 					**get_path_dirs(t_env *env);
 void 					free_env_list(t_env *env);
 void 					free_token_list(t_token *tokens);
-int 					prepare_heredocs(t_command *cmds, t_env *env);
-void 					sigint_handler(int sig);
-
+int						validate_quotes(const char *input, int start, char quote);
 
 
 #endif

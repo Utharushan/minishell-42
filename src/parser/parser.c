@@ -116,45 +116,52 @@ Returns the head of the command list.
 */
 t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
-	t_command	*cmd;
-	t_command	*head;
-	char 		*expanded;
-	int 		expand;
-	t_token_type type;
+    t_command	*cmd;
+    t_command	*head;
+    char 		*expanded;
+    int 		expand;
+    t_token_type type;
 
-	cmd = new_command();
-	head = cmd;
-	while (tokens && tokens->type != TOKEN_EOF)
-	{
-		if (tokens->type == TOKEN_WORD)
-		{
-			 expanded = expand_token_value(tokens->value, env, g_signal_status);
-			add_argument(cmd, expanded);
-			free(expanded);
-		}
-		else if (tokens->type == TOKEN_PIPE)
-		{
-			cmd = handle_pipe(cmd);
-		}
-		else if (tokens->type == TOKEN_REDIRECT_IN
-			|| tokens->type == TOKEN_REDIRECT_OUT
-			|| tokens->type == TOKEN_REDIRECT_APPEND)
-		{
-			type = tokens->type;
-			tokens = tokens->next;
-			if (tokens && tokens->type == TOKEN_WORD)
-				add_redir(cmd, type, tokens->value, 0);
-		}
-		else if (tokens->type == TOKEN_HEREDOC)
-		{
-			tokens = tokens->next;
-			if (tokens && tokens->type == TOKEN_WORD)
-			{
-				expand = (tokens->value[0] != '\'' && tokens->value[0] != '"');
-				add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
-			}
-		}
-		tokens = tokens->next;
-	}
-	return (head);
+    cmd = new_command();
+    head = cmd;
+    while (tokens && tokens->type != TOKEN_EOF)
+    {
+        if (tokens->type == TOKEN_WORD)
+        {
+            if (tokens->word_type == WORD_SINGLE_QUOTED)
+            {
+                add_argument(cmd, ft_strdup(tokens->value));
+            }
+            else
+            {
+                expanded = expand_token_value(tokens->value, env, g_signal_status);
+                add_argument(cmd, expanded);
+                free(expanded);
+            }
+        }
+        else if (tokens->type == TOKEN_PIPE)
+        {
+            cmd = handle_pipe(cmd);
+        }
+        else if (tokens->type == TOKEN_REDIRECT_IN
+            || tokens->type == TOKEN_REDIRECT_OUT
+            || tokens->type == TOKEN_REDIRECT_APPEND)
+        {
+            type = tokens->type;
+            tokens = tokens->next;
+            if (tokens && tokens->type == TOKEN_WORD)
+                add_redir(cmd, type, tokens->value, 0);
+        }
+        else if (tokens->type == TOKEN_HEREDOC)
+        {
+            tokens = tokens->next;
+            if (tokens && tokens->type == TOKEN_WORD)
+            {
+                expand = (tokens->word_type == WORD_UNQUOTED);
+                add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
+            }
+        }
+        tokens = tokens->next;
+    }
+    return (head);
 }
