@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:28:12 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 14:15:42 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,36 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env)
 		free(line);
 	}
 	close(pipe_fd[1]);
-	signal(SIGINT, SIG_DFL);
+	signal(SIGINT, sigint_handler);
 	if (g_signal_status == 130)
 	{
 		close(pipe_fd[0]);
 		return (-1);
 	}
 	return (pipe_fd[0]);
+}
+
+int prepare_heredocs(t_command *cmds, t_env *env)
+{
+    t_command *c = cmds;
+    t_redir *r;
+    int fd;
+
+    while (c)
+    {
+        r = c->redir;
+        while (r)
+        {
+            if (r->type == TOKEN_HEREDOC)
+            {
+                fd = here_doc(r->file, r->heredoc_expand, env);
+                if (fd == -1)
+                    return (0);
+                r->heredoc_fd = fd;
+            }
+            r = r->next;
+        }
+        c = c->next;
+    }
+    return (1);
 }

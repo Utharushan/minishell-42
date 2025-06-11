@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:33:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 13:43:50 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,21 +55,19 @@ int redirect_output(char *outfile, bool append)
 	return (1);
 }
 
-int	command_redirections(t_command *cmd, t_env *env)
+int	command_redirections(t_command *cmd)
 {
-    int		fd = -1;
     t_redir	*redir;
     t_redir	*last_heredoc;
 
-	redir = cmd->redir;
-	last_heredoc = NULL;
+    redir = cmd->redir;
+    last_heredoc = NULL;
     while (redir)
     {
         if (redir->type == TOKEN_HEREDOC)
             last_heredoc = redir;
         redir = redir->next;
     }
-
     redir = cmd->redir;
     while (redir)
     {
@@ -90,19 +88,16 @@ int	command_redirections(t_command *cmd, t_env *env)
         }
         else if (redir->type == TOKEN_HEREDOC)
         {
-            fd = here_doc(redir->file, redir->heredoc_expand, env);
-            if (fd == -1)
-                return (0);
             if (redir == last_heredoc)
             {
-                if (dup2(fd, STDIN_FILENO) == -1)
+                if (dup2(redir->heredoc_fd, STDIN_FILENO) == -1)
                 {
                     perror("dup2");
-                    close(fd);
+                    close(redir->heredoc_fd);
                     return (0);
                 }
             }
-            close(fd);
+            close(redir->heredoc_fd);
         }
         redir = redir->next;
     }

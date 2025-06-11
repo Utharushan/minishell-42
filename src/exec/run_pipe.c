@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:44:13 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 14:04:42 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,18 +69,26 @@ it connects the command through the pipes.
 */
 void wait_for_pids(t_command *cmds, pid_t *pid)
 {
-	int i;
+    int i = 0;
 	int status;
 
-	i = 0;
-	while (cmds)
-	{
-		waitpid(pid[i], &status, 0);
-		if (WIFEXITED(status))
-			cmds->status = WEXITSTATUS(status);
-		cmds = cmds->next;
-		i++;
-	}
+	status = 0;
+    while (cmds)
+    {
+        waitpid(pid[i], &status, 0);
+        if (WIFEXITED(status))
+            cmds->status = WEXITSTATUS(status);
+        if (cmds->status == 130)
+        {
+            g_signal_status = 130;
+            rl_on_new_line();
+            rl_replace_line("", 0);
+            rl_redisplay();
+            break;
+        }
+        cmds = cmds->next;
+        i++;
+    }
 }
 
 /*
@@ -111,8 +119,8 @@ void handle_child_process(t_command *cmds, int in_fd,
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 	}
-	if (command_redirections(cmds, env) == 0)
-		exit(cmds->status);
+	if (command_redirections(cmds) == 0)
+		exit(130);
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, cmds);
 	if (is_builtins(cmds) == 0)

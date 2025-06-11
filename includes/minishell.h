@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/05 17:54:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/11 14:15:59 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_redir
 	char				*file;
 	int					type;
 	int					heredoc_expand;
+	int					heredoc_fd;
 	struct s_redir		*next;
 }						t_redir;
 
@@ -145,7 +146,7 @@ int						ft_cd(t_command *cmds, t_env *env);
 
 //--- PIPES ---
 void					run_pipe(t_command *cmds, t_env *env);
-int						command_redirections(t_command *cmd, t_env *env);
+int						command_redirections(t_command *cmd);
 int						here_doc(const char *delim, int heredoc_expand, t_env *env);
 
 //--- ENV ---
@@ -170,6 +171,8 @@ char 					**env_to_envp(t_env *env);
 char 					**get_path_dirs(t_env *env);
 void 					free_env_list(t_env *env);
 void 					free_token_list(t_token *tokens);
+int 					prepare_heredocs(t_command *cmds, t_env *env);
+void 					sigint_handler(int sig);
 
 
 

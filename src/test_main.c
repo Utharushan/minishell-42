@@ -195,6 +195,11 @@ int main(int argc, char **argv, char **envp)
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, input, env);
+			if (!prepare_heredocs(cmds, env))
+			{
+				free_command_list(cmds);
+				continue;
+			}
 			run_pipe(cmds, env);
 			free_command_list(cmds);
 			free_token_list(tokens);
