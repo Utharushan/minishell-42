@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/11 22:38:56 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/13 10:27:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env)
 	}
 	close(pipe_fd[1]);
 	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
 	if (g_signal_status == 130)
 	{
 		close(pipe_fd[0]);
@@ -64,25 +65,26 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env)
 
 int prepare_heredocs(t_command *cmds, t_env *env)
 {
-    t_command *c = cmds;
-    t_redir *r;
+    t_command *commands;
+    t_redir *redirect;
     int fd;
 
-    while (c)
+	commands = cmds;
+    while (commands)
     {
-        r = c->redir;
-        while (r)
+        redirect = commands->redir;
+        while (redirect)
         {
-            if (r->type == TOKEN_HEREDOC)
+            if (redirect->type == TOKEN_HEREDOC)
             {
-                fd = here_doc(r->file, r->heredoc_expand, env);
+                fd = here_doc(redirect->file, redirect->heredoc_expand, env);
                 if (fd == -1)
                     return (0);
-                r->heredoc_fd = fd;
+                redirect->heredoc_fd = fd;
             }
-            r = r->next;
+            redirect = redirect->next;
         }
-        c = c->next;
+        commands = commands->next;
     }
     return (1);
 }

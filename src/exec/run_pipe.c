@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/11 14:04:42 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/13 10:43:21 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ that no pipe was created.
 
 Returns 1 if a pipe was created, 0 otherwise.
 */
-int create_pipe(t_command *cmds, int *pipe_fd)
+int	create_pipe(t_command *cmds, int *pipe_fd)
 {
 	if (cmds->next_op == OP_PIPE)
 	{
@@ -43,9 +43,9 @@ int create_pipe(t_command *cmds, int *pipe_fd)
 Create a child process by using fork().
 Returns the process ID, so we can know if we are in a child process.
 */
-int create_child_process(void)
+int	create_child_process(void)
 {
-	pid_t pid;
+	pid_t	pid;
 
 	pid = fork();
 	if (pid == -1)
@@ -67,28 +67,29 @@ for the next command.
 
 it connects the command through the pipes.
 */
-void wait_for_pids(t_command *cmds, pid_t *pid)
+void	wait_for_pids(t_command *cmds, pid_t *pid)
 {
-    int i = 0;
-	int status;
+	int	i;
+	int	status;
 
+	i = 0;
 	status = 0;
-    while (cmds)
-    {
-        waitpid(pid[i], &status, 0);
-        if (WIFEXITED(status))
-            cmds->status = WEXITSTATUS(status);
-        if (cmds->status == 130)
-        {
-            g_signal_status = 130;
-            rl_on_new_line();
-            rl_replace_line("", 0);
-            rl_redisplay();
-            break;
-        }
-        cmds = cmds->next;
-        i++;
-    }
+	while (cmds)
+	{
+		waitpid(pid[i], &status, 0);
+		if (WIFEXITED(status))
+			cmds->status = WEXITSTATUS(status);
+		if (cmds->status == 130)
+		{
+			g_signal_status = 130;
+			rl_on_new_line();
+			rl_replace_line("", 0);
+			rl_redisplay();
+			break ;
+		}
+		cmds = cmds->next;
+		i++;
+	}
 }
 
 /*
@@ -105,8 +106,8 @@ If everything is good we execute it.
 
 and we exit with the current exit code.
 */
-void handle_child_process(t_command *cmds, int in_fd,
-						  int *pipe_fd, t_env *env)
+void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
+		t_env *env)
 {
 	if (in_fd != 0)
 	{
@@ -146,38 +147,43 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void run_pipe(t_command *cmds, t_env *env)
+void	run_pipe(t_command *cmds, t_env *env)
 {
-	int pipe_fd[2];
-	int in_fd;
-	pid_t *pid;
-	t_command *first_cmds;
-	int i;
+	int			pipe_fd[2];
+	int			in_fd;
+	pid_t		*pid;
+	t_command	*first_cmds;
+	int			i;
 
 	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
 	if (!pid)
-		return;
+		return ;
 	first_cmds = cmds;
 	in_fd = 0;
 	i = 0;
 	while (cmds)
 	{
-		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
+		if (first_cmds && !first_cmds->next && first_cmds->args
+			&& !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE) || is_builtins(cmds) == 1)
+		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE)
+			|| is_builtins(cmds) == 1)
 		{
 			create_pipe(cmds, pipe_fd);
 			pid[i] = create_child_process();
-			if (pid[i++] == 0)
+			if (pid[i] == 0)
 				handle_child_process(cmds, in_fd, pipe_fd, env);
 			else
 				close_fd(&in_fd, cmds, pipe_fd);
 			cmds = cmds->next;
+			i++;
 		}
 		else
 		{
 			run_builtins(cmds, env);
-			return;
+			return ;
 		}
 	}
 	cmds = first_cmds;
