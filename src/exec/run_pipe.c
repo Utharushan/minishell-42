@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/13 10:43:21 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/13 13:48:03 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,14 +79,6 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 		waitpid(pid[i], &status, 0);
 		if (WIFEXITED(status))
 			cmds->status = WEXITSTATUS(status);
-		if (cmds->status == 130)
-		{
-			g_signal_status = 130;
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			rl_redisplay();
-			break ;
-		}
 		cmds = cmds->next;
 		i++;
 	}
@@ -149,42 +141,29 @@ command becomes the input of the next in the pipe.
 */
 void	run_pipe(t_command *cmds, t_env *env)
 {
-	int			pipe_fd[2];
-	int			in_fd;
-	pid_t		*pid;
-	t_command	*first_cmds;
-	int			i;
+	int pipe_fd[2];
+	int in_fd;
+	pid_t *pid;
+	t_command *first_cmds;
+	int i;
 
 	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
 	if (!pid)
-		return ;
+		return;
 	first_cmds = cmds;
 	in_fd = 0;
 	i = 0;
 	while (cmds)
 	{
-		signal(SIGINT, SIG_IGN);
-		signal(SIGQUIT, SIG_IGN);
-		if (first_cmds && !first_cmds->next && first_cmds->args
-			&& !ft_strncmp(first_cmds->args[0], "exit", 5))
+		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE)
-			|| is_builtins(cmds) == 1)
-		{
-			create_pipe(cmds, pipe_fd);
-			pid[i] = create_child_process();
-			if (pid[i] == 0)
-				handle_child_process(cmds, in_fd, pipe_fd, env);
-			else
-				close_fd(&in_fd, cmds, pipe_fd);
-			cmds = cmds->next;
-			i++;
-		}
+		create_pipe(cmds, pipe_fd);
+		pid[i] = create_child_process();
+		if (pid[i++] == 0)
+			handle_child_process(cmds, in_fd, pipe_fd, env);
 		else
-		{
-			run_builtins(cmds, env);
-			return ;
-		}
+			close_fd(&in_fd, cmds, pipe_fd);
+		cmds = cmds->next;
 	}
 	cmds = first_cmds;
 	wait_for_pids(cmds, pid);

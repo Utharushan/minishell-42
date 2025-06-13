@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/13 10:27:13 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/13 14:23:59 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@ void heredoc_sigint(int sig)
 {
 	(void)sig;
 	g_signal_status = 130;
-	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 int here_doc(const char *delim, int heredoc_expand, t_env *env)
@@ -39,7 +41,7 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env)
 		if (g_signal_status == 130 || !line || !ft_strcmp(line, delim))
 		{
 			free(line);
-			break;
+			break ;
 		}
 		if (heredoc_expand)
 		{

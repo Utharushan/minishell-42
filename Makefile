@@ -12,7 +12,7 @@
 
 NAME		= minishell
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror -g -O0
 INCLUDES	= -Iincludes -Ilibftprintf/inc
 LIBFTPRINTF	= libftprintf/libftprintf.a
 LIBFTPRINTF_DIR	= libftprintf
