@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/13 13:48:03 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 15:05:50 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,13 +157,21 @@ void	run_pipe(t_command *cmds, t_env *env)
 	{
 		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		create_pipe(cmds, pipe_fd);
-		pid[i] = create_child_process();
-		if (pid[i++] == 0)
-			handle_child_process(cmds, in_fd, pipe_fd, env);
-		else
-			close_fd(&in_fd, cmds, pipe_fd);
+		
+		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE) || is_builtins(cmds) == 1)
+		{
+			create_pipe(cmds, pipe_fd);
+			pid[i] = create_child_process();
+			if (pid[i++] == 0)
+				handle_child_process(cmds, in_fd, pipe_fd, env);
+			else
+				close_fd(&in_fd, cmds, pipe_fd);
 		cmds = cmds->next;
+		}else
+		{
+			run_builtins(cmds, env);
+			return ;
+		}
 	}
 	cmds = first_cmds;
 	wait_for_pids(cmds, pid);
