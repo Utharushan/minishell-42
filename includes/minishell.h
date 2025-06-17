@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/17 14:35:47 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 15:51:15 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,20 +64,20 @@ typedef enum e_token_type
 
 typedef enum e_word_type
 {
-    WORD_UNQUOTED,
-    WORD_SINGLE_QUOTED,
-    WORD_DOUBLE_QUOTED
-}	t_word_type;
+	WORD_UNQUOTED,
+	WORD_SINGLE_QUOTED,
+	WORD_DOUBLE_QUOTED
+}						t_word_type;
 
 // --- TOKEN LINKED LIST ---
 
 typedef struct s_token
 {
-    char			*value;
-    t_token_type	type;
-    t_word_type		word_type;
-    struct s_token	*next;
-}	t_token;
+	char				*value;
+	t_token_type		type;
+	t_word_type			word_type;
+	struct s_token		*next;
+}						t_token;
 
 // --- COMMAND STRUCTURE ---
 
@@ -117,8 +117,10 @@ typedef struct s_command
 
 // --- LEXER ---
 
-t_token					*new_token(char *value, t_token_type type, t_word_type word_type);
-void					add_token(t_token **tokens, char *value, t_token_type type, t_word_type word_type);
+t_token					*new_token(char *value, t_token_type type,
+							t_word_type word_type);
+void					add_token(t_token **tokens, char *value,
+							t_token_type type, t_word_type word_type);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
@@ -156,14 +158,16 @@ int						ft_cd(t_command *cmds, t_env *env);
 //--- PIPES ---
 void					run_pipe(t_command *cmds, t_env *env);
 int						command_redirections(t_command *cmd);
-int						here_doc(const char *delim, int heredoc_expand, t_env *env, t_command *cmds);
+int						here_doc(const char *delim, int heredoc_expand,
+							t_env *env, t_command *cmds);
 
 //--- ENV ---
 t_env					*new_env_node(char *name, char *value);
 void					add_env_back(t_env **env, t_env *new);
 t_env					*init_env(char **envp, t_env *env);
 char					*ft_getenv(t_env *env, const char *name);
-void					ft_setenv(t_env *env, const char *name, const char *value);
+void					ft_setenv(t_env *env, const char *name,
+							const char *value);
 //--- UTILS ---
 void					free_command_list(t_command *cmd);
 char					*build_full_path(char *dir, char *cmd);
@@ -173,15 +177,17 @@ void					close_fd(int *in_fd, t_command *cmds, int *pipe_fd);
 int						env_found(t_env *env, char *name);
 void					export_error(char *arg);
 char					*find_plus_equal(char *str);
-void					append_env_value(t_env *env, char *name, char *to_append);
+void					append_env_value(t_env *env, char *name,
+							char *to_append);
 int						handle_plus_equal(t_env *env, char *arg);
 int						argv_parsed(char *name);
-char 					**env_to_envp(t_env *env);
-char 					**get_path_dirs(t_env *env);
-void 					free_env_list(t_env *env);
-void 					free_token_list(t_token *tokens);
-int						validate_quotes(const char *input, int start, char quote);
-void 					sigint_handler(int sig);
-int 					prepare_heredocs(t_command *cmds, t_env *env);
+char					**env_to_envp(t_env *env);
+char					**get_path_dirs(t_env *env);
+void					free_env_list(t_env *env);
+void					free_token_list(t_token *tokens);
+int						validate_quotes(const char *input, int start,
+							char quote);
+void					sigint_handler(int sig);
+int						prepare_heredocs(t_command *cmds, t_env *env);
 
 #endif

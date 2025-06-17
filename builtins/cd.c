@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:09:21 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 12:38:07 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 15:38:20 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int	ft_cd(t_command *cmds, t_env *env)
 		path = cmds->args[1];
 	else
 		path = ft_getenv(env, "HOME");
-
 	if (!path || chdir(path) != 0)
 	{
 		ft_putstr_fd("cd: ", 2);
@@ -38,4 +37,3 @@ int	ft_cd(t_command *cmds, t_env *env)
 	free(oldpwd);
 	return (0);
 }
-

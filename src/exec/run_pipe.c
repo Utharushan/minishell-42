@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/17 15:05:50 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 17:42:55 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,6 @@ void	run_pipe(t_command *cmds, t_env *env)
 	{
 		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 			ft_exit(first_cmds->args, first_cmds);
-		
 		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE) || is_builtins(cmds) == 1)
 		{
 			create_pipe(cmds, pipe_fd);

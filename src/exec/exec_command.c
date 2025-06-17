@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:11:16 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 17:03:03 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ char *build_full_path(char *dir, char *cmd)
 	return (full_path);
 }
 
+//chiant a separer, je ferais ca en dernier...
 int exec_command(t_command *cmd, t_env *env)
 {
 	int i;

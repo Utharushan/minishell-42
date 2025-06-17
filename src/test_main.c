@@ -162,11 +162,15 @@ t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 void sigint_handler(int sig)
 {
 	(void)sig;
-	g_signal_status = 130;
+	char c;
+
+	g_signal_status = 130;	
+	c = '\0';
+	write(1, "\033[2K", 1);
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_redisplay();
+	ioctl(STDIN_FILENO, TIOCSTI, &c);
 }
 
 int main(int argc, char **argv, char **envp)

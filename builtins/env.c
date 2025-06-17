@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/05/30 13:00:59 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:38:16 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ t_env	*new_env_node(char *name, char *value)
 void	add_env_back(t_env **env, t_env *new)
 {
 	t_env	*tmp;
-		
+
 	if (!*env)
 	{
 		*env = new;

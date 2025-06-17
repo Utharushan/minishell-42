@@ -6,15 +6,16 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 17:46:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/05 18:11:25 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 17:03:08 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void free_token_list(t_token *tokens)
+void	free_token_list(t_token *tokens)
 {
-	t_token *tmp;
+	t_token	*tmp;
+
 	while (tokens)
 	{
 		tmp = tokens->next;
@@ -24,9 +25,10 @@ void free_token_list(t_token *tokens)
 	}
 }
 
-void free_env_list(t_env *env)
+void	free_env_list(t_env *env)
 {
-	t_env *tmp;
+	t_env	*tmp;
+
 	while (env)
 	{
 		tmp = env->next;
