@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/11 22:39:08 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 14:35:47 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ int						ft_cd(t_command *cmds, t_env *env);
 //--- PIPES ---
 void					run_pipe(t_command *cmds, t_env *env);
 int						command_redirections(t_command *cmd);
-int						here_doc(const char *delim, int heredoc_expand, t_env *env);
+int						here_doc(const char *delim, int heredoc_expand, t_env *env, t_command *cmds);
 
 //--- ENV ---
 t_env					*new_env_node(char *name, char *value);
@@ -183,6 +183,5 @@ void 					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start, char quote);
 void 					sigint_handler(int sig);
 int 					prepare_heredocs(t_command *cmds, t_env *env);
-
 
 #endif

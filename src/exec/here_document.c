@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/13 14:23:59 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/17 14:33:18 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,16 @@
 void heredoc_sigint(int sig)
 {
 	(void)sig;
+	char c = '\n';
+
 	g_signal_status = 130;
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+	ioctl(STDIN_FILENO, TIOCSTI, &c);
 }
 
-int here_doc(const char *delim, int heredoc_expand, t_env *env)
+int here_doc(const char *delim, int heredoc_expand, t_env *env, t_command *cmds)
 {
 	int pipe_fd[2];
 	char *line;
@@ -59,6 +62,7 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env)
 	signal(SIGQUIT, SIG_IGN);
 	if (g_signal_status == 130)
 	{
+		cmds->status = 130;
 		close(pipe_fd[0]);
 		return (-1);
 	}
@@ -79,7 +83,7 @@ int prepare_heredocs(t_command *cmds, t_env *env)
         {
             if (redirect->type == TOKEN_HEREDOC)
             {
-                fd = here_doc(redirect->file, redirect->heredoc_expand, env);
+                fd = here_doc(redirect->file, redirect->heredoc_expand, env, cmds);
                 if (fd == -1)
                     return (0);
                 redirect->heredoc_fd = fd;
