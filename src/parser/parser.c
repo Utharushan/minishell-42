@@ -64,37 +64,51 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-void	add_argument(t_command *cmd, char *arg)
+void	add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
 {
-	int		count;
-	char	**new_args;
-	int		i;
-	char	*stripped_arg;
+    int		count;
+    char	**new_args;
+    int		i;
+    char	*final_arg = NULL;
 
-	count = 0;
-	while (cmd->args && cmd->args[count])
-		count++;
-	if ((arg[0] == '"' && arg[ft_strlen(arg) - 1] == '"') ||
-		(arg[0] == '\'' && arg[ft_strlen(arg) - 1] == '\''))
-		stripped_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
-	else
-		stripped_arg = ft_strdup(arg);
-	new_args = malloc(sizeof(char *) * (count + 2));
-	if (!new_args)
-	{
-		free(stripped_arg);
-		return ;
-	}
-	i = 0;
-	while (i < count)
-	{
-		new_args[i] = cmd->args[i];
-		i++;
-	}
-	new_args[count] = stripped_arg;
-	new_args[count + 1] = NULL;
-	free(cmd->args);
-	cmd->args = new_args;
+    count = 0;
+    while (cmd->args && cmd->args[count])
+        count++;
+
+    if (word_type == WORD_SINGLE_QUOTED)
+    {
+        // Strip single quotes, no expansion
+        final_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
+    }
+    else if (word_type == WORD_DOUBLE_QUOTED)
+    {
+        // Strip double quotes, expand inside
+        char *tmp = ft_substr(arg, 1, ft_strlen(arg) - 2);
+        final_arg = expand_token_value(tmp, env, g_signal_status);
+        free(tmp);
+    }
+    else
+    {
+        // Unquoted: expand
+        final_arg = expand_token_value(arg, env, g_signal_status);
+    }
+
+    new_args = malloc(sizeof(char *) * (count + 2));
+    if (!new_args)
+    {
+        free(final_arg);
+        return ;
+    }
+    i = 0;
+    while (i < count)
+    {
+        new_args[i] = cmd->args[i];
+        i++;
+    }
+    new_args[count] = final_arg;
+    new_args[count + 1] = NULL;
+    free(cmd->args);
+    cmd->args = new_args;
 }
 
 /*
@@ -118,8 +132,6 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
     t_command	*cmd;
     t_command	*head;
-    char 		*expanded;
-    int 		expand;
     t_token_type type;
 
     cmd = new_command();
@@ -128,16 +140,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
     {
         if (tokens->type == TOKEN_WORD)
         {
-            if (tokens->word_type == WORD_SINGLE_QUOTED)
-            {
-                add_argument(cmd, ft_strdup(tokens->value));
-            }
-            else
-            {
-                expanded = expand_token_value(tokens->value, env, g_signal_status);
-                add_argument(cmd, expanded);
-                free(expanded);
-            }
+            add_argument(cmd, tokens->value, tokens->word_type, env);
         }
         else if (tokens->type == TOKEN_PIPE)
         {
@@ -151,14 +154,24 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
             tokens = tokens->next;
             if (tokens && tokens->type == TOKEN_WORD)
                 add_redir(cmd, type, tokens->value, 0);
+            else
+            {
+                ft_printf("minishell: parse error near `\\n'\n");
+                break;
+            }
         }
         else if (tokens->type == TOKEN_HEREDOC)
         {
             tokens = tokens->next;
             if (tokens && tokens->type == TOKEN_WORD)
             {
-                expand = (tokens->word_type == WORD_UNQUOTED);
+                int expand = (tokens->word_type == WORD_UNQUOTED);
                 add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
+            }
+            else
+            {
+                ft_printf("minishell: parse error near `\\n'\n");
+                break;
             }
         }
         tokens = tokens->next;

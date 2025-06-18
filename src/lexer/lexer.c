@@ -116,23 +116,18 @@ void	extract_word(char *input, int *i, t_token **tokens)
         if ((input[*i] == '"' || input[*i] == '\'') && !quoted)
         {
             quote = input[*i];
-            if (!validate_quotes(input, *i + 1, quote))
-            {
-                ft_printf("minishell: syntax error: unmatched %c\n", quote);
-                free(result);
-                return;
-            }
             quoted = 1;
             wt = (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED;
-            (*i)++;
             start = *i;
+            (*i)++;
             while (input[*i] && input[*i] != quote)
                 (*i)++;
+            if (input[*i] == quote)
+                (*i)++;
+            // Include the quotes in the token value
             segment = ft_substr(input, start, *i - start);
             result = ft_strjoin(result, segment);
             free(segment);
-            if (input[*i] == quote)
-                (*i)++;
         }
         else
         {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/17 15:51:15 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/18 22:33:57 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void					extract_word(char *input, int *i, t_token **tokens);
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg);
+void					add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
