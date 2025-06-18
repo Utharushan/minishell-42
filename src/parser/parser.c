@@ -64,7 +64,7 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-void	add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
+void	add_argument(t_command *cmd, char *arg, t_env *env)
 {
     int		count;
     char	**new_args;
@@ -125,7 +125,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
     {
         if (tokens->type == TOKEN_WORD)
         {
-            add_argument(cmd, tokens->value, tokens->word_type, env);
+            add_argument(cmd, tokens->value, env);
         }
         else if (tokens->type == TOKEN_PIPE)
         {

@@ -129,7 +129,7 @@ void					extract_word(char *input, int *i, t_token **tokens);
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env);
+void					add_argument(t_command *cmd, char *arg, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
