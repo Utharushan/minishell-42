@@ -54,65 +54,38 @@ static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
 char	*expand_token_value(const char *str, t_env *env, int last_status)
 {
 	char	*result;
-	int		i;
-	int		start;
-	char	*seg;
+	int		i = 0;
+	int		len = ft_strlen(str);
+	int		in_single = 0, in_double = 0;
 	char	*exp;
 	char	tmp[2];
 
 	result = ft_strdup("");
-	i = 0;
-	while (str[i])
+	while (i < len)
 	{
-		if (str[i] == '\'')
+		if (str[i] == '\'' && !in_double)
 		{
-			start = i + 1;
+			in_single = !in_single;
 			i++;
-			while (str[i] && str[i] != '\'')
-				i++;
-			seg = ft_substr(str, start, i - start);
-			result = ft_strjoin(result, seg);
-			free(seg);
-			if (str[i] == '\'')
-				i++;
+			continue;
 		}
-		else if (str[i] == '"')
+		if (str[i] == '"' && !in_single)
 		{
+			in_double = !in_double;
 			i++;
-			while (str[i] && str[i] != '"')
-			{
-				if (str[i] == '$')
-				{
-					exp = expand_var(str, &i, env, last_status);
-					result = ft_strjoin(result, exp);
-					free(exp);
-				}
-				else
-				{
-					tmp[0] = str[i];
-					tmp[1] = '\0';
-					result = ft_strjoin(result, tmp);
-					i++;
-				}
-			}
-			if (str[i] == '"')
-				i++;
+			continue;
 		}
-		else if (str[i] == '$')
+		if (str[i] == '$' && !in_single)
 		{
 			exp = expand_var(str, &i, env, last_status);
 			result = ft_strjoin(result, exp);
 			free(exp);
+			continue;
 		}
-		else
-		{
-			start = i;
-			while (str[i] && str[i] != '\'' && str[i] != '"' && str[i] != '$')
-				i++;
-			seg = ft_substr(str, start, i - start);
-			result = ft_strjoin(result, seg);
-			free(seg);
-		}
+		tmp[0] = str[i];
+		tmp[1] = '\0';
+		result = ft_strjoin(result, tmp);
+		i++;
 	}
 	return (result);
 }

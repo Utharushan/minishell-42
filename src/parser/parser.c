@@ -75,23 +75,8 @@ void	add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
     while (cmd->args && cmd->args[count])
         count++;
 
-    if (word_type == WORD_SINGLE_QUOTED)
-    {
-        // Strip single quotes, no expansion
-        final_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
-    }
-    else if (word_type == WORD_DOUBLE_QUOTED)
-    {
-        // Strip double quotes, expand inside
-        char *tmp = ft_substr(arg, 1, ft_strlen(arg) - 2);
-        final_arg = expand_token_value(tmp, env, g_signal_status);
-        free(tmp);
-    }
-    else
-    {
-        // Unquoted: expand
-        final_arg = expand_token_value(arg, env, g_signal_status);
-    }
+    // Always use expand_token_value, which now handles all quoting and expansion
+    final_arg = expand_token_value(arg, env, g_signal_status);
 
     new_args = malloc(sizeof(char *) * (count + 2));
     if (!new_args)
@@ -152,27 +137,23 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
         {
             type = tokens->type;
             tokens = tokens->next;
-            if (tokens && tokens->type == TOKEN_WORD)
-                add_redir(cmd, type, tokens->value, 0);
-            else
+            if (!tokens || tokens->type != TOKEN_WORD)
             {
                 ft_printf("minishell: parse error near `\\n'\n");
-                break;
+                return head;
             }
+            add_redir(cmd, type, tokens->value, 0);
         }
         else if (tokens->type == TOKEN_HEREDOC)
         {
             tokens = tokens->next;
-            if (tokens && tokens->type == TOKEN_WORD)
-            {
-                int expand = (tokens->word_type == WORD_UNQUOTED);
-                add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
-            }
-            else
+            if (!tokens || tokens->type != TOKEN_WORD)
             {
                 ft_printf("minishell: parse error near `\\n'\n");
-                break;
+                return head;
             }
+            int expand = (tokens->word_type == WORD_UNQUOTED);
+            add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
         }
         tokens = tokens->next;
     }
