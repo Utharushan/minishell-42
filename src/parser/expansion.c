@@ -59,6 +59,7 @@ char	*expand_token_value(const char *str, t_env *env, int last_status)
 	int		in_single = 0, in_double = 0;
 	char	*exp;
 	char	tmp[2];
+	char	*tmp_result;
 
 	result = ft_strdup("");
 	while (i < len)
@@ -78,13 +79,17 @@ char	*expand_token_value(const char *str, t_env *env, int last_status)
 		if (str[i] == '$' && !in_single)
 		{
 			exp = expand_var(str, &i, env, last_status);
-			result = ft_strjoin(result, exp);
+			tmp_result = ft_strjoin(result, exp);
+			free(result);
+			result = tmp_result;
 			free(exp);
 			continue;
 		}
 		tmp[0] = str[i];
 		tmp[1] = '\0';
-		result = ft_strjoin(result, tmp);
+		tmp_result = ft_strjoin(result, tmp);
+		free(result);
+		result = tmp_result;
 		i++;
 	}
 	return (result);
