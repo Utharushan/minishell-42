@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/18 11:45:09 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/20 11:33:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ that no pipe was created.
 
 Returns 1 if a pipe was created, 0 otherwise.
 */
-int	create_pipe(t_command *cmds, int *pipe_fd)
+int	create_pipe(t_command *cmds, int *pipe_fd, t_minishell *mini)
 {
 	if (cmds->next_op == OP_PIPE)
 	{
 		if (pipe(pipe_fd) == -1)
 		{
 			perror("pipe");
-			ft_exit(cmds->args, cmds);
+			ft_exit(cmds->args, mini);
 		}
 		return (1);
 	}
@@ -67,7 +67,7 @@ for the next command.
 
 it connects the command through the pipes.
 */
-void	wait_for_pids(t_command *cmds, pid_t *pid)
+void	wait_for_pids(t_command *cmds, pid_t *pid, t_minishell *mini)
 {
 	int	i;
 	int	status;
@@ -78,7 +78,7 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 	{
 		waitpid(pid[i], &status, 0);
 		if (WIFEXITED(status))
-			cmds->status = WEXITSTATUS(status);
+			mini->status = WEXITSTATUS(status);
 		cmds = cmds->next;
 		i++;
 	}
@@ -129,56 +129,56 @@ void	setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
     }
 }
 
-void	exec_child_builtin(t_command *cmds, t_env *env)
+void	exec_child_builtin(t_command *cmds, t_env *env, t_minishell *mini)
 {
     if (is_parent_builtin(cmds))
         exit(0);
-    run_builtins(cmds, env);
-    exit(cmds->status);
+    run_builtins(cmds, env, mini);
+    exit(mini->status);
 }
 
-void	exec_child_external(t_command *cmds, t_env *env)
+void	exec_child_external(t_command *cmds, t_env *env, t_minishell *mini)
 {
     if (!ft_strncmp(cmds->args[0], "exit", 5))
-        ft_exit(cmds->args, cmds);
+        ft_exit(cmds->args, mini);
     if (find_cmd_in_path(cmds, env))
     {
         ft_putstr_fd(cmds->args[0], 2);
         ft_putstr_fd(": command not found\n", 2);
-        cmds->status = 127;
+        mini->status = 127;
     }
     else
         exec_command(cmds, env);
-    exit(cmds->status);
+    exit(mini->status);
 }
 
-void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd, t_env *env)
+void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd, t_env *env, t_minishell *mini)
 {
     setup_child_fds(cmds, in_fd, pipe_fd);
     if (command_redirections(cmds) == 0)
         exit(130);
     if (is_builtins(cmds) == 0)
-        exec_child_builtin(cmds, env);
-    exec_child_external(cmds, env);
+        exec_child_builtin(cmds, env, mini);
+    exec_child_external(cmds, env, mini);
 }
 
-int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
+int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid, t_minishell *mini)
 {
     if (!cmds->next && is_parent_builtin(cmds))
     {
-        run_builtins(cmds, env);
+        run_builtins(cmds, env, mini);
         free(pid);
         return (1);
     }
     return (0);
 }
 
-void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd, pid_t *pid, int *i, t_env *env)
+void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd, pid_t *pid, int *i, t_env *env, t_minishell *mini)
 {
-    create_pipe(cmds, pipe_fd);
+    create_pipe(cmds, pipe_fd, mini);
     pid[*i] = create_child_process();
     if (pid[(*i)++] == 0)
-        handle_child_process(cmds, *in_fd, pipe_fd, env);
+        handle_child_process(cmds, *in_fd, pipe_fd, env, mini);
     else
         close_fd(in_fd, cmds, pipe_fd);
 }
@@ -191,7 +191,7 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void	run_pipe(t_command *cmds, t_env *env)
+void	run_pipe(t_command *cmds, t_env *env, t_minishell *mini)
 {
     int pipe_fd[2];
     int in_fd = 0;
@@ -205,13 +205,13 @@ void	run_pipe(t_command *cmds, t_env *env)
     while (cmds)
     {
         if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
-            ft_exit(first_cmds->args, first_cmds);
-        if (handle_parent_builtin_if_needed(cmds, env, pid))
+            ft_exit(first_cmds->args, mini);
+        if (handle_parent_builtin_if_needed(cmds, env, pid, mini))
             return;
-        launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env);
+        launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env, mini);
         cmds = cmds->next;
     }
     cmds = first_cmds;
-    wait_for_pids(cmds, pid);
+    wait_for_pids(cmds, pid, mini);
     free(pid);
 }

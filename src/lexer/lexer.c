@@ -110,7 +110,7 @@ void	extract_word(char *input, int *i, t_token **tokens)
     t_word_type	wt = WORD_UNQUOTED;
     int			quoted = 0;
 
-    result = ft_strdup("");
+    result = NULL;
     while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
     {
         if ((input[*i] == '"' || input[*i] == '\'') && !quoted)

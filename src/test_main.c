@@ -51,26 +51,26 @@ void print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
-void run_builtins(t_command *cmds, t_env *env)
+void run_builtins(t_command *cmds, t_env *env, t_minishell *mini)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return;
 
 	if (!ft_strncmp(cmds->args[0], "cd", 3))
-		cmds->status = ft_cd(cmds, env);
+		mini->status = ft_cd(cmds, env);
 	else if (!ft_strncmp(cmds->args[0], "echo", 5))
 	{
 		if (cmds->args[1] && !ft_strncmp(cmds->args[1], "$?", 3))
 		{
-			ft_putnbr_fd(cmds->status, 1);
+			ft_putnbr_fd(mini->status, 1);
 			ft_putchar_fd('\n', 1);
-			cmds->status = 0;
+			mini->status = 0;
 		}
 		else
-			cmds->status = ft_echo(cmds);
+			mini->status = ft_echo(cmds);
 	}
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
-		cmds->status = ft_pwd();
+		mini->status = ft_pwd();
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
 		ft_env(env);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
@@ -173,10 +173,20 @@ void sigint_handler(int sig)
 	ioctl(STDIN_FILENO, TIOCSTI, &c);
 }
 
+t_minishell	*init_minishell(t_minishell *minishell)
+{
+	minishell = malloc(sizeof(t_minishell));
+	if (!minishell)
+		return (NULL);
+	minishell->status = 0;
+	return (minishell);
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	t_token *tokens;
 	t_command *cmds;
+	t_minishell *mini;
 	char *input;
 	t_env *env;
 
@@ -184,8 +194,9 @@ int main(int argc, char **argv, char **envp)
 	(void)argv;
 	cmds = NULL;
 	tokens = NULL;
+	mini = NULL;
 	env = init_env(envp, NULL);
-
+	mini = init_minishell(mini);
 	while (1)
 	{
 		signal(SIGINT, sigint_handler);
@@ -195,17 +206,18 @@ int main(int argc, char **argv, char **envp)
 		if (!input)
 		{
 			ft_putstr_fd("exit", 1);
-			break;
+			mini->status = 130;
+			exit(130);
 		}
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, input, env);
-			if (!prepare_heredocs(cmds, env))
+			if (!prepare_heredocs(cmds, env, mini))
 			{
 				free_command_list(cmds);
 				continue;
 			}
-			run_pipe(cmds, env);
+			run_pipe(cmds, env, mini);
 			free_command_list(cmds);
 			free_token_list(tokens);
 			if (g_signal_status == 130)
@@ -216,5 +228,5 @@ int main(int argc, char **argv, char **envp)
 		}
 	}
 	free_env_list(env);
-	return (0);
+	return (mini->status);
 }
