@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/11 13:43:50 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/18 11:04:40 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,50 +55,78 @@ int redirect_output(char *outfile, bool append)
 	return (1);
 }
 
+t_redir *find_last_heredoc(t_redir *redir)
+{
+    t_redir *last = NULL;
+    while (redir)
+    {
+        if (redir->type == TOKEN_HEREDOC)
+            last = redir;
+        redir = redir->next;
+    }
+    return last;
+}
+
+int handle_redir_in(t_redir *redir)
+{
+    if (redirect_input(redir->file) == 0)
+        return (0);
+    return (1);
+}
+
+int handle_redir_out(t_redir *redir)
+{
+    if (redirect_output(redir->file, false) == 0)
+        return (0);
+    return (1);
+}
+
+int handle_redir_append(t_redir *redir)
+{
+    if (redirect_output(redir->file, true) == 0)
+        return (0);
+    return (1);
+}
+
+int handle_heredoc(t_redir *redir, t_redir *last_heredoc)
+{
+    if (redir == last_heredoc)
+    {
+        if (dup2(redir->heredoc_fd, STDIN_FILENO) == -1)
+        {
+            perror("dup2");
+            close(redir->heredoc_fd);
+            return (0);
+        }
+    }
+    close(redir->heredoc_fd);
+    return (1);
+}
+
+static int	handle_one_redir(t_redir *redir, t_redir *last_heredoc)
+{
+    if (redir->type == TOKEN_REDIRECT_IN)
+        return handle_redir_in(redir);
+    else if (redir->type == TOKEN_REDIRECT_OUT)
+        return handle_redir_out(redir);
+    else if (redir->type == TOKEN_REDIRECT_APPEND)
+        return handle_redir_append(redir);
+    else if (redir->type == TOKEN_HEREDOC)
+        return handle_heredoc(redir, last_heredoc);
+    return 1;
+}
+
 int	command_redirections(t_command *cmd)
 {
     t_redir	*redir;
     t_redir	*last_heredoc;
 
     redir = cmd->redir;
-    last_heredoc = NULL;
+    last_heredoc = find_last_heredoc(cmd->redir);
     while (redir)
     {
-        if (redir->type == TOKEN_HEREDOC)
-            last_heredoc = redir;
-        redir = redir->next;
-    }
-    redir = cmd->redir;
-    while (redir)
-    {
-        if (redir->type == TOKEN_REDIRECT_IN)
-        {
-            if (redirect_input(redir->file) == 0)
-                return (0);
-        }
-        else if (redir->type == TOKEN_REDIRECT_OUT)
-        {
-            if (redirect_output(redir->file, false) == 0)
-                return (0);
-        }
-        else if (redir->type == TOKEN_REDIRECT_APPEND)
-        {
-            if (redirect_output(redir->file, true) == 0)
-                return (0);
-        }
-        else if (redir->type == TOKEN_HEREDOC)
-        {
-            if (redir == last_heredoc)
-            {
-                if (dup2(redir->heredoc_fd, STDIN_FILENO) == -1)
-                {
-                    perror("dup2");
-                    close(redir->heredoc_fd);
-                    return (0);
-                }
-            }
-            close(redir->heredoc_fd);
-        }
+        if (!handle_one_redir(redir, last_heredoc))
+            return (0);
         redir = redir->next;
     }
     return (1);

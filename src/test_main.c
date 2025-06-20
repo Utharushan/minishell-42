@@ -166,8 +166,8 @@ void sigint_handler(int sig)
 
 	g_signal_status = 130;	
 	c = '\0';
-	write(1, "\033[2K", 1);
 	write(1, "\n", 1);
+	write(1, "\033[2K", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	ioctl(STDIN_FILENO, TIOCSTI, &c);

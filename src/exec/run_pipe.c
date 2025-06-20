@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/17 17:42:55 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/18 11:45:09 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,22 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 	}
 }
 
+int	is_parent_builtin(t_command *cmds)
+{
+    if (!cmds->args || !cmds->args[0])
+        return (0);
+    if (!ft_strncmp(cmds->args[0], "cd", 3))
+        return (1);
+    else if (!ft_strncmp(cmds->args[0], "export", 7))
+        return (1);
+    else if (!ft_strncmp(cmds->args[0], "unset", 6))
+        return (1);
+    else if (!ft_strncmp(cmds->args[0], "exit", 5))
+        return (1);
+    else
+        return (0);
+}
+
 /*
 Check's if in_fd is not equal to zero, that means that we need to redirect stdin
 into our pipe in_fd,
@@ -98,39 +114,75 @@ If everything is good we execute it.
 
 and we exit with the current exit code.
 */
-void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
-		t_env *env)
+void	setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
 {
-	if (in_fd != 0)
-	{
-		dup2(in_fd, STDIN_FILENO);
-		close(in_fd);
-	}
-	if (cmds->next_op == OP_PIPE)
-	{
-		dup2(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-	}
-	if (command_redirections(cmds) == 0)
-		exit(130);
-	if (!ft_strncmp(cmds->args[0], "exit", 5))
-		ft_exit(cmds->args, cmds);
-	if (is_builtins(cmds) == 0)
-		run_builtins(cmds, env);
-	else
-	{
-		if (find_cmd_in_path(cmds, env))
-		{
-			ft_putstr_fd(cmds->args[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
-			cmds->status = 127;
-		}
-		else
-			exec_command(cmds, env);
-	}
-	exit(cmds->status);
+    if (in_fd != 0)
+    {
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+    if (cmds->next_op == OP_PIPE)
+    {
+        dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+    }
 }
+
+void	exec_child_builtin(t_command *cmds, t_env *env)
+{
+    if (is_parent_builtin(cmds))
+        exit(0);
+    run_builtins(cmds, env);
+    exit(cmds->status);
+}
+
+void	exec_child_external(t_command *cmds, t_env *env)
+{
+    if (!ft_strncmp(cmds->args[0], "exit", 5))
+        ft_exit(cmds->args, cmds);
+    if (find_cmd_in_path(cmds, env))
+    {
+        ft_putstr_fd(cmds->args[0], 2);
+        ft_putstr_fd(": command not found\n", 2);
+        cmds->status = 127;
+    }
+    else
+        exec_command(cmds, env);
+    exit(cmds->status);
+}
+
+void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd, t_env *env)
+{
+    setup_child_fds(cmds, in_fd, pipe_fd);
+    if (command_redirections(cmds) == 0)
+        exit(130);
+    if (is_builtins(cmds) == 0)
+        exec_child_builtin(cmds, env);
+    exec_child_external(cmds, env);
+}
+
+int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
+{
+    if (!cmds->next && is_parent_builtin(cmds))
+    {
+        run_builtins(cmds, env);
+        free(pid);
+        return (1);
+    }
+    return (0);
+}
+
+void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd, pid_t *pid, int *i, t_env *env)
+{
+    create_pipe(cmds, pipe_fd);
+    pid[*i] = create_child_process();
+    if (pid[(*i)++] == 0)
+        handle_child_process(cmds, *in_fd, pipe_fd, env);
+    else
+        close_fd(in_fd, cmds, pipe_fd);
+}
+
 /*
 Iterates through each cmd in the linked list.
 
@@ -141,38 +193,25 @@ command becomes the input of the next in the pipe.
 */
 void	run_pipe(t_command *cmds, t_env *env)
 {
-	int pipe_fd[2];
-	int in_fd;
-	pid_t *pid;
-	t_command *first_cmds;
-	int i;
+    int pipe_fd[2];
+    int in_fd = 0;
+    pid_t *pid;
+    t_command *first_cmds = cmds;
+    int i = 0;
 
-	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
-	if (!pid)
-		return;
-	first_cmds = cmds;
-	in_fd = 0;
-	i = 0;
-	while (cmds)
-	{
-		if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
-			ft_exit(first_cmds->args, first_cmds);
-		if ((is_builtins(cmds) == 0 && cmds->next_op == OP_PIPE) || is_builtins(cmds) == 1)
-		{
-			create_pipe(cmds, pipe_fd);
-			pid[i] = create_child_process();
-			if (pid[i++] == 0)
-				handle_child_process(cmds, in_fd, pipe_fd, env);
-			else
-				close_fd(&in_fd, cmds, pipe_fd);
-		cmds = cmds->next;
-		}else
-		{
-			run_builtins(cmds, env);
-			return ;
-		}
-	}
-	cmds = first_cmds;
-	wait_for_pids(cmds, pid);
-	free(pid);
+    pid = malloc(sizeof(pid_t) * count_cmds(cmds));
+    if (!pid)
+        return;
+    while (cmds)
+    {
+        if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
+            ft_exit(first_cmds->args, first_cmds);
+        if (handle_parent_builtin_if_needed(cmds, env, pid))
+            return;
+        launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env);
+        cmds = cmds->next;
+    }
+    cmds = first_cmds;
+    wait_for_pids(cmds, pid);
+    free(pid);
 }
