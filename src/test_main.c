@@ -16,6 +16,7 @@
 #include "../includes/minishell.h"
 
 int g_signal_status = 0;
+int g_exit_status = 0;
 
 void print_tokens(t_token *tokens)
 {
@@ -67,7 +68,7 @@ void run_builtins(t_command *cmds, t_env *env, t_minishell *mini)
 			mini->status = 0;
 		}
 		else
-			mini->status = ft_echo(cmds);
+			mini->status = ft_echo(cmds->args, env);
 	}
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
 		mini->status = ft_pwd();

@@ -103,42 +103,63 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-	int start;
-	t_word_type word_type = WORD_UNQUOTED;
-	char quote;
+	int		start;
+	char	*word;
+	int		j;
 
 	start = *i;
-	while (input[*i] && !ft_isspace(input[*i]) && !is_token_delim(input[*i]))
+	printf("DEBUG LEXER: Starting extract_word at index %d, char: '%c'\n", *i, input[*i]);
+	
+	// Handle quotes
+	if (input[*i] == '\'' || input[*i] == '"')
 	{
-		if (input[*i] == '\'' || input[*i] == '"')
+		char quote = input[*i];
+		(*i)++;
+		printf("DEBUG LEXER: Found quote '%c', moving to index %d\n", quote, *i);
+		
+		while (input[*i] && input[*i] != quote)
 		{
-			quote = input[*i];
-			if (quote == '\'')
-				word_type = WORD_SINGLE_QUOTED;
-			else if (word_type != WORD_SINGLE_QUOTED)
-				word_type = WORD_DOUBLE_QUOTED;
-			(*i)++;
-			while (input[*i] && input[*i] != quote)
+			if (input[*i] == '\\' && quote == '"')
 				(*i)++;
-			if (input[*i] == quote)
-				(*i)++;
-		}
-		else if (input[*i] == '$')
-		{
-			(*i)++;
-			if (input[*i] == '?')
-				(*i)++;
-			else
-				while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
-					(*i)++;
-		}
-		else
-		{
 			(*i)++;
 		}
+		if (input[*i] == quote)
+			(*i)++;
+		printf("DEBUG LEXER: After quote handling, index=%d\n", *i);
 	}
-	if (*i > start)
-		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, word_type);
-	(*i)--;
+	else
+	{
+		// Handle regular word
+		while (input[*i] && !ft_isspace(input[*i]) 
+			&& input[*i] != '\'' && input[*i] != '"'
+			&& input[*i] != '|' && input[*i] != '<' 
+			&& input[*i] != '>' && input[*i] != '&'
+			&& input[*i] != '(' && input[*i] != ')'
+			&& input[*i] != ';' && input[*i] != '\\')
+		{
+			(*i)++;
+		}
+		printf("DEBUG LEXER: After regular word, index=%d\n", *i);
+	}
+	
+	printf("DEBUG LEXER: Word range: start=%d, end=%d\n", start, *i);
+	
+	// Extract the word
+	word = malloc(sizeof(char) * (*i - start + 1));
+	if (!word)
+		return;
+	
+	j = 0;
+	while (start < *i)
+	{
+		word[j] = input[start];
+		printf("DEBUG LEXER: Copying char '%c' at position %d\n", input[start], j);
+		start++;
+		j++;
+	}
+	word[j] = '\0';
+	
+	printf("DEBUG LEXER: Extracted word: '%s' (length: %d)\n", word, j);
+	add_token(tokens, word, TOKEN_WORD, WORD_UNQUOTED);
 }
 

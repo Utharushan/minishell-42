@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 11:55:33 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 13:14:58 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 
 // --- GLOBAL VAR ---
 extern int				g_signal_status;
+extern int				g_exit_status;
 
 // --- ENV LINKED LIST ---
 
@@ -140,8 +141,7 @@ t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-char					*expand_token_value(const char *str, t_env *env,
-							int last_status, t_word_type word_type);
+char					*expand_token_value(char *token_value, t_env *env);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
@@ -153,7 +153,7 @@ int						exec_command(t_command *cmd, t_env *env);
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
 void					run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
-int						ft_echo(t_command *cmds);
+int						ft_echo(char **args, t_env *env);
 int						ft_pwd(void);
 void					ft_exit(char **args, t_minishell *mini);
 void					ft_env(t_env *env);

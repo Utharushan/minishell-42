@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/22 12:25:58 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 13:17:10 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,31 +43,13 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 
     if (heredoc_expand)
     {
-        expanded = expand_token_value((char *)line, env, g_signal_status, WORD_UNQUOTED);
+        expanded = expand_token_value((char *)line, env);
         ft_putstr_fd(expanded, fd);
         free(expanded);
     }
     else
         ft_putstr_fd(line, fd);
     ft_putchar_fd('\n', fd);
-    return (0);
-}
-
-int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
-{
-    char *line;
-
-    while (g_signal_status != 130)
-    {
-        line = readline("> ");
-        if (g_signal_status == 130 || !line || !ft_strcmp(line, delim))
-        {
-            free(line);
-            break;
-        }
-        heredoc_write_line(line, heredoc_expand, env, fd);
-        free(line);
-    }
     return (0);
 }
 
@@ -78,6 +60,36 @@ int is_quoted_delim(const char *delim)
     if ((delim[0] == '"' && delim[len-1] == '"') || (delim[0] == '\'' && delim[len-1] == '\''))
         return 1;
     return 0;
+}
+
+// Fonction pour enlever les quotes du délimiteur
+char *remove_quotes(const char *delim)
+{
+    int len = ft_strlen(delim);
+    if (len >= 2 && ((delim[0] == '"' && delim[len-1] == '"') || (delim[0] == '\'' && delim[len-1] == '\'')))
+        return ft_substr(delim, 1, len - 2);
+    return ft_strdup(delim);
+}
+
+int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
+{
+    char *line;
+    char *clean_delim;
+
+    clean_delim = remove_quotes(delim);
+    while (g_signal_status != 130)
+    {
+        line = readline("> ");
+        if (g_signal_status == 130 || !line || !ft_strcmp(line, clean_delim))
+        {
+            free(line);
+            break;
+        }
+        heredoc_write_line(line, heredoc_expand, env, fd);
+        free(line);
+    }
+    free(clean_delim);
+    return (0);
 }
 
 int here_doc(const char *delim, int heredoc_expand, t_env *env, t_minishell *mini)

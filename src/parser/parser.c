@@ -87,13 +87,13 @@ void	add_argument(t_command *cmd, char *arg, t_env *env, t_word_type word_type)
     {
         /* Double quotes: remove quotes and expand variables */
         clean_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
-        final_arg = expand_token_value(clean_arg, env, g_signal_status, word_type);
+        final_arg = expand_token_value(clean_arg, env);
         free(clean_arg);
     }
     else
     {
         /* Unquoted: expand variables */
-        final_arg = expand_token_value(arg, env, g_signal_status, word_type);
+        final_arg = expand_token_value(arg, env);
     }
 
     new_args = malloc(sizeof(char *) * (count + 2));

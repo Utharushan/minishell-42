@@ -12,94 +12,93 @@
 
 #include "../../includes/minishell.h"
 
-static char	*get_env_value(t_env *env, const char *name)
+char	*expand_token_value(char *token_value, t_env *env)
 {
-	while (env)
-	{
-		if (ft_strcmp(env->name, name) == 0)
-			return (env->value);
-		env = env->next;
-	}
-	return ("");
-}
-
-static char	*expand_var(const char *name, t_env *env, int last_status)
-{
-	char	*val;
-
-	if (ft_strcmp(name, "?") == 0)
-		return (ft_itoa(last_status));
-	
-	val = get_env_value(env, name);
-	return (ft_strdup(val ? val : ""));
-}
-
-char	*expand_token_value(const char *str, t_env *env, int last_status, t_word_type word_type)
-{
-	(void)word_type;
 	char	*result;
-	char	*exp;
-	char	*tmp_result;
 	int		i;
-	int		start;
+	int		j;
+	int		in_quotes;
 	char	quote;
 
-	result = ft_strdup("");
+	if (!token_value)
+		return (NULL);
+	
+	printf("DEBUG EXPANSION: Starting expansion of token: '%s'\n", token_value);
+	
+	result = malloc(sizeof(char) * (ft_strlen(token_value) * 10 + 1));
+	if (!result)
+		return (NULL);
+	
 	i = 0;
-	while (str[i])
+	j = 0;
+	in_quotes = 0;
+	quote = 0;
+	
+	while (token_value[i])
 	{
-		if (str[i] == '\'' || str[i] == '"')
+		printf("DEBUG EXPANSION: Processing char '%c' at index %d, in_quotes=%d\n", token_value[i], i, in_quotes);
+		
+		if ((token_value[i] == '\'' || token_value[i] == '"') && !in_quotes)
 		{
-			quote = str[i];
-			start = ++i;
-			while (str[i] && str[i] != quote)
-				i++;
-			if (quote == '\'')
-				exp = ft_substr(str, start, i - start); // Pas d'expansion
-			else
-				exp = expand_token_value(ft_substr(str, start, i - start), env, last_status, WORD_DOUBLE_QUOTED);
-			tmp_result = ft_strjoin(result, exp);
-			free(result);
-			result = tmp_result;
-			free(exp);
-			if (str[i] == quote)
-				i++;
-			continue;
-		}
-		if (str[i] == '$')
-		{
-			int var_start = i;
+			quote = token_value[i];
+			in_quotes = 1;
+			printf("DEBUG EXPANSION: Entering quotes '%c'\n", quote);
 			i++;
-			if (str[i] == '?')
+		}
+		else if (token_value[i] == quote)
+		{
+			in_quotes = 0;
+			quote = 0;
+			printf("DEBUG EXPANSION: Exiting quotes\n");
+			i++;
+		}
+		else if (token_value[i] == '$' && quote != '\'')
+		{
+			printf("DEBUG EXPANSION: Found $ at index %d\n", i);
+			i++;
+			if (token_value[i] == '?')
 			{
+				char *exit_status = ft_itoa(g_exit_status);
+				if (exit_status)
+				{
+					ft_strlcpy(result + j, exit_status, ft_strlen(exit_status) + 1);
+					j += ft_strlen(exit_status);
+					free(exit_status);
+				}
 				i++;
-				exp = ft_itoa(last_status);
+				printf("DEBUG EXPANSION: Expanded $? to %d\n", g_exit_status);
 			}
-			else
+			else if (ft_isalpha(token_value[i]) || token_value[i] == '_')
 			{
-				while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
+				int var_start = i;
+				while (token_value[i] && (ft_isalnum(token_value[i]) || token_value[i] == '_'))
 					i++;
-				exp = ft_substr(str, var_start + 1, i - var_start - 1);
-				exp = expand_var(exp, env, last_status);
+				char *var_name = ft_substr(token_value, var_start, i - var_start);
+				printf("DEBUG EXPANSION: Variable name: '%s'\n", var_name);
+				char *var_value = ft_getenv(env, var_name);
+				if (var_value)
+				{
+					ft_strlcpy(result + j, var_value, ft_strlen(var_value) + 1);
+					j += ft_strlen(var_value);
+					printf("DEBUG EXPANSION: Expanded %s to '%s'\n", var_name, var_value);
+				}
+				free(var_name);
 			}
-			tmp_result = ft_strjoin(result, exp);
-			free(result);
-			result = tmp_result;
-			free(exp);
-			continue;
+			else
+			{
+				result[j++] = '$';
+				printf("DEBUG EXPANSION: Invalid variable, keeping $\n");
+			}
 		}
-		start = i;
-		while (str[i] && str[i] != '\'' && str[i] != '"' && str[i] != '$')
-			i++;
-		if (i > start)
+		else
 		{
-			exp = ft_substr(str, start, i - start);
-			tmp_result = ft_strjoin(result, exp);
-			free(result);
-			result = tmp_result;
-			free(exp);
+			result[j++] = token_value[i++];
+			printf("DEBUG EXPANSION: Copied char '%c' to result[%d]\n", token_value[i-1], j-1);
 		}
 	}
+	
+	result[j] = '\0';
+	printf("DEBUG EXPANSION: Final result: '%s' (length: %d)\n", result, j);
 	return (result);
 }
 
