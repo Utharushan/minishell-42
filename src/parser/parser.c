@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:39:56 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 16:21:10 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 16:47:09 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,16 +120,18 @@ void add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 {
     char *arg = ft_strdup("");
     char *tmp;
+    int first = 1;
     while (*tokens && (*tokens)->type == TOKEN_WORD) {
-        // Expand each token according to its own word_type
+        if (!first && (*tokens)->has_leading_space)
+            break;
         char *expanded = expand_token_value((*tokens)->value, env, (*tokens)->word_type);
         tmp = arg;
         arg = ft_strjoin(arg, expanded);
         free(tmp);
         free(expanded);
         *tokens = (*tokens)->next;
+        first = 0;
     }
-    // The expansion is already done, so pass WORD_UNQUOTED to avoid double expansion
     add_argument(cmd, arg, env, WORD_UNQUOTED);
     free(arg);
 }

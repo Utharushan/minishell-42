@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 15:55:58 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 16:42:19 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ typedef struct s_token
 	char				*value;
 	t_token_type		type;
 	t_word_type			word_type;
+	int					has_leading_space;
 	struct s_token		*next;
 }						t_token;
 
@@ -124,9 +125,9 @@ typedef struct s_command
 // --- LEXER ---
 
 t_token					*new_token(char *value, t_token_type type,
-							t_word_type word_type);
+							t_word_type word_type, int has_leading_space);
 void					add_token(t_token **tokens, char *value,
-							t_token_type type, t_word_type word_type);
+							t_token_type type, t_word_type word_type, int has_leading_space);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
