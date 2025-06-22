@@ -23,74 +23,82 @@ static char	*get_env_value(t_env *env, const char *name)
 	return ("");
 }
 
-static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
+static char	*expand_var(const char *name, t_env *env, int last_status)
 {
-	int		start;
-	char	*name;
 	char	*val;
 
-	start = ++(*i);
-	if (str[start - 1] == '?')
-	{
-		(*i)++;
+	if (ft_strcmp(name, "?") == 0)
 		return (ft_itoa(last_status));
-	}
-	if (!ft_isalpha(str[start]) && str[start] != '_')
-	{
-		char	*dollar = malloc(2);
-
-		dollar[0] = '$';
-		dollar[1] = 0;
-		return (dollar);
-	}
-	while (str[*i] && (ft_isalnum(str[*i]) || str[*i] == '_'))
-		(*i)++;
-	name = ft_substr(str, start, *i - start);
+	
 	val = get_env_value(env, name);
-	free(name);
 	return (ft_strdup(val ? val : ""));
 }
 
-char	*expand_token_value(const char *str, t_env *env, int last_status)
+char	*expand_token_value(const char *str, t_env *env, int last_status, t_word_type word_type)
 {
+	(void)word_type;
 	char	*result;
-	int		i = 0;
-	int		len = ft_strlen(str);
-	int		in_single = 0, in_double = 0;
 	char	*exp;
-	char	tmp[2];
 	char	*tmp_result;
+	int		i;
+	int		start;
+	char	quote;
 
 	result = ft_strdup("");
-	while (i < len)
+	i = 0;
+	while (str[i])
 	{
-		if (str[i] == '\'' && !in_double)
+		if (str[i] == '\'' || str[i] == '"')
 		{
-			in_single = !in_single;
-			i++;
+			quote = str[i];
+			start = ++i;
+			while (str[i] && str[i] != quote)
+				i++;
+			if (quote == '\'')
+				exp = ft_substr(str, start, i - start); // Pas d'expansion
+			else
+				exp = expand_token_value(ft_substr(str, start, i - start), env, last_status, WORD_DOUBLE_QUOTED);
+			tmp_result = ft_strjoin(result, exp);
+			free(result);
+			result = tmp_result;
+			free(exp);
+			if (str[i] == quote)
+				i++;
 			continue;
 		}
-		if (str[i] == '"' && !in_single)
+		if (str[i] == '$')
 		{
-			in_double = !in_double;
+			int var_start = i;
 			i++;
-			continue;
-		}
-		if (str[i] == '$' && !in_single)
-		{
-			exp = expand_var(str, &i, env, last_status);
+			if (str[i] == '?')
+			{
+				i++;
+				exp = ft_itoa(last_status);
+			}
+			else
+			{
+				while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
+					i++;
+				exp = ft_substr(str, var_start + 1, i - var_start - 1);
+				exp = expand_var(exp, env, last_status);
+			}
 			tmp_result = ft_strjoin(result, exp);
 			free(result);
 			result = tmp_result;
 			free(exp);
 			continue;
 		}
-		tmp[0] = str[i];
-		tmp[1] = '\0';
-		tmp_result = ft_strjoin(result, tmp);
-		free(result);
-		result = tmp_result;
-		i++;
+		start = i;
+		while (str[i] && str[i] != '\'' && str[i] != '"' && str[i] != '$')
+			i++;
+		if (i > start)
+		{
+			exp = ft_substr(str, start, i - start);
+			tmp_result = ft_strjoin(result, exp);
+			free(result);
+			result = tmp_result;
+			free(exp);
+		}
 	}
 	return (result);
 }

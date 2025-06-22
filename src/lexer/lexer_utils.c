@@ -54,3 +54,12 @@ void add_token(t_token **tokens, char *value, t_token_type type, t_word_type wor
         temp->next = new;
     }
 }
+
+/*
+Checks if a character is a token delimiter.
+Returns 1 if the character is a delimiter, 0 otherwise.
+*/
+int is_token_delim(char c)
+{
+    return (c == '|' || c == '<' || c == '>');
+}

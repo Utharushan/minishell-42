@@ -64,19 +64,37 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-void	add_argument(t_command *cmd, char *arg, t_env *env)
+void	add_argument(t_command *cmd, char *arg, t_env *env, t_word_type word_type)
 {
     int		count;
     char	**new_args;
     int		i;
-    char	*final_arg = NULL;
+    char	*final_arg;
+    char	*clean_arg;
 
     count = 0;
     while (cmd->args && cmd->args[count])
         count++;
 
-    // Always use expand_token_value, which now handles all quoting and expansion
-    final_arg = expand_token_value(arg, env, g_signal_status);
+    if (word_type == WORD_SINGLE_QUOTED)
+    {
+        /* Single quotes: remove quotes and no expansion */
+        clean_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
+        final_arg = ft_strdup(clean_arg);
+        free(clean_arg);
+    }
+    else if (word_type == WORD_DOUBLE_QUOTED)
+    {
+        /* Double quotes: remove quotes and expand variables */
+        clean_arg = ft_substr(arg, 1, ft_strlen(arg) - 2);
+        final_arg = expand_token_value(clean_arg, env, g_signal_status, word_type);
+        free(clean_arg);
+    }
+    else
+    {
+        /* Unquoted: expand variables */
+        final_arg = expand_token_value(arg, env, g_signal_status, word_type);
+    }
 
     new_args = malloc(sizeof(char *) * (count + 2));
     if (!new_args)
@@ -125,7 +143,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
     {
         if (tokens->type == TOKEN_WORD)
         {
-            add_argument(cmd, tokens->value, env);
+            add_argument(cmd, tokens->value, env, tokens->word_type);
         }
         else if (tokens->type == TOKEN_PIPE)
         {

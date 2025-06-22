@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_document.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/20 11:32:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/22 12:25:58 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 
     if (heredoc_expand)
     {
-        expanded = expand_token_value((char *)line, env, g_signal_status);
+        expanded = expand_token_value((char *)line, env, g_signal_status, WORD_UNQUOTED);
         ft_putstr_fd(expanded, fd);
         free(expanded);
     }
@@ -71,17 +71,31 @@ int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
     return (0);
 }
 
+// Ajout d'une fonction utilitaire pour détecter les quotes autour du délimiteur
+int is_quoted_delim(const char *delim)
+{
+    int len = ft_strlen(delim);
+    if ((delim[0] == '"' && delim[len-1] == '"') || (delim[0] == '\'' && delim[len-1] == '\''))
+        return 1;
+    return 0;
+}
+
 int here_doc(const char *delim, int heredoc_expand, t_env *env, t_minishell *mini)
 {
     int pipe_fd[2];
+    int expand;
 
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
         return (0);
     }
+    // Expansion seulement si le délimiteur n'est pas entre quotes
+    expand = heredoc_expand;
+    if (is_quoted_delim(delim))
+        expand = 0;
     setup_heredoc_signals();
-    heredoc_loop(delim, heredoc_expand, env, pipe_fd[1]);
+    heredoc_loop(delim, expand, env, pipe_fd[1]);
     close(pipe_fd[1]);
     restore_heredoc_signals();
     if (g_signal_status == 130)

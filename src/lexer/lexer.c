@@ -98,49 +98,47 @@ t_token_type	get_token_type(char *input, int *i)
 
 /*
 Extracts a word token from the input string starting at position *i.
-Continues until a special character or whitespace is found.
+Extracts the complete word including quotes and variables as a single token.
 Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-    int			start;
-    char		quote;
-    char		*result;
-    char		*segment;
-    t_word_type	wt = WORD_UNQUOTED;
-    int			quoted = 0;
+	int start;
+	t_word_type word_type = WORD_UNQUOTED;
+	char quote;
 
-    result = NULL;
-    while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
-    {
-        if ((input[*i] == '"' || input[*i] == '\'') && !quoted)
-        {
-            quote = input[*i];
-            quoted = 1;
-            wt = (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED;
-            start = *i;
-            (*i)++;
-            while (input[*i] && input[*i] != quote)
-                (*i)++;
-            if (input[*i] == quote)
-                (*i)++;
-            // Include the quotes in the token value
-            segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin(result, segment);
-            free(segment);
-        }
-        else
-        {
-            start = *i;
-            while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-                    && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
-                (*i)++;
-            segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin(result, segment);
-            free(segment);
-        }
-    }
-    add_token(tokens, result, TOKEN_WORD, wt);
-    (*i)--;
+	start = *i;
+	while (input[*i] && !ft_isspace(input[*i]) && !is_token_delim(input[*i]))
+	{
+		if (input[*i] == '\'' || input[*i] == '"')
+		{
+			quote = input[*i];
+			if (quote == '\'')
+				word_type = WORD_SINGLE_QUOTED;
+			else if (word_type != WORD_SINGLE_QUOTED)
+				word_type = WORD_DOUBLE_QUOTED;
+			(*i)++;
+			while (input[*i] && input[*i] != quote)
+				(*i)++;
+			if (input[*i] == quote)
+				(*i)++;
+		}
+		else if (input[*i] == '$')
+		{
+			(*i)++;
+			if (input[*i] == '?')
+				(*i)++;
+			else
+				while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
+					(*i)++;
+		}
+		else
+		{
+			(*i)++;
+		}
+	}
+	if (*i > start)
+		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, word_type);
+	(*i)--;
 }
 
