@@ -51,16 +51,12 @@ t_token	*lexer(char *input)
     i = 0;
     while (input[i])
     {
-        printf("DEBUG LEXER MAIN: At index %d, char: '%c' (ascii: %d)\n", i, input[i], input[i]);
         if (ft_isspace(input[i]))
         {
-            printf("DEBUG LEXER MAIN: Skipping whitespace at index %d\n", i);
             i++;
             continue ;
         }
-        printf("DEBUG LEXER MAIN: Calling handle_token at index %d\n", i);
         handle_token(input, &i, &tokens);
-        printf("DEBUG LEXER MAIN: After handle_token, index=%d\n", i);
     }
     add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED);
     return (tokens);
@@ -106,61 +102,25 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-	int		start;
-	char	*word;
-	int		j;
+    int start;
+    char quote;
 
-	start = *i;
-	printf("DEBUG LEXER: Starting extract_word at index %d, char: '%c'\n", *i, input[*i]);
-	
-	// Handle quotes
-	if (input[*i] == '\'' || input[*i] == '"')
-	{
-		char quote = input[*i];
-		(*i)++;
-		printf("DEBUG LEXER: Found quote '%c', moving to index %d\n", quote, *i);
-		
-		while (input[*i] && input[*i] != quote)
-		{
-			if (input[*i] == '\\' && quote == '"')
-				(*i)++;
-			(*i)++;
-		}
-		printf("DEBUG LEXER: After quote handling, index=%d\n", *i);
-	}
-	else
-	{
-		// Handle regular word
-		while (input[*i] && !ft_isspace(input[*i]) 
-			&& input[*i] != '\'' && input[*i] != '"'
-			&& input[*i] != '|' && input[*i] != '<' 
-			&& input[*i] != '>' && input[*i] != '&'
-			&& input[*i] != '(' && input[*i] != ')'
-			&& input[*i] != ';' && input[*i] != '\\')
-		{
-			(*i)++;
-		}
-		printf("DEBUG LEXER: After regular word, index=%d\n", *i);
-	}
-	
-	printf("DEBUG LEXER: Word range: start=%d, end=%d\n", start, *i);
-	
-	// Extract the word
-	word = malloc(sizeof(char) * (*i - start + 1));
-	if (!word)
-		return;
-	
-	j = 0;
-	while (start < *i)
-	{
-		word[j] = input[start];
-		printf("DEBUG LEXER: Copying char '%c' at position %d\n", input[start], j);
-		start++;
-		j++;
-	}
-	word[j] = '\0';
-	
-	printf("DEBUG LEXER: Extracted word: '%s' (length: %d)\n", word, j);
-	add_token(tokens, word, TOKEN_WORD, WORD_UNQUOTED);
+    if (input[*i] == '\'' || input[*i] == '"') {
+        quote = input[*i];
+        (*i)++;
+        start = *i;
+        while (input[*i] && input[*i] != quote)
+            (*i)++;
+        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED);
+        if (input[*i] == quote)
+            (*i)++;
+    } else {
+        start = *i;
+        while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
+            && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
+            && input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
+            (*i)++;
+        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED);
+    }
 }
 

@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/22 13:17:10 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 15:56:23 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 
     if (heredoc_expand)
     {
-        expanded = expand_token_value((char *)line, env);
+        expanded = expand_token_value((char *)line, env, WORD_UNQUOTED);
         ft_putstr_fd(expanded, fd);
         free(expanded);
     }

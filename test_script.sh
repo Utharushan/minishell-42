@@ -22,4 +22,14 @@ echo 'echo $TOTO' | ./minishell
 echo "Test 5: echo \"    \"\$TOTO\"   \""
 echo 'echo "    "$TOTO"   "' | ./minishell
 
+export TOTO=salut
+
+echo $TOTO
+echo '$TOTO'
+echo "$TOTO"
+echo "   "$TOTO"   "
+echo '   '4TOTO'   '
+echo "   '4TOTO'   "
+echo '   "$TOTO"   '
+
 echo "Tests completed." 

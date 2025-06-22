@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 13:14:58 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 15:55:58 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-char					*expand_token_value(char *token_value, t_env *env);
+char					*expand_token_value(char *token_value, t_env *env, t_word_type word_type);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
