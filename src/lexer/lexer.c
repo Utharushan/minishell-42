@@ -51,13 +51,16 @@ t_token	*lexer(char *input)
     i = 0;
     while (input[i])
     {
+        printf("DEBUG LEXER MAIN: At index %d, char: '%c' (ascii: %d)\n", i, input[i], input[i]);
         if (ft_isspace(input[i]))
         {
+            printf("DEBUG LEXER MAIN: Skipping whitespace at index %d\n", i);
             i++;
             continue ;
         }
+        printf("DEBUG LEXER MAIN: Calling handle_token at index %d\n", i);
         handle_token(input, &i, &tokens);
-        i++;
+        printf("DEBUG LEXER MAIN: After handle_token, index=%d\n", i);
     }
     add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED);
     return (tokens);
@@ -123,8 +126,6 @@ void	extract_word(char *input, int *i, t_token **tokens)
 				(*i)++;
 			(*i)++;
 		}
-		if (input[*i] == quote)
-			(*i)++;
 		printf("DEBUG LEXER: After quote handling, index=%d\n", *i);
 	}
 	else
