@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/22 15:56:23 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 17:22:56 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,19 +95,14 @@ int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
 int here_doc(const char *delim, int heredoc_expand, t_env *env, t_minishell *mini)
 {
     int pipe_fd[2];
-    int expand;
 
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
         return (0);
     }
-    // Expansion seulement si le délimiteur n'est pas entre quotes
-    expand = heredoc_expand;
-    if (is_quoted_delim(delim))
-        expand = 0;
     setup_heredoc_signals();
-    heredoc_loop(delim, expand, env, pipe_fd[1]);
+    heredoc_loop(delim, heredoc_expand, env, pipe_fd[1]);
     close(pipe_fd[1]);
     restore_heredoc_signals();
     if (g_signal_status == 130)

@@ -37,6 +37,7 @@ void	handle_token(char *input, int *i, t_token **tokens)
         else
             length = 1;
         add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
+        *i += length;
     }
 }
 
@@ -134,5 +135,4 @@ void	extract_word(char *input, int *i, t_token **tokens)
             (*i)++;
         add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
     }
-}
-
+} 
