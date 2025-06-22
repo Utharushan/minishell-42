@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 16:42:19 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 18:33:13 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ int						exec_command(t_command *cmd, t_env *env);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
-void					run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
+int						run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
 int						ft_echo(char **args, t_env *env);
 int						ft_pwd(void);
 void					ft_exit(char **args, t_minishell *mini);

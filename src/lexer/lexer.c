@@ -33,11 +33,17 @@ void	handle_token(char *input, int *i, t_token **tokens)
     else
     {
         if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
+        {
             length = 2;
+            add_token(tokens, ft_substr(input, *i - 1, length), type, WORD_UNQUOTED, has_leading_space);
+            *i += 1;
+        }
         else
+        {
             length = 1;
-        add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
-        *i += length;
+            add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
+            *i += length;
+        }
     }
 }
 

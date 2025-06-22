@@ -6,22 +6,22 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/22 17:22:56 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/22 18:32:59 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
+#include <readline/readline.h>
 
 void heredoc_sigint(int sig)
 {
 	(void)sig;
-	char c = '\n';
-
 	g_signal_status = 130;
+	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	ioctl(STDIN_FILENO, TIOCSTI, &c);
+	rl_done = 1; // Forcer readline à s'arrêter
 }
 
 void setup_heredoc_signals(void)
@@ -77,10 +77,16 @@ int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
     char *clean_delim;
 
     clean_delim = remove_quotes(delim);
+    g_signal_status = 0;  // Réinitialiser au début
     while (g_signal_status != 130)
     {
         line = readline("> ");
-        if (g_signal_status == 130 || !line || !ft_strcmp(line, clean_delim))
+        if (g_signal_status == 130)
+        {
+            free(line);
+            break;
+        }
+        if (!line || !ft_strcmp(line, clean_delim))
         {
             free(line);
             break;
@@ -130,7 +136,10 @@ int prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini)
             {
                 fd = here_doc(redirect->file, redirect->heredoc_expand, env, mini);
                 if (fd == -1)
+                {
+                    mini->status = 130;
                     return (0);
+                }
                 redirect->heredoc_fd = fd;
             }
             redirect = redirect->next;
