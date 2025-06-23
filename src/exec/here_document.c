@@ -71,7 +71,7 @@ int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
     return (0);
 }
 
-int here_doc(const char *delim, int heredoc_expand, t_env *env, t_minishell *mini)
+int here_doc(const char *delim, int heredoc_expand, t_env *env)
 {
     int pipe_fd[2];
 
@@ -86,14 +86,13 @@ int here_doc(const char *delim, int heredoc_expand, t_env *env, t_minishell *min
     restore_heredoc_signals();
     if (g_signal_status == 130)
     {
-        mini->status = 130;
         close(pipe_fd[0]);
         return (-1);
     }
     return (pipe_fd[0]);
 }
 
-int prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini)
+int prepare_heredocs(t_command *cmds, t_env *env)
 {
     t_command *commands;
     t_redir *redirect;
@@ -107,7 +106,7 @@ int prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini)
         {
             if (redirect->type == TOKEN_HEREDOC)
             {
-                fd = here_doc(redirect->file, redirect->heredoc_expand, env, mini);
+                fd = here_doc(redirect->file, redirect->heredoc_expand, env);
                 if (fd == -1)
                     return (0);
                 redirect->heredoc_fd = fd;

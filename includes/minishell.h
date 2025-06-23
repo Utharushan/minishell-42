@@ -99,11 +99,6 @@ typedef struct s_redir
 	struct s_redir		*next;
 }						t_redir;
 
-typedef struct s_minishell
-{
-	int					status;
-}						t_minishell;
-
 typedef struct s_command
 {
 	char				**args;
@@ -152,20 +147,20 @@ int						exec_command(t_command *cmd, t_env *env);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
-void					run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
+void					run_builtins(t_command *cmds, t_env *env);
 int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
-void					ft_exit(char **args, t_minishell *mini);
-void					ft_env(t_env *env);
-void					ft_export(t_env *env, char **args);
-void					ft_unset(t_env **env, char *name);
+void					ft_exit(char **args);
+int						ft_env(t_env *env);
+int						ft_export(t_env *env, char **args);
+int						ft_unset(t_env **env, char *name);
 int						ft_cd(t_command *cmds, t_env *env);
 
 //--- PIPES ---
-void					run_pipe(t_command *cmds, t_env *env, t_minishell *mini);
+void					run_pipe(t_command *cmds, t_env *env);
 int						command_redirections(t_command *cmd);
 int						here_doc(const char *delim, int heredoc_expand,
-							t_env *env, t_minishell *mini);
+							t_env *env);
 
 //--- ENV ---
 t_env					*new_env_node(char *name, char *value);
@@ -194,6 +189,7 @@ void					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start,
 							char quote);
 void					sigint_handler(int sig);
+
 int						prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini);
 void					add_argument_concat(t_command *cmd, t_token **tokens, t_env *env);
 
