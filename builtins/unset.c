@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 11:22:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/17 15:50:32 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/23 19:54:00 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,14 @@ void	free_tmp(t_env *tmp)
 	free(tmp->value);
 	free(tmp);
 }
-void	ft_unset(t_env **env, char *name)
+int		ft_unset(t_env **env, char *name)
 {
 	t_env	*cur;
 	t_env	*prev;
 	t_env	*tmp;
 
+	if (!name)
+		return (0);
 	cur = *env;
 	prev = NULL;
 	while (cur)
@@ -37,7 +39,7 @@ void	ft_unset(t_env **env, char *name)
 				prev->next = cur->next;
 			cur = cur->next;
 			free_tmp(tmp);
-			return ;
+			return (0);
 		}
 		else
 		{
@@ -45,4 +47,5 @@ void	ft_unset(t_env **env, char *name)
 			cur = cur->next;
 		}
 	}
+	return (0);
 }

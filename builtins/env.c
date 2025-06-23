@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/20 13:23:19 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/23 19:49:52 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,10 @@ t_env	*init_env(char **envp, t_env *env)
 	return (env);
 }
 
-void	ft_env(t_env *env)
+int		ft_env(t_env *env)
 {
 	if (!env)
-		return ;
+		return (1);
 	while (env)
 	{
 		if (env->name && env->value)
@@ -83,4 +83,5 @@ void	ft_env(t_env *env)
 		}
 		env = env->next;
 	}
+	return (0);
 }
