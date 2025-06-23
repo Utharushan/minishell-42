@@ -12,86 +12,68 @@
 
 #include "../../includes/minishell.h"
 
-static char	*get_env_value(t_env *env, const char *name)
-{
-	while (env)
-	{
-		if (ft_strcmp(env->name, name) == 0)
-			return (env->value);
-		env = env->next;
-	}
-	return ("");
-}
-
-static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
-{
-	int		start;
-	char	*name;
-	char	*val;
-
-	start = ++(*i);
-	if (str[start - 1] == '?')
-	{
-		(*i)++;
-		return (ft_itoa(last_status));
-	}
-	if (!ft_isalpha(str[start]) && str[start] != '_')
-	{
-		char	*dollar = malloc(2);
-
-		dollar[0] = '$';
-		dollar[1] = 0;
-		return (dollar);
-	}
-	while (str[*i] && (ft_isalnum(str[*i]) || str[*i] == '_'))
-		(*i)++;
-	name = ft_substr(str, start, *i - start);
-	val = get_env_value(env, name);
-	free(name);
-	return (ft_strdup(val ? val : ""));
-}
-
-char	*expand_token_value(const char *str, t_env *env, int last_status)
+char	*expand_token_value(char *token_value, t_env *env, t_word_type word_type)
 {
 	char	*result;
-	int		i = 0;
-	int		len = ft_strlen(str);
-	int		in_single = 0, in_double = 0;
-	char	*exp;
-	char	tmp[2];
-	char	*tmp_result;
+	int		i;
+	int		j;
 
-	result = ft_strdup("");
-	while (i < len)
+	if (!token_value)
+		return (NULL);
+	
+	// No expansion for single quoted words
+	if (word_type == WORD_SINGLE_QUOTED)
+		return (ft_strdup(token_value));
+	
+	result = malloc(sizeof(char) * (ft_strlen(token_value) * 10 + 1));
+	if (!result)
+		return (NULL);
+	
+	i = 0;
+	j = 0;
+	
+	while (token_value[i])
 	{
-		if (str[i] == '\'' && !in_double)
+		if (token_value[i] == '$' && word_type != WORD_SINGLE_QUOTED)
 		{
-			in_single = !in_single;
 			i++;
-			continue;
+			if (token_value[i] == '?')
+			{
+				char *exit_status = ft_itoa(g_exit_status);
+				if (exit_status)
+				{
+					ft_strlcpy(result + j, exit_status, ft_strlen(exit_status) + 1);
+					j += ft_strlen(exit_status);
+					free(exit_status);
+				}
+				i++;
+			}
+			else if (ft_isalpha(token_value[i]) || token_value[i] == '_')
+			{
+				int var_start = i;
+				while (token_value[i] && (ft_isalnum(token_value[i]) || token_value[i] == '_'))
+					i++;
+				char *var_name = ft_substr(token_value, var_start, i - var_start);
+				char *var_value = ft_getenv(env, var_name);
+				if (var_value)
+				{
+					ft_strlcpy(result + j, var_value, ft_strlen(var_value) + 1);
+					j += ft_strlen(var_value);
+				}
+				free(var_name);
+			}
+			else
+			{
+				result[j++] = '$';
+			}
 		}
-		if (str[i] == '"' && !in_single)
+		else
 		{
-			in_double = !in_double;
-			i++;
-			continue;
+			result[j++] = token_value[i++];
 		}
-		if (str[i] == '$' && !in_single)
-		{
-			exp = expand_var(str, &i, env, last_status);
-			tmp_result = ft_strjoin(result, exp);
-			free(result);
-			result = tmp_result;
-			free(exp);
-			continue;
-		}
-		tmp[0] = str[i];
-		tmp[1] = '\0';
-		tmp_result = ft_strjoin(result, tmp);
-		free(result);
-		result = tmp_result;
-		i++;
 	}
+	
+	result[j] = '\0';
 	return (result);
 }
 

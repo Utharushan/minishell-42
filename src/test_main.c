@@ -16,6 +16,7 @@
 #include "../includes/minishell.h"
 
 int g_signal_status = 0;
+int g_exit_status = 0;
 
 void print_tokens(t_token *tokens)
 {
@@ -51,32 +52,43 @@ void print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
-void run_builtins(t_command *cmds, t_env *env, t_minishell *mini)
+int run_builtins(t_command *cmds, t_env *env, t_minishell *mini)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
-		return;
+		return (0);
 
 	if (!ft_strncmp(cmds->args[0], "cd", 3))
-		mini->status = ft_cd(cmds, env);
+		return (ft_cd(cmds, env));
 	else if (!ft_strncmp(cmds->args[0], "echo", 5))
 	{
 		if (cmds->args[1] && !ft_strncmp(cmds->args[1], "$?", 3))
 		{
 			ft_putnbr_fd(mini->status, 1);
 			ft_putchar_fd('\n', 1);
-			mini->status = 0;
+			return (0);
 		}
 		else
-			mini->status = ft_echo(cmds);
+			return (ft_echo(cmds->args, env));
 	}
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
-		mini->status = ft_pwd();
+		return (ft_pwd());
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
+	{
 		ft_env(env);
+		return (0);
+	}
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
+	{
 		ft_export(env, cmds->args);
+		return (0);
+	}
 	else if (!ft_strncmp(cmds->args[0], "unset", 6))
+	{
 		ft_unset(&env, cmds->args[1]);
+		return (0);
+	}
+	else
+		return (127);
 }
 int is_builtins(t_command *cmds)
 {
@@ -162,15 +174,11 @@ t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 void sigint_handler(int sig)
 {
 	(void)sig;
-	char c;
-
 	g_signal_status = 130;	
-	c = '\0';
 	write(1, "\n", 1);
-	write(1, "\033[2K", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	ioctl(STDIN_FILENO, TIOCSTI, &c);
+	rl_redisplay();
 }
 
 t_minishell	*init_minishell(t_minishell *minishell)
@@ -220,11 +228,7 @@ int main(int argc, char **argv, char **envp)
 			run_pipe(cmds, env, mini);
 			free_command_list(cmds);
 			free_token_list(tokens);
-			if (g_signal_status == 130)
-			{
-				g_signal_status = 0;
-				continue;
-			}
+			g_signal_status = 0;
 		}
 	}
 	free_env_list(env);

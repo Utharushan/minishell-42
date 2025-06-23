@@ -3,25 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   here_document.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/20 11:32:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/22 18:32:59 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
+#include <readline/readline.h>
 
 void heredoc_sigint(int sig)
 {
 	(void)sig;
-	char c = '\n';
-
 	g_signal_status = 130;
+	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	ioctl(STDIN_FILENO, TIOCSTI, &c);
+	rl_done = 1; // Forcer readline à s'arrêter
 }
 
 void setup_heredoc_signals(void)
@@ -43,7 +43,7 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 
     if (heredoc_expand)
     {
-        expanded = expand_token_value((char *)line, env, g_signal_status);
+        expanded = expand_token_value((char *)line, env, WORD_UNQUOTED);
         ft_putstr_fd(expanded, fd);
         free(expanded);
     }
@@ -53,14 +53,40 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
     return (0);
 }
 
+// Ajout d'une fonction utilitaire pour détecter les quotes autour du délimiteur
+int is_quoted_delim(const char *delim)
+{
+    int len = ft_strlen(delim);
+    if ((delim[0] == '"' && delim[len-1] == '"') || (delim[0] == '\'' && delim[len-1] == '\''))
+        return 1;
+    return 0;
+}
+
+// Fonction pour enlever les quotes du délimiteur
+char *remove_quotes(const char *delim)
+{
+    int len = ft_strlen(delim);
+    if (len >= 2 && ((delim[0] == '"' && delim[len-1] == '"') || (delim[0] == '\'' && delim[len-1] == '\'')))
+        return ft_substr(delim, 1, len - 2);
+    return ft_strdup(delim);
+}
+
 int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
 {
     char *line;
+    char *clean_delim;
 
+    clean_delim = remove_quotes(delim);
+    g_signal_status = 0;  // Réinitialiser au début
     while (g_signal_status != 130)
     {
         line = readline("> ");
-        if (g_signal_status == 130 || !line || !ft_strcmp(line, delim))
+        if (g_signal_status == 130)
+        {
+            free(line);
+            break;
+        }
+        if (!line || !ft_strcmp(line, clean_delim))
         {
             free(line);
             break;
@@ -68,6 +94,7 @@ int heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
         heredoc_write_line(line, heredoc_expand, env, fd);
         free(line);
     }
+    free(clean_delim);
     return (0);
 }
 
@@ -109,7 +136,10 @@ int prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini)
             {
                 fd = here_doc(redirect->file, redirect->heredoc_expand, env, mini);
                 if (fd == -1)
+                {
+                    mini->status = 130;
                     return (0);
+                }
                 redirect->heredoc_fd = fd;
             }
             redirect = redirect->next;
