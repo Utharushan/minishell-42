@@ -190,7 +190,6 @@ int						validate_quotes(const char *input, int start,
 							char quote);
 void					sigint_handler(int sig);
 
-int						prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini);
-void					add_argument_concat(t_command *cmd, t_token **tokens, t_env *env);
+int						prepare_heredocs(t_command *cmds, t_env *env);
 
 #endif
