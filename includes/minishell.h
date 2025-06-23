@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/23 19:51:43 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/23 21:27:27 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ typedef struct s_token
 	char				*value;
 	t_token_type		type;
 	t_word_type			word_type;
+	int					has_leading_space;
 	struct s_token		*next;
 }						t_token;
 
@@ -118,9 +119,9 @@ typedef struct s_command
 // --- LEXER ---
 
 t_token					*new_token(char *value, t_token_type type,
-							t_word_type word_type);
+							t_word_type word_type, int has_leading_space);
 void					add_token(t_token **tokens, char *value,
-							t_token_type type, t_word_type word_type);
+							t_token_type type, t_word_type word_type, int has_leading_space);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
@@ -129,13 +130,13 @@ void					extract_word(char *input, int *i, t_token **tokens);
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg, t_env *env);
+void					add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-char					*expand_token_value(const char *str, t_env *env,
-							int last_status);
+char					*expand_token_value(const char *str, t_word_type word_type, t_env *env, int last_status);
+char					*expand_token_value_unquoted(const char *str, t_env *env, int last_status);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
@@ -188,6 +189,8 @@ void					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start,
 							char quote);
 void					sigint_handler(int sig);
-int						prepare_heredocs(t_command *cmds, t_env *env);
+
+int						prepare_heredocs(t_command *cmds, t_env *env, t_minishell *mini);
+void					add_argument_concat(t_command *cmd, t_token **tokens, t_env *env);
 
 #endif

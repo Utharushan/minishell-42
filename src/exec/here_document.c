@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_document.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/23 19:42:33 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/23 21:11:55 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 
     if (heredoc_expand)
     {
-        expanded = expand_token_value((char *)line, env, g_signal_status);
+        expanded = expand_token_value(line, WORD_UNQUOTED, env, g_signal_status);
         ft_putstr_fd(expanded, fd);
         free(expanded);
     }
