@@ -20,6 +20,10 @@ void	handle_token(char *input, int *i, t_token **tokens)
 {
     t_token_type	type;
     int				length;
+    int				has_leading_space = 0;
+
+    if (*i > 0 && ft_isspace(input[*i - 1]))
+        has_leading_space = 1;
 
     type = get_token_type(input, i);
     if (type == TOKEN_WORD)
@@ -29,10 +33,17 @@ void	handle_token(char *input, int *i, t_token **tokens)
     else
     {
         if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
+        {
             length = 2;
+            add_token(tokens, ft_substr(input, *i - 1, length), type, WORD_UNQUOTED, has_leading_space);
+            *i += 1;
+        }
         else
+        {
             length = 1;
-        add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED);
+            add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
+            *i += length;
+        }
     }
 }
 
@@ -57,9 +68,8 @@ t_token	*lexer(char *input)
             continue ;
         }
         handle_token(input, &i, &tokens);
-        i++;
     }
-    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED);
+    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED, 1);
     return (tokens);
 }
 
@@ -103,36 +113,35 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-	int		start;
-	char	quote;
-	int		j;
+    int start;
+    char quote;
+    int has_leading_space = 0;
 
-	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
-	{
-		if (input[*i] == '"' || input[*i] == '\'')
-		{
-			quote = input[*i];
-			start = ++(*i);
-			j = 0;
-			while (input[*i] && input[*i] != quote)
-			{
-				(*i)++;
-				j++;
-			}
-			add_token(tokens, ft_substr(input, start, j), TOKEN_WORD,
-				(quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED);
-			if (input[*i] == quote)
-				(*i)++;
-		}
-		else
-		{
-			start = *i;
-			while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
-				(*i)++;
-			if (*i > start)
-				add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED);
-		}
-	}
-	(*i)--;
+    if (*i == 0)
+        has_leading_space = 0;
+    else if (ft_isspace(input[*i - 1]))
+        has_leading_space = 1;
+
+    if (input[*i] == '\'' || input[*i] == '"')
+    {
+        quote = input[*i];
+        start = *i;
+        (*i)++;
+        while (input[*i] && input[*i] != quote)
+            (*i)++;
+        if (input[*i] == quote)
+            (*i)++;
+        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD,
+            (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
+    }
+    else
+    {
+        start = *i;
+        while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
+            && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
+            && input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
+            (*i)++;
+        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
+    }
 }
 

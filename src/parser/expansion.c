@@ -56,10 +56,29 @@ static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
 
 char	*expand_token_value(const char *str, t_word_type word_type, t_env *env, int last_status)
 {
+	char	*result;
+	int		len;
+
 	if (!str)
 		return (NULL);
+	len = ft_strlen(str);
 	if (word_type == WORD_SINGLE_QUOTED)
+	{
+		if (len >= 2 && str[0] == '\'' && str[len - 1] == '\'')
+			return (ft_substr(str, 1, len - 2));
 		return (ft_strdup(str));
+	}
+	if (word_type == WORD_DOUBLE_QUOTED)
+	{
+		if (len >= 2 && str[0] == '"' && str[len - 1] == '"')
+		{
+			char	*tmp = ft_substr(str, 1, len - 2);
+			result = expand_token_value_unquoted(tmp, env, last_status);
+			free(tmp);
+			return (result);
+		}
+		return (expand_token_value_unquoted(str, env, last_status));
+	}
 	return (expand_token_value_unquoted(str, env, last_status));
 }
 

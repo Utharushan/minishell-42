@@ -107,6 +107,45 @@ t_command	*handle_pipe(t_command *cmd)
 	return (cmd->next);
 }
 
+void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
+{
+    char *arg = ft_strdup("");
+    char *tmp;
+    int first = 1;
+    while (*tokens && (*tokens)->type == TOKEN_WORD)
+    {
+        if (!first && (*tokens)->has_leading_space)
+            break;
+        char *expanded = expand_token_value((*tokens)->value, (*tokens)->word_type, env, g_signal_status);
+        tmp = arg;
+        arg = ft_strjoin(arg, expanded);
+        free(tmp);
+        free(expanded);
+        *tokens = (*tokens)->next;
+        first = 0;
+    }
+    int count = 0;
+    while (cmd->args && cmd->args[count])
+        count++;
+    char **new_args = malloc(sizeof(char *) * (count + 2));
+    if (!new_args)
+    {
+        free(arg);
+        return;
+    }
+    int i = 0;
+    while (i < count)
+    {
+        new_args[i] = cmd->args[i];
+        i++;
+    }
+    new_args[count] = ft_strdup(arg);
+    new_args[count + 1] = NULL;
+    free(cmd->args);
+    cmd->args = new_args;
+    free(arg);
+}
+
 /*
 Parses a list of tokens into a linked list of command structures.
 Handles arguments, pipes, redirections, and heredocs.
@@ -120,15 +159,28 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 
     cmd = new_command();
     head = cmd;
+    if (tokens && tokens->type == TOKEN_WORD)
+    {
+        add_argument(cmd, tokens->value, tokens->word_type, env);
+        tokens = tokens->next;
+    }
     while (tokens && tokens->type != TOKEN_EOF)
     {
         if (tokens->type == TOKEN_WORD)
         {
-            add_argument(cmd, tokens->value, tokens->word_type, env);
+            add_argument_concat(cmd, &tokens, env);
+            continue;
         }
         else if (tokens->type == TOKEN_PIPE)
         {
             cmd = handle_pipe(cmd);
+            tokens = tokens->next;
+            if (tokens && tokens->type == TOKEN_WORD)
+            {
+                add_argument(cmd, tokens->value, tokens->word_type, env);
+                tokens = tokens->next;
+            }
+            continue;
         }
         else if (tokens->type == TOKEN_REDIRECT_IN
             || tokens->type == TOKEN_REDIRECT_OUT
@@ -152,7 +204,19 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
                 return head;
             }
             int expand = (tokens->word_type == WORD_UNQUOTED);
-            add_redir(cmd, TOKEN_HEREDOC, tokens->value, expand);
+            char *delim = tokens->value;
+            if (tokens->word_type == WORD_SINGLE_QUOTED || tokens->word_type == WORD_DOUBLE_QUOTED)
+            {
+                int len = ft_strlen(delim);
+                if (len >= 2 && ((delim[0] == '\'' && delim[len-1] == '\'') || (delim[0] == '"' && delim[len-1] == '"')))
+                    delim = ft_substr(delim, 1, len - 2);
+                else
+                    delim = ft_strdup(delim);
+            }
+            else
+                delim = ft_strdup(delim);
+            add_redir(cmd, TOKEN_HEREDOC, delim, expand);
+            free(delim);
         }
         tokens = tokens->next;
     }
