@@ -103,44 +103,36 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-    int			start;
-    char		quote;
-    char		*result;
-    char		*segment;
-    t_word_type	wt = WORD_UNQUOTED;
-    int			quoted = 0;
+	int		start;
+	char	quote;
+	int		j;
 
-    result = NULL;
-    while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
-    {
-        if ((input[*i] == '"' || input[*i] == '\'') && !quoted)
-        {
-            quote = input[*i];
-            quoted = 1;
-            wt = (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED;
-            start = *i;
-            (*i)++;
-            while (input[*i] && input[*i] != quote)
-                (*i)++;
-            if (input[*i] == quote)
-                (*i)++;
-            // Include the quotes in the token value
-            segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin(result, segment);
-            free(segment);
-        }
-        else
-        {
-            start = *i;
-            while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-                    && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
-                (*i)++;
-            segment = ft_substr(input, start, *i - start);
-            result = ft_strjoin(result, segment);
-            free(segment);
-        }
-    }
-    add_token(tokens, result, TOKEN_WORD, wt);
-    (*i)--;
+	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
+	{
+		if (input[*i] == '"' || input[*i] == '\'')
+		{
+			quote = input[*i];
+			start = ++(*i);
+			j = 0;
+			while (input[*i] && input[*i] != quote)
+			{
+				(*i)++;
+				j++;
+			}
+			add_token(tokens, ft_substr(input, start, j), TOKEN_WORD,
+				(quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED);
+			if (input[*i] == quote)
+				(*i)++;
+		}
+		else
+		{
+			start = *i;
+			while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
+				(*i)++;
+			if (*i > start)
+				add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED);
+		}
+	}
+	(*i)--;
 }
 

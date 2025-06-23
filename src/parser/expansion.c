@@ -48,15 +48,26 @@ static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
 	name = ft_substr(str, start, *i - start);
 	val = get_env_value(env, name);
 	free(name);
-	return (ft_strdup(val ? val : ""));
+	if (val)
+		return (ft_strdup(val));
+	else
+		return (ft_strdup(""));
 }
 
-char	*expand_token_value(const char *str, t_env *env, int last_status)
+char	*expand_token_value(const char *str, t_word_type word_type, t_env *env, int last_status)
+{
+	if (!str)
+		return (NULL);
+	if (word_type == WORD_SINGLE_QUOTED)
+		return (ft_strdup(str));
+	return (expand_token_value_unquoted(str, env, last_status));
+}
+
+char	*expand_token_value_unquoted(const char *str, t_env *env, int last_status)
 {
 	char	*result;
 	int		i = 0;
 	int		len = ft_strlen(str);
-	int		in_single = 0, in_double = 0;
 	char	*exp;
 	char	tmp[2];
 	char	*tmp_result;
@@ -64,19 +75,7 @@ char	*expand_token_value(const char *str, t_env *env, int last_status)
 	result = ft_strdup("");
 	while (i < len)
 	{
-		if (str[i] == '\'' && !in_double)
-		{
-			in_single = !in_single;
-			i++;
-			continue;
-		}
-		if (str[i] == '"' && !in_single)
-		{
-			in_double = !in_double;
-			i++;
-			continue;
-		}
-		if (str[i] == '$' && !in_single)
+		if (str[i] == '$')
 		{
 			exp = expand_var(str, &i, env, last_status);
 			tmp_result = ft_strjoin(result, exp);
