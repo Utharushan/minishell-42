@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:39:56 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 17:23:23 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/03/31 13:39:56 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,24 +64,19 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-void	add_argument(t_command *cmd, char *arg, t_env *env, t_word_type word_type)
+void	add_argument(t_command *cmd, char *arg, t_env *env)
 {
     int		count;
     char	**new_args;
     int		i;
-    char	*final_arg;
+    char	*final_arg = NULL;
 
     count = 0;
     while (cmd->args && cmd->args[count])
         count++;
 
-    // If word_type is not WORD_UNQUOTED, expand according to type
-    if (word_type != WORD_UNQUOTED) {
-        final_arg = expand_token_value(arg, env, word_type);
-    } else {
-        // Already expanded, just duplicate
-        final_arg = ft_strdup(arg);
-    }
+    // Always use expand_token_value, which now handles all quoting and expansion
+    final_arg = expand_token_value(arg, env, g_signal_status);
 
     new_args = malloc(sizeof(char *) * (count + 2));
     if (!new_args)
@@ -114,29 +109,6 @@ t_command	*handle_pipe(t_command *cmd)
 }
 
 /*
-Adds an argument to the command's argument list by concatenating adjacent TOKEN_WORD tokens.
-*/
-void add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
-{
-    char *arg = ft_strdup("");
-    char *tmp;
-    int first = 1;
-    while (*tokens && (*tokens)->type == TOKEN_WORD) {
-        if (!first && (*tokens)->has_leading_space)
-            break;
-        char *expanded = expand_token_value((*tokens)->value, env, (*tokens)->word_type);
-        tmp = arg;
-        arg = ft_strjoin(arg, expanded);
-        free(tmp);
-        free(expanded);
-        *tokens = (*tokens)->next;
-        first = 0;
-    }
-    add_argument(cmd, arg, env, WORD_UNQUOTED);
-    free(arg);
-}
-
-/*
 Parses a list of tokens into a linked list of command structures.
 Handles arguments, pipes, redirections, and heredocs.
 Returns the head of the command list.
@@ -149,29 +121,15 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 
     cmd = new_command();
     head = cmd;
-    // 1. Always treat the first TOKEN_WORD as the command
-    if (tokens && tokens->type == TOKEN_WORD) {
-        add_argument(cmd, tokens->value, env, tokens->word_type);
-        tokens = tokens->next;
-    }
-    // 2. For each argument, concatenate adjacent TOKEN_WORD tokens
     while (tokens && tokens->type != TOKEN_EOF)
     {
         if (tokens->type == TOKEN_WORD)
         {
-            add_argument_concat(cmd, &tokens, env);
-            continue;
+            add_argument(cmd, tokens->value, env);
         }
         else if (tokens->type == TOKEN_PIPE)
         {
             cmd = handle_pipe(cmd);
-            tokens = tokens->next;
-            // Next command: treat first TOKEN_WORD as command
-            if (tokens && tokens->type == TOKEN_WORD) {
-                add_argument(cmd, tokens->value, env, tokens->word_type);
-                tokens = tokens->next;
-            }
-            continue;
         }
         else if (tokens->type == TOKEN_REDIRECT_IN
             || tokens->type == TOKEN_REDIRECT_OUT

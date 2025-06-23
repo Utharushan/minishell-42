@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/22 18:33:13 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:33:12 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@
 
 // --- GLOBAL VAR ---
 extern int				g_signal_status;
-extern int				g_exit_status;
 
 // --- ENV LINKED LIST ---
 
@@ -77,7 +76,6 @@ typedef struct s_token
 	char				*value;
 	t_token_type		type;
 	t_word_type			word_type;
-	int					has_leading_space;
 	struct s_token		*next;
 }						t_token;
 
@@ -125,24 +123,24 @@ typedef struct s_command
 // --- LEXER ---
 
 t_token					*new_token(char *value, t_token_type type,
-							t_word_type word_type, int has_leading_space);
+							t_word_type word_type);
 void					add_token(t_token **tokens, char *value,
-							t_token_type type, t_word_type word_type, int has_leading_space);
+							t_token_type type, t_word_type word_type);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
 void					extract_word(char *input, int *i, t_token **tokens);
-int						is_token_delim(char c);
 
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg, t_env *env, t_word_type word_type);
+void					add_argument(t_command *cmd, char *arg, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-char					*expand_token_value(char *token_value, t_env *env, t_word_type word_type);
+char					*expand_token_value(const char *str, t_env *env,
+							int last_status);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
@@ -153,8 +151,8 @@ int						exec_command(t_command *cmd, t_env *env);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
-int						run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
-int						ft_echo(char **args, t_env *env);
+void					run_builtins(t_command *cmds, t_env *env, t_minishell *mini);
+int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
 void					ft_exit(char **args, t_minishell *mini);
 void					ft_env(t_env *env);

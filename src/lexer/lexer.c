@@ -20,10 +20,6 @@ void	handle_token(char *input, int *i, t_token **tokens)
 {
     t_token_type	type;
     int				length;
-    int				has_leading_space = 0;
-
-    if (*i > 0 && ft_isspace(input[*i - 1]))
-        has_leading_space = 1;
 
     type = get_token_type(input, i);
     if (type == TOKEN_WORD)
@@ -33,17 +29,10 @@ void	handle_token(char *input, int *i, t_token **tokens)
     else
     {
         if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
-        {
             length = 2;
-            add_token(tokens, ft_substr(input, *i - 1, length), type, WORD_UNQUOTED, has_leading_space);
-            *i += 1;
-        }
         else
-        {
             length = 1;
-            add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
-            *i += length;
-        }
+        add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED);
     }
 }
 
@@ -68,9 +57,9 @@ t_token	*lexer(char *input)
             continue ;
         }
         handle_token(input, &i, &tokens);
+        i++;
     }
-    // For EOF, always set has_leading_space to 1 (doesn't matter)
-    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED, 1);
+    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED);
     return (tokens);
 }
 
@@ -109,36 +98,49 @@ t_token_type	get_token_type(char *input, int *i)
 
 /*
 Extracts a word token from the input string starting at position *i.
-Extracts the complete word including quotes and variables as a single token.
+Continues until a special character or whitespace is found.
 Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-    int start;
-    char quote;
-    int has_leading_space = 0;
+    int			start;
+    char		quote;
+    char		*result;
+    char		*segment;
+    t_word_type	wt = WORD_UNQUOTED;
+    int			quoted = 0;
 
-    // Check if the current token is preceded by a space
-    if (*i == 0)
-        has_leading_space = 0;
-    else if (ft_isspace(input[*i - 1]))
-        has_leading_space = 1;
-
-    if (input[*i] == '\'' || input[*i] == '"') {
-        quote = input[*i];
-        (*i)++;
-        start = *i;
-        while (input[*i] && input[*i] != quote)
+    result = NULL;
+    while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
+    {
+        if ((input[*i] == '"' || input[*i] == '\'') && !quoted)
+        {
+            quote = input[*i];
+            quoted = 1;
+            wt = (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED;
+            start = *i;
             (*i)++;
-        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
-        if (input[*i] == quote)
-            (*i)++;
-    } else {
-        start = *i;
-        while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
-            && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
-            && input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
-            (*i)++;
-        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
+            while (input[*i] && input[*i] != quote)
+                (*i)++;
+            if (input[*i] == quote)
+                (*i)++;
+            // Include the quotes in the token value
+            segment = ft_substr(input, start, *i - start);
+            result = ft_strjoin(result, segment);
+            free(segment);
+        }
+        else
+        {
+            start = *i;
+            while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
+                    && input[*i] != '<' && input[*i] != '>' && input[*i] != '"' && input[*i] != '\'')
+                (*i)++;
+            segment = ft_substr(input, start, *i - start);
+            result = ft_strjoin(result, segment);
+            free(segment);
+        }
     }
-} 
+    add_token(tokens, result, TOKEN_WORD, wt);
+    (*i)--;
+}
+

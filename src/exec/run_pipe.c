@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_pipe.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/22 18:32:51 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:33:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,16 +79,6 @@ void	wait_for_pids(t_command *cmds, pid_t *pid, t_minishell *mini)
 		waitpid(pid[i], &status, 0);
 		if (WIFEXITED(status))
 			mini->status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-				mini->status = 130;
-			else if (WTERMSIG(status) == SIGQUIT)
-			{
-				mini->status = 131;
-				ft_putstr_fd("Quit (core dumped)\n", 2);
-			}
-		}
 		cmds = cmds->next;
 		i++;
 	}
@@ -143,7 +133,8 @@ void	exec_child_builtin(t_command *cmds, t_env *env, t_minishell *mini)
 {
     if (is_parent_builtin(cmds))
         exit(0);
-    exit(run_builtins(cmds, env, mini));
+    run_builtins(cmds, env, mini);
+    exit(mini->status);
 }
 
 void	exec_child_external(t_command *cmds, t_env *env, t_minishell *mini)
@@ -154,7 +145,7 @@ void	exec_child_external(t_command *cmds, t_env *env, t_minishell *mini)
     {
         ft_putstr_fd(cmds->args[0], 2);
         ft_putstr_fd(": command not found\n", 2);
-        exit(127);
+        mini->status = 127;
     }
     else
         exec_command(cmds, env);
@@ -167,24 +158,15 @@ void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd, t_env *env, 
     if (command_redirections(cmds) == 0)
         exit(130);
     if (is_builtins(cmds) == 0)
-    {
-        // Pour les builtins, garder les signaux du parent
         exec_child_builtin(cmds, env, mini);
-    }
-    else
-    {
-        // Pour les commandes externes, restaurer les signaux par défaut
-        signal(SIGINT, SIG_DFL);
-        signal(SIGQUIT, SIG_DFL);
-        exec_child_external(cmds, env, mini);
-    }
+    exec_child_external(cmds, env, mini);
 }
 
 int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid, t_minishell *mini)
 {
     if (!cmds->next && is_parent_builtin(cmds))
     {
-        mini->status = run_builtins(cmds, env, mini);
+        run_builtins(cmds, env, mini);
         free(pid);
         return (1);
     }
