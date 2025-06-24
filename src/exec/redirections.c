@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 09:32:24 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 17:55:45 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,8 @@ int	command_redirections(t_command *cmd)
 
     redir = cmd->redir;
     last_heredoc = find_last_heredoc(cmd->redir);
+	if (!last_heredoc)
+		return (1);
     while (redir)
     {
         if (!handle_one_redir(redir, last_heredoc))

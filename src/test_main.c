@@ -184,17 +184,19 @@ int main(int argc, char **argv, char **envp)
 	cmds = NULL;
 	tokens = NULL;
 	env = init_env(envp, NULL);
+	if (!env)
+		return (1);
 	while (1)
 	{
 		signal(SIGINT, sigint_handler);
 		signal(SIGQUIT, SIG_IGN);
 		input = readline("minishell> ");
-		add_history(input);
 		if (!input)
 		{
 			ft_putstr_fd("exit", 1);
 			exit(0);
 		}
+		add_history(input);
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, input, env);

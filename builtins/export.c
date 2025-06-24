@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:09:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/23 19:50:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 17:45:01 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,22 +86,27 @@ int		ft_export(t_env *env, char **args)
 {
 	int	i;
 
-	i = 1;
+	i = 0;
 	if (!env)
 		return (1);
-	while (args[i])
+	while (args[++i])
 	{
 		if (find_plus_equal(args[i]))
 		{
 			if (handle_plus_equal(env, args[i]))
+			{
 				export_error(args[i]);
+				return (1);
+			}		
 		}
 		else if (ft_strchr(args[i], '='))
 		{
 			if (add_new_node(env, args[i]))
+			{
 				export_error(args[i]);
+				return (1);
+			}
 		}
-		i++;
 	}
 	return (0);
 }

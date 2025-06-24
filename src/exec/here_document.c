@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 13:24:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 17:54:29 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,9 @@ int	heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
 	while (g_signal_status != 130)
 	{
 		line = readline("> ");
-		if (g_signal_status == 130 || !line || !ft_strcmp(line, delim))
+		if (!line)
+			break ;
+		if (g_signal_status == 130 || !ft_strcmp(line, delim))
 		{
 			free(line);
 			break ;

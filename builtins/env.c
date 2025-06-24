@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/23 19:49:52 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 17:47:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,14 @@ t_env	*init_env(char **envp, t_env *env)
 			{
 				free(name);
 				free(value);
+				return (NULL);
 			}
 			add_env_back(&env, new_env);
 		}
 		i++;
 	}
+	free(value);
+	free(name);
 	return (env);
 }
 

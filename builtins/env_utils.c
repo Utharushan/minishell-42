@@ -2,11 +2,11 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+        
+/*                                                    +:+ +:+
 	+:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+      
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+
 	+#+        */
-/*                                                +#+#+#+#+#+  
+/*                                                +#+#+#+#+#+
 	+#+           */
 /*   Created: 2025/05/30 14:33:45 by tuthayak          #+#    #+#             */
 /*   Updated: 2025/05/30 14:33:45 by tuthayak         ###   ########.fr       */
@@ -35,6 +35,8 @@ void	ft_setenv(t_env *env, const char *name, const char *value)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);
+			if (!env->value)
+				return ;
 			return ;
 		}
 		env = env->next;
@@ -83,7 +85,9 @@ char	**env_to_envp(t_env *env)
 
 char	**get_path_dirs(t_env *env)
 {
-	char *path_value = ft_getenv(env, "PATH");
+	char *path_value;
+
+	path_value = ft_getenv(env, "PATH");
 	if (!path_value)
 		return (NULL);
 	return (ft_split(path_value, ':'));

@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 13:30:50 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 16:05:23 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,9 +191,7 @@ void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd,
 	create_pipe(cmds, pipe_fd);
 	pid[*i] = create_child_process();
 	if (pid[(*i)++] == 0)
-	{
 		handle_child_process(cmds, *in_fd, pipe_fd, env);
-	}
 	else
 		close_fd(in_fd, cmds, pipe_fd);
 }
