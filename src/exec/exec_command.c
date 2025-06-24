@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/18 10:47:55 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/24 09:13:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int try_exec_path(char **args, char **envp, char **path_dirs)
 	return (-1);
 }
 
-static void free_str_array(char **envp)
+void free_str_array(char **envp)
 {
 	int i;
 

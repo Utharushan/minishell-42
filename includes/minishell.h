@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/23 21:27:27 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/06/24 10:14:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,6 @@ typedef struct s_command
 	char				*input;
 	char				*output;
 	bool				append;
-	int					status;
 	int					fd[2];
 	int					heredoc_expand;
 	pid_t				pid;
@@ -189,7 +188,8 @@ void					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start,
 							char quote);
 void					sigint_handler(int sig);
-
+void 					restore_heredoc_signals(void);
 int						prepare_heredocs(t_command *cmds, t_env *env);
+void					child_process_signals(void);
 
 #endif

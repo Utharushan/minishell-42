@@ -64,7 +64,6 @@ void run_builtins(t_command *cmds, t_env *env)
 		{
 			ft_putnbr_fd(g_signal_status, 1);
 			ft_putchar_fd('\n', 1);
-			g_signal_status = 0;
 		}
 		else
 			g_signal_status = ft_echo(cmds);
@@ -194,13 +193,14 @@ int main(int argc, char **argv, char **envp)
 		if (!input)
 		{
 			ft_putstr_fd("exit", 1);
-			g_signal_status = 130;
-			exit(130);
+			exit(0);
 		}
 		if (!check_input(input))
 		{
+			int fd;
 			cmds = init(tokens, cmds, input, env);
-			if (!prepare_heredocs(cmds, env))
+			fd = prepare_heredocs(cmds, env);
+			if (!fd)
 			{
 				free_command_list(cmds);
 				continue;
@@ -209,10 +209,7 @@ int main(int argc, char **argv, char **envp)
 			free_command_list(cmds);
 			free_token_list(tokens);
 			if (g_signal_status == 130)
-			{
-				g_signal_status = 0;
 				continue;
-			}
 		}
 	}
 	free_env_list(env);
