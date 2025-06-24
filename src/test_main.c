@@ -197,10 +197,8 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (!check_input(input))
 		{
-			int fd;
 			cmds = init(tokens, cmds, input, env);
-			fd = prepare_heredocs(cmds, env);
-			if (!fd)
+			if (!prepare_heredocs(cmds, env))
 			{
 				free_command_list(cmds);
 				continue;
