@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 17:47:51 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/25 12:06:30 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ t_env	*new_env_node(char *name, char *value)
 {
 	t_env	*new;
 
+	if (!name || !value)
+		return (NULL);
 	new = malloc(sizeof(t_env));
 	if (!new)
 		return (NULL);
@@ -56,18 +58,20 @@ t_env	*init_env(char **envp, t_env *env)
 			name = ft_substr(envp[i], 0, equal_position - envp[i]);
 			value = ft_strdup(equal_position + 1);
 			new_env = new_env_node(name, value);
-			if (!new_env)
+			if (!new_env || !name || !value)
 			{
 				free(name);
 				free(value);
+				free_env_list(new_env);
+				free(equal_position);
 				return (NULL);
 			}
 			add_env_back(&env, new_env);
 		}
 		i++;
 	}
-	free(value);
 	free(name);
+	free(value);
 	return (env);
 }
 

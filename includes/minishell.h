@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/24 16:18:06 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/25 17:59:44 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,8 @@ typedef struct s_command
 t_token					*new_token(char *value, t_token_type type,
 							t_word_type word_type, int has_leading_space);
 void					add_token(t_token **tokens, char *value,
-							t_token_type type, t_word_type word_type, int has_leading_space);
+							t_token_type type, t_word_type word_type,
+							int has_leading_space);
 void					handle_token(char *input, int *i, t_token **tokens);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
@@ -129,13 +130,16 @@ void					extract_word(char *input, int *i, t_token **tokens);
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env);
+void					add_argument(t_command *cmd, char *arg,
+							t_word_type word_type, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);
 int						check_syntax_errors(t_token *tokens);
 void					handle_redirection(t_command *cmd, t_token **tokens);
-char					*expand_token_value(const char *str, t_word_type word_type, t_env *env, int last_status);
-char					*expand_token_value_unquoted(const char *str, t_env *env, int last_status);
+char					*expand_token_value(const char *str,
+							t_word_type word_type, t_env *env, int last_status);
+char					*expand_token_value_unquoted(const char *str,
+							t_env *env, int last_status);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
@@ -149,7 +153,7 @@ int						is_builtins(t_command *cmds);
 void					run_builtins(t_command *cmds, t_env *env);
 int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
-void					ft_exit(char **args);
+void					ft_exit(char **args, t_command *cmds, t_env *env);
 int						ft_env(t_env *env);
 int						ft_export(t_env *env, char **args);
 int						ft_unset(t_env **env, char *name);
@@ -168,6 +172,7 @@ t_env					*init_env(char **envp, t_env *env);
 char					*ft_getenv(t_env *env, const char *name);
 void					ft_setenv(t_env *env, const char *name,
 							const char *value);
+int						add_new_node(t_env *env, char *args);
 //--- UTILS ---
 void					free_command_list(t_command *cmd);
 char					*build_full_path(char *dir, char *cmd);
@@ -188,7 +193,7 @@ void					free_token_list(t_token *tokens);
 int						validate_quotes(const char *input, int start,
 							char quote);
 void					sigint_handler(int sig);
-void 					restore_heredoc_signals(void);
+void					restore_heredoc_signals(void);
 int						prepare_heredocs(t_command *cmds, t_env *env);
 void					child_process_signals(void);
 

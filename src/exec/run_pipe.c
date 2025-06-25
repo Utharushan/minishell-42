@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 16:05:23 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/25 14:51:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ that no pipe was created.
 
 Returns 1 if a pipe was created, 0 otherwise.
 */
-int	create_pipe(t_command *cmds, int *pipe_fd)
+int	create_pipe(t_command *cmds, t_env *env, int *pipe_fd)
 {
 	if (cmds->next_op == OP_PIPE)
 	{
 		if (pipe(pipe_fd) == -1)
 		{
 			perror("pipe");
-			ft_exit(cmds->args);
+			ft_exit(cmds->args, cmds, env);
 		}
 		return (1);
 	}
@@ -150,7 +150,7 @@ void	exec_child_builtin(t_command *cmds, t_env *env)
 void	exec_child_external(t_command *cmds, t_env *env)
 {
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
-		ft_exit(cmds->args);
+		ft_exit(cmds->args, cmds, env);
 	if (find_cmd_in_path(cmds, env))
 	{
 		ft_putstr_fd(cmds->args[0], 2);
@@ -168,7 +168,7 @@ void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
 	setup_child_fds(cmds, in_fd, pipe_fd);
 	if (command_redirections(cmds) == 0)
 		exit(130);
-	child_process_signals();
+	// child_process_signals();
 	if (is_builtins(cmds) == 0)
 		exec_child_builtin(cmds, env);
 	exec_child_external(cmds, env);
@@ -188,7 +188,7 @@ int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
 void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd,
 		pid_t *pid, int *i, t_env *env)
 {
-	create_pipe(cmds, pipe_fd);
+	create_pipe(cmds, env, pipe_fd);
 	pid[*i] = create_child_process();
 	if (pid[(*i)++] == 0)
 		handle_child_process(cmds, *in_fd, pipe_fd, env);
@@ -222,7 +222,7 @@ void	run_pipe(t_command *cmds, t_env *env)
 	{
 		if (first_cmds && !first_cmds->next && first_cmds->args
 			&& !ft_strncmp(first_cmds->args[0], "exit", 5))
-			ft_exit(first_cmds->args);
+			ft_exit(first_cmds->args, cmds, env);
 		if (handle_parent_builtin_if_needed(cmds, env, pid))
 			return ;
 		launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env);

@@ -153,6 +153,14 @@ t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 {
 	tokens = lexer(input);
 	cmds = parse_tokens(tokens, env);
+	if (!cmds || !tokens)
+	{
+		g_signal_status = 2;
+		free_command_list(cmds);
+		free_token_list(tokens);
+		free(input);
+		return (NULL);
+	}
 	free_token_list(tokens);
 	free(input);
 	return (cmds);
@@ -200,6 +208,8 @@ int main(int argc, char **argv, char **envp)
 		if (!check_input(input))
 		{
 			cmds = init(tokens, cmds, input, env);
+			if (!cmds)
+				continue;
 			if (!prepare_heredocs(cmds, env))
 			{
 				free_command_list(cmds);
@@ -215,3 +225,5 @@ int main(int argc, char **argv, char **envp)
 	free_env_list(env);
 	return (g_signal_status);
 }
+
+//valgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishellvalgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishell
