@@ -47,6 +47,18 @@ static char	*expand_var(const char *str, int *i, t_env *env, int last_status)
 		(*i)++;
 	name = ft_substr(str, start, *i - start);
 	val = get_env_value(env, name);
+	if ((!val || !*val) && name && ft_strcmp(name, "PWD") == 0)
+	{
+		char cwd[4096];
+		if (getcwd(cwd, sizeof(cwd)))
+		{
+			char *pwd_str = ft_strjoin("PWD=", cwd);
+			add_new_node(env, pwd_str);
+			free(pwd_str);
+			free(name);
+			return (ft_strdup(cwd));
+		}
+	}
 	free(name);
 	if (val)
 		return (ft_strdup(val));
