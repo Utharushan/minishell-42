@@ -81,6 +81,11 @@ void	add_argument(t_command *cmd, char *arg, t_word_type word_type,
 		count++;
 
 	final_arg = expand_token_value(arg, word_type, env, g_signal_status);
+	if (!final_arg || final_arg[0] == '\0')
+	{
+		free(final_arg);
+		return;
+	}
 
 	new_args = malloc(sizeof(char *) * (count + 2));
 	if (!new_args)
@@ -129,6 +134,11 @@ void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 		free(expanded);
 		*tokens = (*tokens)->next;
 		first = 0;
+	}
+	if (!arg || arg[0] == '\0')
+	{
+		free(arg);
+		return;
 	}
 	int count = 0;
 	while (cmd->args && cmd->args[count])

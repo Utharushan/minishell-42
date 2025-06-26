@@ -117,35 +117,44 @@ Adds the extracted word as a token and updates the index.
 */
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-    int start;
-    char quote;
-    int has_leading_space = 0;
+	int start;
+	char quote;
+	int has_leading_space = 0;
 
-    if (*i == 0)
-        has_leading_space = 0;
-    else if (ft_isspace(input[*i - 1]))
-        has_leading_space = 1;
+	if (*i == 0)
+		has_leading_space = 0;
+	else if (ft_isspace(input[*i - 1]))
+		has_leading_space = 1;
 
-    if (input[*i] == '\'' || input[*i] == '"')
-    {
-        quote = input[*i];
-        start = *i;
-        (*i)++;
-        while (input[*i] && input[*i] != quote)
-            (*i)++;
-        if (input[*i] == quote)
-            (*i)++;
-        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD,
-            (quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
-    }
-    else
-    {
-        start = *i;
-        while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
-            && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
-            && input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
-            (*i)++;
-        add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
-    }
+	if (input[*i] == '\'' || input[*i] == '"')
+	{
+		quote = input[*i];
+		start = *i;
+		(*i)++;
+		while (input[*i] && input[*i] != quote)
+			(*i)++;
+		if (input[*i] == quote)
+		{
+			(*i)++;
+			add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD,
+				(quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
+		}
+		else
+		{
+			ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
+			ft_putchar_fd(quote, 2);
+			ft_putstr_fd("'\n", 2);
+			*tokens = NULL;
+		}
+	}
+	else
+	{
+		start = *i;
+		while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
+			&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
+			&& input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
+			(*i)++;
+		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
+	}
 }
 

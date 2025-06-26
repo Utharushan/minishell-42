@@ -49,7 +49,7 @@ int	check_syntax_errors(t_token *tokens)
 	}
 	if (err_tok)
 	{
-		ft_putstr_fd("bash: syntax error near unexpected token `", 2);
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 		if (err_tok->type == TOKEN_PIPE)
 			ft_putstr_fd("|", 2);
 		else if (err_tok->type == TOKEN_AMP)
