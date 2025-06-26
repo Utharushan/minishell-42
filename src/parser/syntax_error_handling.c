@@ -18,15 +18,44 @@ Returns 1 if a syntax error is found, 0 otherwise.
 */
 int	check_syntax_errors(t_token *tokens)
 {
+	t_token *prev = NULL;
+	t_token *err_tok = NULL;
 	while (tokens)
 	{
-		if ((tokens->type == TOKEN_REDIRECT_IN
-				|| tokens->type == TOKEN_REDIRECT_OUT
-				|| tokens->type == TOKEN_REDIRECT_APPEND
-				|| tokens->type == TOKEN_PIPE)
-			&& (!tokens->next || tokens->next->type != TOKEN_WORD))
-			return (1);
+		if ((tokens->type == TOKEN_PIPE || tokens->type == TOKEN_AMP) &&
+			(!prev || !tokens->next || tokens->next->type == TOKEN_EOF))
+		{
+			err_tok = tokens;
+			break;
+		}
+		if (tokens->type == TOKEN_PIPE)
+		{
+			if (tokens->next && tokens->next->type == TOKEN_PIPE)
+			{
+				err_tok = tokens->next;
+				break;
+			}
+		}
+		if (tokens->type == TOKEN_AMP)
+		{
+			if (tokens->next && tokens->next->type == TOKEN_AMP)
+			{
+				err_tok = tokens->next;
+				break;
+			}
+		}
+		prev = tokens;
 		tokens = tokens->next;
+	}
+	if (err_tok)
+	{
+		ft_putstr_fd("bash: syntax error near unexpected token `", 2);
+		if (err_tok->type == TOKEN_PIPE)
+			ft_putstr_fd("|", 2);
+		else if (err_tok->type == TOKEN_AMP)
+			ft_putstr_fd("&", 2);
+		ft_putstr_fd("'\n", 2);
+		return (1);
 	}
 	return (0);
 }

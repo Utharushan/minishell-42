@@ -159,6 +159,10 @@ Returns the head of the command list.
 */
 t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
+	if (check_syntax_errors(tokens))
+	{
+		return (NULL);
+	}
 	t_command *cmd;
 	t_command *head;
 	t_token_type type;
@@ -168,6 +172,17 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	if (tokens && tokens->type == TOKEN_WORD)
 	{
 		add_argument(cmd, tokens->value, tokens->word_type, env);
+		if (cmd->args && cmd->args[0])
+		{
+			struct stat st;
+			if (stat(cmd->args[0], &st) == 0 && S_ISDIR(st.st_mode))
+			{
+				ft_putstr_fd(cmd->args[0], 2);
+				ft_putstr_fd(": Is a directory\n", 2);
+				free_command_list(head);
+				return (NULL);
+			}
+		}
 		tokens = tokens->next;
 	}
 	while (tokens && tokens->type != TOKEN_EOF)

@@ -103,6 +103,10 @@ t_token_type	get_token_type(char *input, int *i)
 		}
 		return (TOKEN_REDIRECT_OUT);
 	}
+	else if (input[*i] == '&')
+	{
+		return (TOKEN_AMP);
+	}
 	return (TOKEN_WORD);
 }
 
