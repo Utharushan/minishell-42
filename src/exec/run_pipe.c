@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/26 09:59:12 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/26 12:50:42 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,9 @@ void handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
 	setup_child_fds(cmds, in_fd, pipe_fd);
 	if (command_redirections(cmds) == 0)
 		exit(130);
-	child_process_signals();
 	if (is_builtins(cmds) == 0)
 		exec_child_builtin(cmds, env);
+	child_process_signals();
 	exec_child_external(cmds, env);
 }
 
