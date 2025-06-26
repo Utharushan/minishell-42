@@ -6,15 +6,15 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/25 11:58:36 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/26 09:58:19 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	free_redir(t_redir *redir)
+void free_redir(t_redir *redir)
 {
-	t_redir	*tmp;
+	t_redir *tmp;
 
 	while (redir)
 	{
@@ -26,9 +26,9 @@ void	free_redir(t_redir *redir)
 	}
 }
 
-void	free_args(t_command *cmd)
+void free_args(t_command *cmd)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (cmd->args[i])
@@ -36,9 +36,9 @@ void	free_args(t_command *cmd)
 	free(cmd->args);
 }
 
-void	free_command_list(t_command *cmd)
+void free_command_list(t_command *cmd)
 {
-	t_command	*tmp;
+	t_command *tmp;
 
 	while (cmd)
 	{
@@ -53,6 +53,7 @@ void	free_command_list(t_command *cmd)
 			free(cmd->heredoc_delim);
 		if (cmd->redir)
 		{
+			close_all_heredoc_fds(cmd);
 			free_redir(cmd->redir);
 			cmd->redir = NULL;
 		}
@@ -61,7 +62,7 @@ void	free_command_list(t_command *cmd)
 	}
 }
 
-int	is_numeric(const char *str)
+int is_numeric(const char *str)
 {
 	if (!str || *str == '\0')
 		return (0);
@@ -76,9 +77,9 @@ int	is_numeric(const char *str)
 	return (1);
 }
 
-void	ft_exit(char **args, t_command *cmds, t_env *env)
+void ft_exit(char **args, t_command *cmds, t_env *env)
 {
-	int	exit_code;
+	int exit_code;
 
 	if (args && args[1])
 	{
@@ -92,7 +93,7 @@ void	ft_exit(char **args, t_command *cmds, t_env *env)
 		{
 			ft_putstr_fd("exit: too many arguments\n", 2);
 			g_signal_status = 1;
-			return ;
+			return;
 		}
 		else
 			exit_code = ft_atoi(args[1]) % 256;

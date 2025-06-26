@@ -6,34 +6,43 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/25 12:06:30 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/26 09:58:06 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_env	*new_env_node(char *name, char *value)
+t_env *new_env_node(char *name, char *value)
 {
-	t_env	*new;
+	t_env *new;
 
-	if (!name || !value)
-		return (NULL);
 	new = malloc(sizeof(t_env));
 	if (!new)
 		return (NULL);
-	new->name = name;
-	new->value = value;
+	new->name = ft_strdup(name);
+	if (!new->name)
+	{
+		free(new);
+		return (NULL);
+	}
+	new->value = ft_strdup(value);
+	if (!new->value)
+	{
+		free(new->name);
+		free(new);
+		return (NULL);
+	}
 	new->next = NULL;
 	return (new);
 }
-void	add_env_back(t_env **env, t_env *new)
+void add_env_back(t_env **env, t_env *new)
 {
-	t_env	*tmp;
+	t_env *tmp;
 
 	if (!*env)
 	{
 		*env = new;
-		return ;
+		return;
 	}
 	tmp = *env;
 	while (tmp->next)
@@ -41,13 +50,13 @@ void	add_env_back(t_env **env, t_env *new)
 	tmp->next = new;
 }
 
-t_env	*init_env(char **envp, t_env *env)
+t_env *init_env(char **envp, t_env *env)
 {
-	int		i;
-	char	*equal_position;
-	char	*name;
-	char	*value;
-	t_env	*new_env;
+	int i;
+	char *equal_position;
+	char *name;
+	char *value;
+	t_env *new_env;
 
 	i = 0;
 	while (envp[i])
@@ -56,26 +65,27 @@ t_env	*init_env(char **envp, t_env *env)
 		if (equal_position)
 		{
 			name = ft_substr(envp[i], 0, equal_position - envp[i]);
+			if (!name)
+				return (env);
 			value = ft_strdup(equal_position + 1);
-			new_env = new_env_node(name, value);
-			if (!new_env || !name || !value)
+			if (!value)
 			{
 				free(name);
-				free(value);
-				free_env_list(new_env);
-				free(equal_position);
-				return (NULL);
+				return (env);
 			}
+			new_env = new_env_node(name, value);
+			free(name);
+			free(value);
+			if (!new_env)
+				continue;
 			add_env_back(&env, new_env);
 		}
 		i++;
 	}
-	free(name);
-	free(value);
 	return (env);
 }
 
-int		ft_env(t_env *env)
+int ft_env(t_env *env)
 {
 	if (!env)
 		return (1);

@@ -225,5 +225,4 @@ int main(int argc, char **argv, char **envp)
 	free_env_list(env);
 	return (g_signal_status);
 }
-
-//valgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishellvalgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishell
+// valgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishell
