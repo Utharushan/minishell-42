@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/28 04:29:51 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/28 16:47:11 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,21 +145,25 @@ void	setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
 	}
 }
 
-void	exec_child_builtin(t_command *cmds, t_env *env)
+void	exec_child_builtin(t_command *cmds, t_env *env, pid_t *pid)
 {
 	if (is_parent_builtin(cmds))
 	{
 		free_env_list(env);
 		free_command_list(cmds);
+		free(pid);
 		exit(0);
+	}else
+	{
+		run_builtins(cmds, env);
+		free_env_list(env);
+		free_command_list(cmds);
 	}
-	run_builtins(cmds, env);
-	free_env_list(env);
-	free_command_list(cmds);
+	free(pid);
 	exit(g_signal_status);
 }
 
-void	exec_child_external(t_command *cmds, t_env *env)
+void	exec_child_external(t_command *cmds, t_env *env, pid_t *pid)
 {
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
 	{
@@ -170,23 +174,25 @@ void	exec_child_external(t_command *cmds, t_env *env)
 	exec_command(cmds, env);
 	free_env_list(env);
 	free_command_list(cmds);
+	free(pid);
 	exit(g_signal_status);
 }
 
 void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
-		t_env *env)
+		t_env *env, pid_t *pid)
 {
 	setup_child_fds(cmds, in_fd, pipe_fd);
 	if (command_redirections(cmds) == 0)
 	{
 		free_env_list(env);
 		free_command_list(cmds);
+		free(pid);
 		exit(130);
 	}
 	if (is_builtins(cmds) == 0)
-		exec_child_builtin(cmds, env);
+		exec_child_builtin(cmds, env, pid);
 	child_process_signals();
-	exec_child_external(cmds, env);
+	exec_child_external(cmds, env, pid);
 }
 
 int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
@@ -206,9 +212,10 @@ void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd,
 	create_pipe(cmds, pipe_fd);
 	pid[*i] = create_child_process();
 	if (pid[(*i)++] == 0)
-		handle_child_process(cmds, *in_fd, pipe_fd, env);
-	else
+		handle_child_process(cmds, *in_fd, pipe_fd, env, pid);
+	else 
 		close_fd(in_fd, cmds, pipe_fd);
+	close_fd(in_fd, cmds, pipe_fd);
 }
 
 /*
@@ -251,5 +258,6 @@ void	run_pipe(t_command *cmds, t_env *env)
 	}
 	cmds = first_cmds;
 	wait_for_pids(cmds, pid);
+	close_fd(&in_fd, cmds, pipe_fd);
 	free(pid);
 }
