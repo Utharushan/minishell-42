@@ -15,9 +15,10 @@
 
 #include "../includes/minishell.h"
 
-int g_signal_status = 0;
 
-void print_tokens(t_token *tokens)
+int			g_signal_status = 0;
+
+void	print_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -26,7 +27,7 @@ void print_tokens(t_token *tokens)
 	}
 }
 
-void print_commands(t_command *cmds)
+void	print_commands(t_command *cmds)
 {
 	int i;
 
@@ -51,10 +52,10 @@ void print_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 }
-void run_builtins(t_command *cmds, t_env *env)
+void	run_builtins(t_command *cmds, t_env *env)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
-		return;
+		return ;
 
 	if (!ft_strncmp(cmds->args[0], "cd", 3))
 		g_signal_status = ft_cd(cmds, env);
@@ -77,7 +78,7 @@ void run_builtins(t_command *cmds, t_env *env)
 	else if (!ft_strncmp(cmds->args[0], "unset", 6))
 		g_signal_status = ft_unset(&env, cmds->args[1]);
 }
-int is_builtins(t_command *cmds)
+int	is_builtins(t_command *cmds)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return (1);
@@ -98,7 +99,7 @@ int is_builtins(t_command *cmds)
 		return (1);
 }
 
-int find_cmd_in_path(t_command *cmd, t_env *env)
+int	find_cmd_in_path(t_command *cmd, t_env *env)
 {
 	char *full_path;
 	char **path_dirs;
@@ -108,17 +109,15 @@ int find_cmd_in_path(t_command *cmd, t_env *env)
 		return (1);
 	if (ft_strchr(cmd->args[0], '/'))
 		return (access(cmd->args[0], F_OK | X_OK) == 0 ? 0 : 1);
-
 	path_dirs = get_path_dirs(env);
 	if (!path_dirs)
 		return (1);
-
 	i = 0;
 	while (path_dirs[i])
 	{
 		full_path = build_full_path(path_dirs[i], cmd->args[0]);
 		if (!full_path)
-			break;
+			break ;
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			free(full_path);
@@ -137,7 +136,7 @@ int find_cmd_in_path(t_command *cmd, t_env *env)
 	return (1);
 }
 
-int check_input(char *input)
+int	check_input(char *input)
 {
 	int i;
 
@@ -149,7 +148,7 @@ int check_input(char *input)
 	return (0);
 }
 
-t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
+t_command	*init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 {
 	tokens = lexer(input);
 	cmds = parse_tokens(tokens, env);
@@ -166,7 +165,7 @@ t_command *init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 	return (cmds);
 }
 
-void sigint_handler(int sig)
+void	sigint_handler(int sig)
 {
 	(void)sig;
 	char c;
@@ -180,7 +179,7 @@ void sigint_handler(int sig)
 	ioctl(STDIN_FILENO, TIOCSTI, &c);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
 	t_token *tokens;
 	t_command *cmds;
@@ -202,6 +201,7 @@ int main(int argc, char **argv, char **envp)
 		if (!input)
 		{
 			ft_putstr_fd("exit", 1);
+			free_env_list(env);
 			exit(0);
 		}
 		add_history(input);
@@ -209,17 +209,17 @@ int main(int argc, char **argv, char **envp)
 		{
 			cmds = init(tokens, cmds, input, env);
 			if (!cmds)
-				continue;
+				continue ;
 			if (!prepare_heredocs(cmds, env))
 			{
 				free_command_list(cmds);
-				continue;
+				continue ;
 			}
 			run_pipe(cmds, env);
 			free_command_list(cmds);
 			free_token_list(tokens);
 			if (g_signal_status == 130)
-				continue;
+				continue ;
 		}
 	}
 	free_env_list(env);

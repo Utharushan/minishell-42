@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/26 12:46:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/27 18:37:03 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void free_command_list(t_command *cmd)
 {
 	t_command *tmp;
 
+	if (!cmd)
+		return ;
 	while (cmd)
 	{
 		tmp = cmd->next;

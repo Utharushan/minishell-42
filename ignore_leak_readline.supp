@@ -11,3 +11,10 @@
    ...
    obj:/bin
 }
+
+{
+   ignore_all_ls_leaks
+   Memcheck:Leak
+   ...
+   obj:/usr/bin
+}

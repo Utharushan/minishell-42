@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/24 09:13:02 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/27 15:51:24 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ int exec_command(t_command *cmd, t_env *env)
 
 	envp = env_to_envp(env);
 	path_dirs = get_path_dirs(env);
+	if (!path_dirs)
+		return (1);
 	ret = try_exec_direct(cmd->args, envp);
 	if (ret != -1)
 	{
