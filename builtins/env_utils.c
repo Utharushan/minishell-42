@@ -103,9 +103,7 @@ char **get_path_dirs(t_env *env)
 {
 	char *path_value;
 	char **path_dirs;
-	int i;
 
-	i = 0;
 	path_value = ft_getenv(env, "PATH");
 	if (!path_value)
 		return (NULL);

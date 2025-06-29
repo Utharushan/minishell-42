@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/28 16:47:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/06/29 22:05:20 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ that no pipe was created.
 
 Returns 1 if a pipe was created, 0 otherwise.
 */
-int	create_pipe(t_command *cmds, int *pipe_fd)
+int create_pipe(t_command *cmds, int *pipe_fd)
 {
 	if (cmds->next_op == OP_PIPE)
 	{
@@ -43,9 +43,9 @@ int	create_pipe(t_command *cmds, int *pipe_fd)
 Create a child process by using fork().
 Returns the process ID, so we can know if we are in a child process.
 */
-int	create_child_process(void)
+int create_child_process(void)
 {
-	pid_t	pid;
+	pid_t pid;
 
 	pid = fork();
 	if (pid == -1)
@@ -67,10 +67,10 @@ for the next command.
 
 it connects the command through the pipes.
 */
-void	wait_for_pids(t_command *cmds, pid_t *pid)
+void wait_for_pids(t_command *cmds, pid_t *pid)
 {
-	int	i;
-	int	status;
+	int i;
+	int status;
 
 	i = 0;
 	status = 0;
@@ -94,7 +94,7 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 	}
 }
 
-int	is_parent_builtin(t_command *cmds)
+int is_parent_builtin(t_command *cmds)
 {
 	if (!cmds->args || !cmds->args[0])
 		return (0);
@@ -106,14 +106,7 @@ int	is_parent_builtin(t_command *cmds)
 		return (1);
 	else if (!ft_strncmp(cmds->args[0], "exit", 5))
 		return (1);
-	else if (!ft_strncmp(cmds->args[0], "env", 4))
-		return (1);
-	else if (!ft_strncmp(cmds->args[0], "echo", 5))
-		return (1);
-	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
-		return (1);
-	else
-		return (0);
+	return (0);
 }
 
 /*
@@ -130,7 +123,7 @@ If everything is good we execute it.
 
 and we exit with the current exit code.
 */
-void	setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
+void setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
 {
 	if (in_fd != 0)
 	{
@@ -145,57 +138,60 @@ void	setup_child_fds(t_command *cmds, int in_fd, int *pipe_fd)
 	}
 }
 
-void	exec_child_builtin(t_command *cmds, t_env *env, pid_t *pid)
+void exec_child_builtin(t_command *cmds, t_env *env, pid_t *pid,
+						t_command *first_cmds)
 {
 	if (is_parent_builtin(cmds))
 	{
 		free_env_list(env);
-		free_command_list(cmds);
+		free_command_list(first_cmds);
 		free(pid);
 		exit(0);
-	}else
+	}
+	else
 	{
 		run_builtins(cmds, env);
 		free_env_list(env);
-		free_command_list(cmds);
+		free_command_list(first_cmds);
 	}
 	free(pid);
 	exit(g_signal_status);
 }
 
-void	exec_child_external(t_command *cmds, t_env *env, pid_t *pid)
+void exec_child_external(t_command *cmds, t_env *env, pid_t *pid,
+						 t_command *first_cmds)
 {
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
 	{
 		free_env_list(env);
-		free_command_list(cmds);
+		free_command_list(first_cmds);
 		exit(g_signal_status);
 	}
 	exec_command(cmds, env);
 	free_env_list(env);
-	free_command_list(cmds);
+	free_command_list(first_cmds);
 	free(pid);
 	exit(g_signal_status);
 }
 
-void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
-		t_env *env, pid_t *pid)
+void handle_child_process(t_command *cmds, int in_fd, int *pipe_fd, t_env *env,
+						  pid_t *pid, t_command *first_cmds)
 {
 	setup_child_fds(cmds, in_fd, pipe_fd);
 	if (command_redirections(cmds) == 0)
 	{
 		free_env_list(env);
-		free_command_list(cmds);
+		free_command_list(first_cmds);
 		free(pid);
 		exit(130);
 	}
 	if (is_builtins(cmds) == 0)
-		exec_child_builtin(cmds, env, pid);
+		exec_child_builtin(cmds, env, pid, first_cmds);
 	child_process_signals();
-	exec_child_external(cmds, env, pid);
+	exec_child_external(cmds, env, pid, first_cmds);
 }
 
-int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
+int handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
 {
 	if (!cmds->next && is_parent_builtin(cmds))
 	{
@@ -206,14 +202,14 @@ int	handle_parent_builtin_if_needed(t_command *cmds, t_env *env, pid_t *pid)
 	return (0);
 }
 
-void	launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd,
-		pid_t *pid, int *i, t_env *env)
+void launch_child_process(t_command *cmds, int *in_fd, int *pipe_fd,
+						  pid_t *pid, int *i, t_env *env, t_command *first_cmds)
 {
 	create_pipe(cmds, pipe_fd);
 	pid[*i] = create_child_process();
 	if (pid[(*i)++] == 0)
-		handle_child_process(cmds, *in_fd, pipe_fd, env, pid);
-	else 
+		handle_child_process(cmds, *in_fd, pipe_fd, env, pid, first_cmds);
+	else
 		close_fd(in_fd, cmds, pipe_fd);
 	close_fd(in_fd, cmds, pipe_fd);
 }
@@ -226,23 +222,22 @@ For each command we create a pipe if needed, and we fork a new child process.
 Manages fd's at each step to make sure that the output of one
 command becomes the input of the next in the pipe.
 */
-void	run_pipe(t_command *cmds, t_env *env)
+void run_pipe(t_command *cmds, t_env *env)
 {
-	int			pipe_fd[2];
-	int			in_fd;
-	pid_t		*pid;
-	t_command	*first_cmds;
-	int			i;
+	int pipe_fd[2];
+	int in_fd;
+	pid_t *pid;
+	t_command *first_cmds;
+	int i;
 
 	in_fd = 0;
 	first_cmds = cmds;
 	i = 0;
-	if (first_cmds && !first_cmds->next && first_cmds->args
-		&& !ft_strncmp(first_cmds->args[0], "exit", 5))
+	if (first_cmds && !first_cmds->next && first_cmds->args && !ft_strncmp(first_cmds->args[0], "exit", 5))
 		ft_exit(first_cmds->args, cmds, env);
 	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
 	if (!pid)
-		return ;
+		return;
 	if (!cmds)
 	{
 		free(pid);
@@ -251,9 +246,9 @@ void	run_pipe(t_command *cmds, t_env *env)
 	while (cmds)
 	{
 		if (handle_parent_builtin_if_needed(cmds, env, pid))
-			return ;
+			return;
 		else
-			launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env);
+			launch_child_process(cmds, &in_fd, pipe_fd, pid, &i, env, first_cmds);
 		cmds = cmds->next;
 	}
 	cmds = first_cmds;
