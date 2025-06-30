@@ -152,7 +152,7 @@ void	extract_word(char *input, int *i, t_token **tokens)
 		start = *i;
 		while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
 			&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
-			&& input[*i] != '(' && input[*i] != ')' && input[*i] != ';' && input[*i] != '\\')
+			&& input[*i] != '(' && input[*i] != ')' && input[*i] != ';')
 			(*i)++;
 		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
 	}
