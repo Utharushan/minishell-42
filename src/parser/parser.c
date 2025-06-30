@@ -134,10 +134,6 @@ void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 		*tokens = (*tokens)->next;
 		first = 0;
 	}
-	if (!arg)
-	{
-		return;
-	}
 	int count = 0;
 	while (cmd->args && cmd->args[count])
 		count++;
@@ -179,7 +175,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	head = cmd;
 	if (tokens && tokens->type == TOKEN_WORD)
 	{
-		add_argument(cmd, tokens->value, tokens->word_type, env);
+		add_argument_concat(cmd, &tokens, env);
 		if (cmd->args && cmd->args[0])
 		{
 			struct stat st;
@@ -191,7 +187,6 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 				return (NULL);
 			}
 		}
-		tokens = tokens->next;
 	}
 	while (tokens && tokens->type != TOKEN_EOF)
 	{
