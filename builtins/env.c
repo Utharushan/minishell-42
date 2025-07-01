@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/27 15:59:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/01 01:14:23 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,14 @@ t_env *init_env(char **envp, t_env *env)
 		{
 			name = ft_substr(envp[i], 0, equal_position - envp[i]);
 			if (!name)
+			{
+				free(equal_position);
 				return (env);
+			}
 			value = ft_strdup(equal_position + 1);
 			if (!value)
 			{
+				free(equal_position);
 				free(name);
 				return (env);
 			}

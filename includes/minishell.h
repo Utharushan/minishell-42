@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/06/29 21:26:40 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/01 10:19:39 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,12 +148,13 @@ void					print_commands(t_command *cmds);
 
 // --- TESTING EXEC ---
 int						exec_command(t_command *cmd, t_env *env);
-void	exec_child_builtin(t_command *cmds, t_env *env, pid_t *pid,
+void					exec_child_builtin(t_command *cmds, t_env *env,
+							pid_t *pid, t_command *first_cmds);
+void					exec_child_external(t_command *cmds, t_env *env,
+							pid_t *pid);
+void					handle_child_process(t_command *cmds, int in_fd,
+							int *pipe_fd, t_env *env, pid_t *pid,
 							t_command *first_cmds);
-void	exec_child_external(t_command *cmds, t_env *env, pid_t *pid,
-							t_command *first_cmds);
-void	handle_child_process(t_command *cmds, int in_fd, int *pipe_fd,
-							t_env *env, pid_t *pid, t_command *first_cmds);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
@@ -204,5 +205,7 @@ void					restore_heredoc_signals(void);
 int						prepare_heredocs(t_command *cmds, t_env *env);
 void					child_process_signals(void);
 void					close_all_heredoc_fds(t_command *cmds);
+void					close_unused_heredoc_fds(t_command *current_cmd,
+							t_command *all_cmds);
 
 #endif

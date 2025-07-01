@@ -99,16 +99,35 @@ int	is_builtins(t_command *cmds)
 		return (1);
 }
 
+static void	free_path_dirs(char **path_dirs)
+{
+	int	i;
+
+	if (!path_dirs)
+		return ;
+	i = 0;
+	while (path_dirs[i])
+		free(path_dirs[i++]);
+	free(path_dirs);
+}
+
+static int	check_absolute_path(char *cmd_path)
+{
+	if (access(cmd_path, F_OK | X_OK) == 0)
+		return (0);
+	return (1);
+}
+
 int	find_cmd_in_path(t_command *cmd, t_env *env)
 {
-	char *full_path;
-	char **path_dirs;
-	int i;
+	char	*full_path;
+	char	**path_dirs;
+	int		i;
 
 	if (!cmd || !cmd->args || !cmd->args[0])
 		return (1);
 	if (ft_strchr(cmd->args[0], '/'))
-		return (access(cmd->args[0], F_OK | X_OK) == 0 ? 0 : 1);
+		return (check_absolute_path(cmd->args[0]));
 	path_dirs = get_path_dirs(env);
 	if (!path_dirs)
 		return (1);
@@ -117,22 +136,20 @@ int	find_cmd_in_path(t_command *cmd, t_env *env)
 	{
 		full_path = build_full_path(path_dirs[i], cmd->args[0]);
 		if (!full_path)
-			break ;
+		{
+			free_path_dirs(path_dirs);
+			return (1);
+		}
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			free(full_path);
-			while (path_dirs[i])
-				free(path_dirs[i++]);
-			free(path_dirs);
+			free_path_dirs(path_dirs);
 			return (0);
 		}
 		free(full_path);
 		i++;
 	}
-	i = 0;
-	while (path_dirs[i])
-		free(path_dirs[i++]);
-	free(path_dirs);
+	free_path_dirs(path_dirs);
 	return (1);
 }
 
@@ -151,11 +168,16 @@ int	check_input(char *input)
 t_command	*init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 {
 	tokens = lexer(input);
-	cmds = parse_tokens(tokens, env);
-	if (!cmds || !tokens)
+	if (!tokens)
 	{
 		g_signal_status = 2;
-		free_command_list(cmds);
+		free(input);
+		return (NULL);
+	}
+	cmds = parse_tokens(tokens, env);
+	if (!cmds)
+	{
+		g_signal_status = 2;
 		free_token_list(tokens);
 		free(input);
 		return (NULL);
@@ -210,17 +232,29 @@ int	main(int argc, char **argv, char **envp)
 			cmds = init(tokens, cmds, input, env);
 			if (!cmds)
 				continue ;
-			if (!prepare_heredocs(cmds, env))
+			if (!cmds->next && cmds->args && cmds->args[0] && 
+				!is_builtins(cmds) && find_cmd_in_path(cmds, env))
 			{
+				ft_putstr_fd(cmds->args[0], 2);
+				ft_putstr_fd(": command not found\n", 2);
+				g_signal_status = 127;
+				free_command_list(cmds);
+				continue ;
+			}
+			if (prepare_heredocs(cmds, env) == 0)
+			{
+				close_all_heredoc_fds(cmds);
 				free_command_list(cmds);
 				continue ;
 			}
 			run_pipe(cmds, env);
+			close_all_heredoc_fds(cmds);
 			free_command_list(cmds);
-			free_token_list(tokens);
 			if (g_signal_status == 130)
 				continue ;
 		}
+		else
+			free(input);
 	}
 	free_env_list(env);
 	return (g_signal_status);

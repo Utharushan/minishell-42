@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 11:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/28 04:24:23 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/01 10:06:06 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,12 @@ int	count_cmds(t_command *cmds)
 
 void	close_fd(int *in_fd, t_command *cmds, int *pipe_fd)
 {
-	if (*in_fd != 0)
+	if (*in_fd != 0 && *in_fd != -1)
 		close(*in_fd);
 	if (cmds->next_op == OP_PIPE)
 	{
-		close(pipe_fd[1]);
+		if (pipe_fd[1] != -1)
+			close(pipe_fd[1]);
 		*in_fd = pipe_fd[0];
 	}
 }
@@ -60,5 +61,30 @@ void	close_all_heredoc_fds(t_command *cmds)
 			redirection = redirection->next;
 		}
 		command = command->next;
+	}
+}
+
+void	close_unused_heredoc_fds(t_command *current_cmd, t_command *all_cmds)
+{
+	t_command	*cmd;
+	t_redir		*redir;
+
+	cmd = all_cmds;
+	while (cmd)
+	{
+		if (cmd != current_cmd)
+		{
+			redir = cmd->redir;
+			while (redir)
+			{
+				if ((redir->type == TOKEN_HEREDOC) && redir->heredoc_fd > 0)
+				{
+					close(redir->heredoc_fd);
+					redir->heredoc_fd = -1;
+				}
+				redir = redir->next;
+			}
+		}
+		cmd = cmd->next;
 	}
 }

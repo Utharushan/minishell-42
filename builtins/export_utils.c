@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 07:33:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/27 15:55:04 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/01 00:25:22 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,19 @@ int	handle_plus_equal(t_env *env, char *arg)
 
 	plus_equal = find_plus_equal(arg);
 	if (!plus_equal)
-		return (0);
+		return (1);
 	name = ft_substr(arg, 0, plus_equal - arg);
+	if (!name)
+	{
+		free(plus_equal);
+		return (1);
+	}
 	value = ft_strdup(plus_equal + 2);
+	if (!value)
+	{
+		free(name);
+		return (1);
+	}
 	if (argv_parsed(name) != 0)
 	{
 		free(name);
