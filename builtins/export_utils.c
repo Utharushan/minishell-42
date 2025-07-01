@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 07:33:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/01 00:25:22 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/01 15:02:40 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,14 @@ int	handle_plus_equal(t_env *env, char *arg)
 	value = ft_strdup(plus_equal + 2);
 	if (!value)
 	{
+		free(plus_equal);
 		free(name);
 		return (1);
 	}
 	if (argv_parsed(name) != 0)
 	{
 		free(name);
+		free(plus_equal);
 		free(value);
 		return (1);
 	}
@@ -84,7 +86,12 @@ int	handle_plus_equal(t_env *env, char *arg)
 	{
 		new_env = new_env_node(name, value);
 		if (!new_env)
+		{
+			free(name);
+			free(value);
+			free(plus_equal);
 			return(1);
+		}
 		add_env_back(&env, new_env);
 	}
 	return (0);

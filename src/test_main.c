@@ -101,7 +101,7 @@ int	is_builtins(t_command *cmds)
 
 static void	free_path_dirs(char **path_dirs)
 {
-	int	i;
+	int i;
 
 	if (!path_dirs)
 		return ;
@@ -120,9 +120,9 @@ static int	check_absolute_path(char *cmd_path)
 
 int	find_cmd_in_path(t_command *cmd, t_env *env)
 {
-	char	*full_path;
-	char	**path_dirs;
-	int		i;
+	char *full_path;
+	char **path_dirs;
+	int i;
 
 	if (!cmd || !cmd->args || !cmd->args[0])
 		return (1);
@@ -232,8 +232,8 @@ int	main(int argc, char **argv, char **envp)
 			cmds = init(tokens, cmds, input, env);
 			if (!cmds)
 				continue ;
-			if (!cmds->next && cmds->args && cmds->args[0] && 
-				!is_builtins(cmds) && find_cmd_in_path(cmds, env))
+			if ((!cmds->next && cmds->args && cmds->args[0]
+					&& find_cmd_in_path(cmds, env)) && is_builtins(cmds))
 			{
 				ft_putstr_fd(cmds->args[0], 2);
 				ft_putstr_fd(": command not found\n", 2);
