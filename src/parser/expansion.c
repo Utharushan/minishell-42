@@ -106,6 +106,16 @@ char	*expand_token_value_unquoted(const char *str, t_env *env, int last_status)
 	result = ft_strdup("");
 	while (i < len)
 	{
+		if (str[i] == '\\' && (i + 1 < len) && str[i + 1] == '$')
+		{
+			tmp[0] = '$';
+			tmp[1] = '\0';
+			tmp_result = ft_strjoin(result, tmp);
+			free(result);
+			result = tmp_result;
+			i += 2;
+			continue;
+		}
 		if (str[i] == '$')
 		{
 			exp = expand_var(str, &i, env, last_status);
