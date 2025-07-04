@@ -12,10 +12,10 @@
 
 #include "../../includes/minishell.h"
 
-char *build_full_path(char *dir, char *cmd)
+char	*build_full_path(char *dir, char *cmd)
 {
-	char *tmp;
-	char *full_path;
+	char	*tmp;
+	char	*full_path;
 
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
@@ -25,7 +25,7 @@ char *build_full_path(char *dir, char *cmd)
 	return (full_path);
 }
 
-int try_exec_direct(char **args, char **envp)
+int	try_exec_direct(char **args, char **envp)
 {
 	if (ft_strchr(args[0], '/'))
 	{
@@ -36,17 +36,17 @@ int try_exec_direct(char **args, char **envp)
 	return (-1);
 }
 
-int try_exec_path(char **args, char **envp, char **path_dirs)
+int	try_exec_path(char **args, char **envp, char **path_dirs)
 {
-	int i;
-	char *full_path;
+	int		i;
+	char	*full_path;
 
 	i = 0;
 	while (path_dirs && path_dirs[i])
 	{
 		full_path = build_full_path(path_dirs[i], args[0]);
 		if (!full_path)
-			break;
+			break ;
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			execve(full_path, args, envp);
@@ -60,23 +60,23 @@ int try_exec_path(char **args, char **envp, char **path_dirs)
 	return (-1);
 }
 
-void free_str_array(char **envp)
+void	free_str_array(char **envp)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!envp)
-		return;
+		return ;
 	while (envp[i])
 		free(envp[i++]);
 	free(envp);
 }
 
-int exec_command(t_command *cmd, t_env *env)
+int	exec_command(t_command *cmd, t_env *env)
 {
-	char **envp;
-	char **path_dirs;
-	int ret;
+	char	**envp;
+	char	**path_dirs;
+	int		ret;
 
 	envp = env_to_envp(env);
 	path_dirs = get_path_dirs(env);

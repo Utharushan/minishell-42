@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/01 15:20:59 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/04 21:49:04 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,24 +23,6 @@ void	heredoc_sigint(int sig)
 	rl_replace_line("", 0);
 	rl_redisplay();
 	ioctl(STDIN_FILENO, TIOCSTI, &c);
-}
-
-void	setup_heredoc_signals(void)
-{
-	signal(SIGINT, heredoc_sigint);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	restore_heredoc_signals(void)
-{
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	child_process_signals(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
 }
 
 int	heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
@@ -104,9 +86,9 @@ int	here_doc(const char *delim, int heredoc_expand, t_env *env)
 
 int	prepare_heredocs(t_command *cmds, t_env *env)
 {
-	t_command *commands;
-	t_redir *redirect;
-	int fd;
+	t_command	*commands;
+	t_redir		*redirect;
+	int			fd;
 
 	commands = cmds;
 	while (commands)

@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/01 14:57:48 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 00:14:05 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,20 @@ typedef struct s_command
 	struct s_command	*next;
 }						t_command;
 
+// --- EXECUTION CONTEXT ---
+
+typedef struct s_info
+{
+	pid_t				*pid;
+	int					pipe_fd[2];
+	int					in_fd;
+	int					cmd_index;
+	int					cmd_count;
+	t_env				*env;
+	t_command			*cmds;
+	t_command			*first_cmds;
+}						t_info;
+
 // --- LEXER ---
 
 t_token					*new_token(char *value, t_token_type type,
@@ -148,20 +162,16 @@ void					print_commands(t_command *cmds);
 
 // --- TESTING EXEC ---
 int						exec_command(t_command *cmd, t_env *env);
-void					exec_child_builtin(t_command *cmds, t_env *env,
-							pid_t *pid);
-void					exec_child_external(t_command *cmds, t_env *env,
-							pid_t *pid);
-void					handle_child_process(t_command *cmds, int in_fd,
-							int *pipe_fd, t_env *env, pid_t *pid,
-							t_command *first_cmds);
+void					exec_child_builtin(t_command *cmds, t_info *info);
+void					exec_child_external(t_command *cmds, t_info *info);
+void					handle_child_process(t_command *cmds, t_info *info);
 
 // --- BUILTINS ---
 int						is_builtins(t_command *cmds);
-void					run_builtins(t_command *cmds, t_env *env);
+void					run_builtins(t_command *cmds, t_info *info);
 int						ft_echo(t_command *cmds);
 int						ft_pwd(void);
-void					ft_exit(char **args, t_command *cmds, t_env *env);
+void					ft_exit(char **args, t_info *info);
 int						ft_env(t_env *env);
 int						ft_export(t_env *env, char **args);
 int						ft_unset(t_env **env, char *name);
@@ -207,5 +217,30 @@ void					child_process_signals(void);
 void					close_all_heredoc_fds(t_command *cmds);
 void					close_unused_heredoc_fds(t_command *current_cmd,
 							t_command *all_cmds);
+t_command				*init(t_token *tokens, t_command *cmds, char *input,
+							t_env *env);
+void					heredoc_sigint(int sig);
+int						check_input(char *input);
+void					setup_signals(void);
+void					setup_heredoc_signals(void);
+int						handle_redir_append(t_redir *redir);
+int						handle_redir_out(t_redir *redir);
+int						handle_redir_in(t_redir *redir);
+t_redir					*find_last_heredoc(t_redir *redir);
+int						redirect_input(char *infile);
+int						redirect_output(char *outfile, bool append);
+void					setup_child_fds(t_command *cmds, t_info *info);
+void					wait_for_pids(t_command *cmds, pid_t *pid);
+int						create_child_process(void);
+int						create_pipe(t_command *cmds, int *pipe_fd);
+int						is_parent_builtin(t_command *cmds);
+void					free_info(t_info *info);
+void					free_info_child(t_info *info);
+t_info					*init_info(t_command *cmds, t_env *env);
+void					launch_child_process(t_command *cmds, t_info *info);
+void					exec_pipe(t_command *cmds, t_info *info);
+int						handle_parent_builtin_if_needed(t_command *cmds,
+							t_info *info);
+void					free_info_and_exit(t_info *info, int exit_code);
 
 #endif

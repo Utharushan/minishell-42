@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 14:40:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/27 22:10:49 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/04 21:20:49 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,41 +52,6 @@ int	redirect_output(char *outfile, bool append)
 		return (0);
 	}
 	close(fd);
-	return (1);
-}
-
-t_redir	*find_last_heredoc(t_redir *redir)
-{
-	t_redir	*last;
-
-	last = NULL;
-	while (redir)
-	{
-		if (redir->type == TOKEN_HEREDOC)
-			last = redir;
-		redir = redir->next;
-	}
-	return (last);
-}
-
-int	handle_redir_in(t_redir *redir)
-{
-	if (redirect_input(redir->file) == 0)
-		return (0);
-	return (1);
-}
-
-int	handle_redir_out(t_redir *redir)
-{
-	if (redirect_output(redir->file, false) == 0)
-		return (0);
-	return (1);
-}
-
-int	handle_redir_append(t_redir *redir)
-{
-	if (redirect_output(redir->file, true) == 0)
-		return (0);
 	return (1);
 }
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   run_pipe.c                                         :+:      :+:    :+:   */
+/*   child_process.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 23:28:14 by ebella           ###   ########.fr       */
+/*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
+/*   Updated: 2025/07/04 22:51:47 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,7 @@ void	handle_child_process(t_command *cmds, t_info *info)
 	setup_child_fds(cmds, info);
 	close_unused_heredoc_fds(cmds, info->first_cmds);
 	if (command_redirections(cmds) == 0)
-	{
-		close_all_heredoc_fds(info->first_cmds);
-		free_info(info);
-		exit(130);
-	}
+		free_info_and_exit(info, 130);
 	close_all_heredoc_fds(info->first_cmds);
 	if (is_builtins(cmds) == 0)
 		exec_child_builtin(cmds, info);
@@ -39,38 +35,12 @@ void	launch_child_process(t_command *cmds, t_info *info)
 		close_fd(&info->in_fd, cmds, info->pipe_fd);
 }
 
-void	exec_pipe(t_command *cmds, t_info *info)
+void	exec_child_external(t_command *cmds, t_info *info)
 {
-	while (cmds)
-	{
-		launch_child_process(cmds, info);
-		cmds = cmds->next;
-	}
-	wait_for_pids(info->first_cmds, info->pid);
-}
-
-int	handle_parent_builtin_if_needed(t_command *cmds, t_info *info)
-{
-	if (!cmds->next && is_parent_builtin(cmds))
-	{
-		run_builtins(cmds, info);
-		return (1);
-	}
-	return (0);
-}
-
-void	run_pipe(t_command *cmds, t_env *env)
-{
-	t_info	*info;
-
-	info = init_info(cmds, env);
-	if (!info)
-		return ;
-	if (handle_parent_builtin_if_needed(cmds, info))
-	{
-		free_info(info);
-		return ;
-	}
-	exec_pipe(cmds, info);
-	free_info(info);
+	if (!cmds || !cmds->args || !cmds->args[0])
+		free_info_and_exit(info, g_signal_status);
+	if (!ft_strncmp(cmds->args[0], "exit", 5))
+		free_info_and_exit(info, g_signal_status);
+	exec_command(cmds, info->env);
+	free_info_and_exit(info, g_signal_status);
 }

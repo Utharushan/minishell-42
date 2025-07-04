@@ -28,11 +28,19 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/parser/expansion.c \
 			  $(SRC_DIR)/test_main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
-			  $(SRC_DIR)/exec/run_pipe.c \
+			  $(SRC_DIR)/exec/info_management.c \
+			  $(SRC_DIR)/exec/child_process.c \
+			  $(SRC_DIR)/exec/pipe_execution.c \
 			  $(SRC_DIR)/exec/redirections.c \
 			  $(SRC_DIR)/exec/here_document.c \
 			  $(SRC_DIR)/exec/pipe_utils.c \
 			  $(SRC_DIR)/exec/free_utils.c \
+			  $(SRC_DIR)/exec/builtins.c \
+			  $(SRC_DIR)/exec/path.c \
+			  $(SRC_DIR)/exec/init.c \
+			  $(SRC_DIR)/exec/signals.c \
+			  $(SRC_DIR)/exec/redirection_utils.c \
+			  $(SRC_DIR)/exec/run_pipes_utils.c \
 			  $(BUILTINS_DIR)/echo.c \
 			  $(BUILTINS_DIR)/pwd.c \
 			  $(BUILTINS_DIR)/exit.c \

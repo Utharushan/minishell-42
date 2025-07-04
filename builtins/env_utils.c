@@ -115,3 +115,4 @@ char **get_path_dirs(t_env *env)
 	}
 	return (path_dirs);
 }
+
