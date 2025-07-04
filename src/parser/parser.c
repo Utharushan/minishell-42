@@ -16,15 +16,20 @@
 #include "../../includes/minishell.h"
 
 
-static void	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
+static int	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
 {
 	t_redir *new;
 	t_redir *tmp;
 
 	new = malloc(sizeof(t_redir));
 	if (!new)
-		return ;
+		return (0);
 	new->file = ft_strdup(file);
+	if (!new->file)
+	{
+		free(new);
+		return (0);
+	}
 	new->type = type;
 	new->heredoc_expand = heredoc_expand;
 	new->next = NULL;
@@ -37,6 +42,7 @@ static void	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
 			tmp = tmp->next;
 		tmp->next = new;
 	}
+	return (1);
 }
 
 /*
@@ -68,8 +74,7 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-void	add_argument(t_command *cmd, char *arg, t_word_type word_type,
-		t_env *env)
+int add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
 {
 	int count;
 	char **new_args;
@@ -83,14 +88,14 @@ void	add_argument(t_command *cmd, char *arg, t_word_type word_type,
 	final_arg = expand_token_value(arg, word_type, env, g_signal_status);
 	if (!final_arg)
 	{
-		return ;
+		return (0);
 	}
 
 	new_args = malloc(sizeof(char *) * (count + 2));
 	if (!new_args)
 	{
 		free(final_arg);
-		return ;
+		return (0);
 	}
 	i = 0;
 	while (i < count)
@@ -102,6 +107,7 @@ void	add_argument(t_command *cmd, char *arg, t_word_type word_type,
 	new_args[count + 1] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;
+	return (1);
 }
 
 /*
@@ -116,11 +122,13 @@ t_command	*handle_pipe(t_command *cmd)
 	return (cmd->next);
 }
 
-void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
+int add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 {
 	char *arg = ft_strdup("");
 	char *tmp;
 	int first = 1;
+	if (!arg)
+		return (0);
 	while (*tokens && (*tokens)->type == TOKEN_WORD)
 	{
 		if (!first && (*tokens)->has_leading_space)
@@ -141,7 +149,7 @@ void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 	if (!new_args)
 	{
 		free(arg);
-		return ;
+		return (0);
 	}
 	int i = 0;
 	while (i < count)
@@ -154,6 +162,7 @@ void	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 	free(cmd->args);
 	cmd->args = new_args;
 	free(arg);
+	return (1);
 }
 
 /*
@@ -175,7 +184,11 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	head = cmd;
 	if (tokens && tokens->type == TOKEN_WORD)
 	{
-		add_argument_concat(cmd, &tokens, env);
+		if (!add_argument_concat(cmd, &tokens, env))
+		{
+			free_command_list(head);
+			return (NULL);
+		}
 		if (cmd->args && cmd->args[0])
 		{
 			struct stat st;
@@ -192,7 +205,11 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	{
 		if (tokens->type == TOKEN_WORD)
 		{
-			add_argument_concat(cmd, &tokens, env);
+			if (!add_argument_concat(cmd, &tokens, env))
+			{
+				free_command_list(head);
+				return (NULL);
+			}
 			continue ;
 		}
 		else if (tokens->type == TOKEN_PIPE)
@@ -201,7 +218,11 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 			tokens = tokens->next;
 			if (tokens && tokens->type == TOKEN_WORD)
 			{
-				add_argument(cmd, tokens->value, tokens->word_type, env);
+				if (!add_argument(cmd, tokens->value, tokens->word_type, env))
+				{
+					free_command_list(head);
+					return (NULL);
+				}
 				tokens = tokens->next;
 			}
 			continue ;
@@ -218,7 +239,11 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 				free_command_list(head);
 				return (NULL);
 			}
-			add_redir(cmd, type, tokens->value, 0);
+			if (!add_redir(cmd, type, tokens->value, 0))
+			{
+				free_command_list(head);
+				return (NULL);
+			}
 		}
 		else if (tokens->type == TOKEN_HEREDOC)
 		{
@@ -243,7 +268,12 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 			}
 			else
 				delim = ft_strdup(delim);
-			add_redir(cmd, TOKEN_HEREDOC, delim, expand);
+			if (!add_redir(cmd, TOKEN_HEREDOC, delim, expand))
+			{
+				free(delim);
+				free_command_list(head);
+				return (NULL);
+			}
 			free(delim);
 		}
 		tokens = tokens->next;

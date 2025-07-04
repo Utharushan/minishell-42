@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/05 00:14:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 00:38:45 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ t_token_type			get_token_type(char *input, int *i);
 // --- PARSER ---
 
 t_command				*new_command(void);
-void					add_argument(t_command *cmd, char *arg,
+int						add_argument(t_command *cmd, char *arg,
 							t_word_type word_type, t_env *env);
 t_command				*handle_pipe(t_command *cmd);
 t_command				*parse_tokens(t_token *tokens, t_env *env);

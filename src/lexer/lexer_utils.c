@@ -23,7 +23,11 @@ t_token *new_token(char *value, t_token_type type, t_word_type word_type, int ha
 
     token = malloc(sizeof(t_token));
     if (!token)
+    {
+        if (value)
+            free(value);
         return (NULL);
+    }
     token->value = value;
     token->type = type;
     token->word_type = word_type;
@@ -44,7 +48,11 @@ void add_token(t_token **tokens, char *value, t_token_type type, t_word_type wor
 
     new = new_token(value, type, word_type, has_leading_space);
     if (!new)
-        return;
+    {
+        if (value)
+            free(value);
+        return ;
+    }
     if (!*tokens)
         *tokens = new;
     else
