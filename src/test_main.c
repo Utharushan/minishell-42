@@ -175,6 +175,11 @@ t_command	*init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 		return (NULL);
 	}
 	cmds = parse_tokens(tokens, env);
+	if (count_cmds(cmds) > 512)
+	{
+		ft_putstr_fd("ERROR: too many commands\n", 2);
+		return(NULL);
+	}
 	if (!cmds)
 	{
 		g_signal_status = 2;
@@ -207,8 +212,6 @@ int	main(int argc, char **argv, char **envp)
 	t_command *cmds;
 	char *input;
 	t_env *env;
-	t_command *tmp;
-	int empty_cmd;
 
 	(void)argc;
 	(void)argv;
@@ -234,26 +237,6 @@ int	main(int argc, char **argv, char **envp)
 			cmds = init(tokens, cmds, input, env);
 			if (!cmds)
 				continue ;
-
-			tmp = cmds;
-			empty_cmd = 0;
-			while (tmp)
-			{
-				if (!tmp->args || !tmp->args[0] || tmp->args[0][0] == '\0')
-				{
-					empty_cmd = 1;
-					break;
-				}
-				tmp = tmp->next;
-			}
-			if (empty_cmd)
-			{
-				ft_putstr_fd("minishell : command not found\n", 2);
-				g_signal_status = 127;
-				free_command_list(cmds);
-				continue ;
-			}
-
 			if ((!cmds->next && cmds->args && cmds->args[0]
 					&& find_cmd_in_path(cmds, env)) && is_builtins(cmds))
 			{
