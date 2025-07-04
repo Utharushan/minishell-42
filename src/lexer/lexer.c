@@ -21,7 +21,16 @@ void	handle_token(char *input, int *i, t_token **tokens)
     t_token_type	type;
     int				length;
     int				has_leading_space = 0;
+    t_token *old_tokens = *tokens;
+    int token_count_before = 0;
+	int token_count_after = 0;
+    t_token *tmp = *tokens;
 
+    while (tmp)
+	{
+		token_count_before++;
+		tmp = tmp->next;
+	}
     if (*i > 0 && ft_isspace(input[*i - 1]))
         has_leading_space = 1;
 
@@ -29,6 +38,8 @@ void	handle_token(char *input, int *i, t_token **tokens)
     if (type == TOKEN_WORD)
     {
         extract_word(input, i, tokens);
+        if (*tokens == NULL && old_tokens != NULL)
+            free_token_list(old_tokens);
     }
     else
     {
@@ -43,6 +54,17 @@ void	handle_token(char *input, int *i, t_token **tokens)
             length = 1;
             add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
             *i += length;
+        }
+        tmp = *tokens;
+        while (tmp)
+		{
+			token_count_after++;
+			tmp = tmp->next;
+		}
+        if (token_count_after == token_count_before && old_tokens != NULL)
+        {
+            free_token_list(old_tokens);
+            *tokens = NULL;
         }
     }
 }
@@ -68,8 +90,12 @@ t_token	*lexer(char *input)
             continue ;
         }
         handle_token(input, &i, &tokens);
+        if (tokens == NULL)
+            return (NULL);
     }
     add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED, 1);
+    if (tokens == NULL)
+        return (NULL);
     return (tokens);
 }
 
@@ -138,6 +164,8 @@ void	extract_word(char *input, int *i, t_token **tokens)
 			(*i)++;
 			add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD,
 				(quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
+			if (*tokens == NULL)
+				return;
 		}
 		else
 		{
@@ -155,6 +183,8 @@ void	extract_word(char *input, int *i, t_token **tokens)
 			&& input[*i] != '(' && input[*i] != ')' && input[*i] != ';')
 			(*i)++;
 		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
+		if (*tokens == NULL)
+			return ;
 	}
 }
 
