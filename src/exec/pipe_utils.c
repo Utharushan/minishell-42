@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 11:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 22:16:41 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 00:45:57 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	close_all_heredoc_fds(t_command *cmds)
 		while (redirection)
 		{
 			if ((redirection->type == TOKEN_HEREDOC)
-				&& redirection->heredoc_fd > 0)
+				&& redirection->heredoc_fd >= 0)
 			{
 				close(redirection->heredoc_fd);
 				redirection->heredoc_fd = -1;
@@ -77,7 +77,7 @@ void	close_unused_heredoc_fds(t_command *current_cmd, t_command *all_cmds)
 			redir = cmd->redir;
 			while (redir)
 			{
-				if ((redir->type == TOKEN_HEREDOC) && redir->heredoc_fd > 0)
+				if ((redir->type == TOKEN_HEREDOC) && redir->heredoc_fd >= 0)
 				{
 					close(redir->heredoc_fd);
 					redir->heredoc_fd = -1;

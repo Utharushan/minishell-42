@@ -32,6 +32,7 @@ static int	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
 	}
 	new->type = type;
 	new->heredoc_expand = heredoc_expand;
+	new->heredoc_fd = -1;
 	new->next = NULL;
 	if (!cmd->redir)
 		cmd->redir = new;

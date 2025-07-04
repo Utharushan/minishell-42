@@ -84,7 +84,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	cmds = NULL;
 	tokens = NULL;
-	env = init_env(envp, NULL);  // Initialiser une seule fois au début
+	env = init_env(envp, NULL);
 	if (!env)
 		return (1);
 	while (1)
