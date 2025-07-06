@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 21:49:04 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:22:39 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ int	heredoc_write_line(char *line, int heredoc_expand, t_env *env, int fd)
 	if (heredoc_expand)
 	{
 		expanded = expand_token_value(line, WORD_UNQUOTED, env,
-				g_signal_status);
+				singleton(0, 0));
+        if (!expanded)
+            return(0);
 		ft_putstr_fd(expanded, fd);
 		free(expanded);
 	}
@@ -78,6 +80,7 @@ int	here_doc(const char *delim, int heredoc_expand, t_env *env)
 	restore_heredoc_signals();
 	if (g_signal_status == 130)
 	{
+        singleton(1, 130);
 		close(pipe_fd[0]);
 		return (-1);
 	}

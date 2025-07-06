@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:04:42 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 21:12:33 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:16:59 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,21 +31,21 @@ t_command	*init(t_token *tokens, t_command *cmds, char *input, t_env *env)
 	tokens = lexer(input);
 	if (!tokens)
 	{
-		g_signal_status = 2;
+		singleton(1, 2);
 		free(input);
 		return (NULL);
 	}
 	cmds = parse_tokens(tokens, env);
+	if (!cmds)
+	{
+		singleton(1, 2);
+		free_token_list(tokens);
+		free(input);
+		return (NULL);
+	}
 	if (count_cmds(cmds) > 512)
 	{
 		ft_putstr_fd("ERROR: too many commands\n", 2);
-		return (NULL);
-	}
-	if (!cmds)
-	{
-		g_signal_status = 2;
-		free_token_list(tokens);
-		free(input);
 		return (NULL);
 	}
 	free_token_list(tokens);

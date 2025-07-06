@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 11:13:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/23 19:42:54 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:17:22 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,5 @@ void	print_error(t_command *cmds)
 {
 	ft_putstr_fd(cmds->args[0], 2);
 	ft_putstr_fd(": command not found\n", 2);
-	g_signal_status = 127;
+	singleton(1, 127);
 }

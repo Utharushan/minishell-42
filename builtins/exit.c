@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/05 00:17:59 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:13:45 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,25 +83,26 @@ void ft_exit(char **args, t_info *info)
 {
 	int exit_code;
 
+    exit_code = 0;
 	if (args && args[1])
 	{
 		if (!is_numeric(args[1]))
 		{
 			ft_putstr_fd("exit: numeric argument required\n", 2);
-			g_signal_status = 2;
-			free_info_and_exit(info, g_signal_status);
+			singleton(1, 2);
+			free_info_and_exit(info,singleton(0, 0));
 		}
 		else if (args[2])
 		{
 			ft_putstr_fd("exit: too many arguments\n", 2);
-			g_signal_status = 1;
+			singleton(1, 1);
 			return;
 		}
 		else
 			exit_code = ft_atoi(args[1]) % 256;
 	}
 	else
-		exit_code = g_signal_status;
+		exit_code = singleton(0, 0);
 	if (isatty(STDIN_FILENO))
 		ft_putstr_fd("exit\n", 1);
 	if (info->env)

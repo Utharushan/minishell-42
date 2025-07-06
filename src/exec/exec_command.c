@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/27 15:51:24 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 20:42:12 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,12 @@ char	*build_full_path(char *dir, char *cmd)
 	if (!tmp)
 		return (NULL);
 	full_path = ft_strjoin(tmp, cmd);
-	free(tmp);
+    if (!full_path)
+    {
+        free(tmp);
+        return (NULL);
+    }
+    free(tmp);
 	return (full_path);
 }
 

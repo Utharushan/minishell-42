@@ -86,7 +86,7 @@ int add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
 	while (cmd->args && cmd->args[count])
 		count++;
 
-	final_arg = expand_token_value(arg, word_type, env, g_signal_status);
+	final_arg = expand_token_value(arg, word_type, env, singleton(0, 0));
 	if (!final_arg)
 	{
 		return (0);
@@ -135,7 +135,7 @@ int add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 		if (!first && (*tokens)->has_leading_space)
 			break ;
 		char *expanded = expand_token_value((*tokens)->value,
-				(*tokens)->word_type, env, g_signal_status);
+				(*tokens)->word_type, env, singleton(0, 0));
 		tmp = arg;
 		arg = ft_strjoin(arg, expanded);
 		free(tmp);

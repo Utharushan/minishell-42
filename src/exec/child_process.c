@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 22:51:47 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:16:23 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ void	launch_child_process(t_command *cmds, t_info *info)
 void	exec_child_external(t_command *cmds, t_info *info)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
-		free_info_and_exit(info, g_signal_status);
+		free_info_and_exit(info, singleton(0, 0));
 	if (!ft_strncmp(cmds->args[0], "exit", 5))
-		free_info_and_exit(info, g_signal_status);
+		free_info_and_exit(info, singleton(0, 0));
 	exec_command(cmds, info->env);
-	free_info_and_exit(info, g_signal_status);
+	free_info_and_exit(info, singleton(0, 0));
 }

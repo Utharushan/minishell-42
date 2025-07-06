@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 12:39:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 23:28:14 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 02:04:37 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,14 @@ void	exec_pipe(t_command *cmds, t_info *info)
 {
 	while (cmds)
 	{
+        if (find_cmd_in_path(cmds, info->env) && is_builtins(cmds))
+	    {
+	    	ft_putstr_fd(cmds->args[0], 2);
+	    	ft_putstr_fd(": command not found\n", 2);
+	    	singleton(1, 127);
+	    	free_command_list(cmds);
+	    	return ;
+	    }
 		launch_child_process(cmds, info);
 		cmds = cmds->next;
 	}

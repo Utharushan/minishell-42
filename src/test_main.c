@@ -18,6 +18,17 @@
 
 int			g_signal_status = 0;
 
+int singleton(int type, int value)
+{
+    static int nb = 0;
+
+    if (type == 0)
+        return nb;
+    else
+        nb = value;
+    return (nb);
+}
+
 int	handle_input_error(char *input, t_env *env)
 {
 	if (!input)
@@ -25,7 +36,7 @@ int	handle_input_error(char *input, t_env *env)
 		ft_putstr_fd("exit", 1);
 		if (env)
 			free_env_list(env);
-		exit(0);
+		exit(singleton(0, 0));
 	}
 	return (0);
 }
@@ -37,7 +48,7 @@ int	handle_command_not_found(t_command *cmds, t_env *env)
 	{
 		ft_putstr_fd(cmds->args[0], 2);
 		ft_putstr_fd(": command not found\n", 2);
-		g_signal_status = 127;
+		singleton(1, 127);
 		free_command_list(cmds);
 		return (1);
 	}
@@ -96,6 +107,6 @@ int	main(int argc, char **argv, char **envp)
 		process_input(input, tokens, cmds, &env);
 	}
 	free_env_list(env);
-	return (g_signal_status);
+	return (singleton(0, 0));
 }
 // valgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishell

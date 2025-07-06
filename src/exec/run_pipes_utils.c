@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:28:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/04 22:51:49 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:18:29 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 	{
 		waitpid(pid[i], &status, 0);
 		if (WIFEXITED(status))
-			g_signal_status = WEXITSTATUS(status);
+			singleton(1, WEXITSTATUS(status));
 		else if (WIFSIGNALED(status))
 		{
 			if (WTERMSIG(status) == SIGINT)
@@ -114,7 +114,7 @@ pid_t	*init_pipe_exec(t_command *cmds, t_env *env)
 {
 	pid_t	*pid;
 	t_info	*info;
-
+    
 	if (cmds && !cmds->next && cmds->args && !ft_strncmp(cmds->args[0], "exit",
 			5))
 	{
@@ -122,7 +122,11 @@ pid_t	*init_pipe_exec(t_command *cmds, t_env *env)
 		if (info)
 			ft_exit(cmds->args, info);
 		else
-			exit(g_signal_status);
+        {
+            printf("ici\n");
+            exit(singleton(0, 0));
+        }
+			
 	}
 	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
 	if (!pid)
