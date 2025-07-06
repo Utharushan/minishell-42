@@ -86,10 +86,10 @@ void	process_input(char *input, t_token *tokens, t_command *cmds, t_env **env)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_token *tokens;
-	t_command *cmds;
-	char *input;
-	t_env *env;
+	t_token		*tokens;
+	t_command	*cmds;
+	char		*input;
+	t_env		*env;
 
 	(void)argc;
 	(void)argv;

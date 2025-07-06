@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:04:42 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/06 14:25:10 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:59:53 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,14 @@ int	check_input(char *input)
 	i = 0;
 	while (input[i] == ' ' || input[i] == '\t')
 		i++;
+	if (input[i] == '\0')
+		return (1);
+	while (input[i] && (input[i] == ':' || input[i] == '!' || input[i] == '$'))
+	{
+		i++;
+		while (input[i] == ' ' || input[i] == '\t')
+			i++;
+	}
 	if (input[i] == '\0')
 		return (1);
 	return (0);
