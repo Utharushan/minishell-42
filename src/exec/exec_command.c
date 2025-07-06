@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 11:18:30 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 20:42:12 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:30:39 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ char	*build_full_path(char *dir, char *cmd)
 	if (!tmp)
 		return (NULL);
 	full_path = ft_strjoin(tmp, cmd);
-    if (!full_path)
-    {
-        free(tmp);
-        return (NULL);
-    }
-    free(tmp);
+	if (!full_path)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	free(tmp);
 	return (full_path);
 }
 
@@ -98,6 +98,7 @@ int	exec_command(t_command *cmd, t_env *env)
 	free_str_array(envp);
 	if (ret != -1)
 		return (ret);
-	perror(cmd->args[0]);
+	ft_putstr_fd(cmd->args[0], 2);
+	ft_putstr_fd(": command not found\n", 2);
 	return (127);
 }

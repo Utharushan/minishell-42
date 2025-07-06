@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:28:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 21:18:29 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:36:22 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,16 +58,27 @@ int	create_child_process(void)
 }
 
 /*
-The function is called in the parent process after forking a child.
+Handle the exit status of a child process.
+If the process exited normally, store the exit code.
+If it was killed by a signal, set the appropriate global signal status.
+*/
+static void	handle_child_exit_status(int status, t_command *cmds)
+{
+	int	exit_code;
 
-Wait for the child process to end, register its status.
+	if (WIFEXITED(status))
+	{
+		exit_code = WEXITSTATUS(status);
+		if (!cmds->next)
+			singleton(1, exit_code);
+	}
+	else if (WIFSIGNALED(status))
+		handle_signal_termination(status);
+}
 
-If in_fd is not stdin (0), close it.
-If this command is followed by a pipe, we close its write end,
-and save the read end into in_fd, so we can use it as the input
-for the next command.
-
-it connects the command through the pipes.
+/*
+Wait for all child processes to complete and handle their exit status.
+For pipelines, only the exit code of the last command is preserved.
 */
 void	wait_for_pids(t_command *cmds, pid_t *pid)
 {
@@ -75,22 +86,10 @@ void	wait_for_pids(t_command *cmds, pid_t *pid)
 	int	status;
 
 	i = 0;
-	status = 0;
 	while (cmds)
 	{
 		waitpid(pid[i], &status, 0);
-		if (WIFEXITED(status))
-			singleton(1, WEXITSTATUS(status));
-		else if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-				g_signal_status = 130;
-			else if (WTERMSIG(status) == SIGQUIT)
-			{
-				g_signal_status = 131;
-				ft_putstr_fd("Quit (core dumped)\n", 2);
-			}
-		}
+		handle_child_exit_status(status, cmds);
 		cmds = cmds->next;
 		i++;
 	}
@@ -114,7 +113,7 @@ pid_t	*init_pipe_exec(t_command *cmds, t_env *env)
 {
 	pid_t	*pid;
 	t_info	*info;
-    
+
 	if (cmds && !cmds->next && cmds->args && !ft_strncmp(cmds->args[0], "exit",
 			5))
 	{
@@ -122,11 +121,7 @@ pid_t	*init_pipe_exec(t_command *cmds, t_env *env)
 		if (info)
 			ft_exit(cmds->args, info);
 		else
-        {
-            printf("ici\n");
-            exit(singleton(0, 0));
-        }
-			
+			exit(singleton(0, 0));
 	}
 	pid = malloc(sizeof(pid_t) * count_cmds(cmds));
 	if (!pid)

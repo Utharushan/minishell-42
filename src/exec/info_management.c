@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 20:50:30 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:31:46 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,20 +67,20 @@ void	setup_child_fds(t_command *cmds, t_info *info)
 	if (info->in_fd != 0)
 	{
 		if (dup2(info->in_fd, STDIN_FILENO) == -1)
-        {
-            close(info->in_fd);
-            return ;
-        }
+		{
+			close(info->in_fd);
+			return ;
+		}
 		close(info->in_fd);
 	}
 	if (cmds->next_op == OP_PIPE)
 	{
 		if (dup2(info->pipe_fd[1], STDOUT_FILENO) == -1)
-        {
-		    close(info->pipe_fd[0]);
-		    close(info->pipe_fd[1]);
-            return ;
-        }
+		{
+			close(info->pipe_fd[0]);
+			close(info->pipe_fd[1]);
+			return ;
+		}
 		close(info->pipe_fd[0]);
 		close(info->pipe_fd[1]);
 	}

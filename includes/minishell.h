@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/06 02:04:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:36:55 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,7 @@ void					exec_pipe(t_command *cmds, t_info *info);
 int						handle_parent_builtin_if_needed(t_command *cmds,
 							t_info *info);
 void					free_info_and_exit(t_info *info, int exit_code);
-int                     singleton(int type, int value);
+int						singleton(int type, int value);
+void					handle_signal_termination(int status);
 
 #endif

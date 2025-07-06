@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/05 21:13:45 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:16:48 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,14 +83,14 @@ void ft_exit(char **args, t_info *info)
 {
 	int exit_code;
 
-    exit_code = 0;
+	exit_code = 0;
 	if (args && args[1])
 	{
 		if (!is_numeric(args[1]))
 		{
 			ft_putstr_fd("exit: numeric argument required\n", 2);
 			singleton(1, 2);
-			free_info_and_exit(info,singleton(0, 0));
+			free_info_and_exit(info, singleton(0, 0));
 		}
 		else if (args[2])
 		{
@@ -105,6 +105,7 @@ void ft_exit(char **args, t_info *info)
 		exit_code = singleton(0, 0);
 	if (isatty(STDIN_FILENO))
 		ft_putstr_fd("exit\n", 1);
+	singleton(1, exit_code);
 	if (info->env)
 		free_env_list(info->env);
 	free_info_child(info);

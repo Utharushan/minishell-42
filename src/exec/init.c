@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:04:42 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 21:16:59 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/06 14:25:10 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	sigint_handler(int sig)
 
 	(void)sig;
 	g_signal_status = 130;
+	singleton(1, 130);
 	c = '\0';
 	write(1, "\n", 1);
 	write(1, "\033[2K", 1);
