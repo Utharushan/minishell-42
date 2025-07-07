@@ -53,7 +53,7 @@ Returns a pointer to the new command, or NULL if allocation fails.
 */
 t_command	*new_command(void)
 {
-	t_command *cmd;
+	t_command	*cmd;
 
 	cmd = malloc(sizeof(t_command));
 	if (!cmd)
@@ -75,12 +75,12 @@ Allocates a new array with space for the new argument and NULL terminator.
 Copies existing arguments and appends the new one.
 Frees the old argument array.
 */
-int add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
+int	add_argument(t_command *cmd, char *arg, t_word_type word_type, t_env *env)
 {
-	int count;
-	char **new_args;
-	int i;
-	char *final_arg = NULL;
+	int		count;
+	char	**new_args;
+	int		i;
+	char	*final_arg = NULL;
 
 	count = 0;
 	while (cmd->args && cmd->args[count])
@@ -123,19 +123,23 @@ t_command	*handle_pipe(t_command *cmd)
 	return (cmd->next);
 }
 
-int add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
+int	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 {
-	char *arg = ft_strdup("");
-	char *tmp;
-	int first = 1;
+	char	*arg;
+	char	*tmp;
+	int		first;
+	char *expanded;
+	
+	*arg = ft_strdup("");
+	first = 1;
 	if (!arg)
 		return (0);
 	while (*tokens && (*tokens)->type == TOKEN_WORD)
 	{
 		if (!first && (*tokens)->has_leading_space)
 			break ;
-		char *expanded = expand_token_value((*tokens)->value,
-				(*tokens)->word_type, env, singleton(0, 0));
+		*expanded = expand_token_value((*tokens)->value,
+			(*tokens)->word_type, env, singleton(0, 0));
 		tmp = arg;
 		arg = ft_strjoin(arg, expanded);
 		free(tmp);
@@ -173,14 +177,12 @@ Returns the head of the command list.
 */
 t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
-	if (check_syntax_errors(tokens))
-	{
-		return (NULL);
-	}
-	t_command *cmd;
-	t_command *head;
-	t_token_type type;
+	t_command		*cmd;
+	t_command		*head;
+	t_token_type	type;
 
+	if (check_syntax_errors(tokens))
+		return (NULL);
 	cmd = new_command();
 	head = cmd;
 	if (tokens && tokens->type == TOKEN_WORD)
