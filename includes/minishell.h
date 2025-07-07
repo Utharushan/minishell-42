@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/06 14:36:55 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/07 22:57:06 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,14 @@ typedef enum e_word_type
 
 // --- TOKEN LINKED LIST ---
 
+typedef struct s_token_args
+{
+	char			*value;
+	t_token_type	type;
+	t_word_type	word_type;
+	int			has_leading_space;
+} t_token_args;
+
 typedef struct s_token
 {
 	char				*value;
@@ -131,16 +139,30 @@ typedef struct s_info
 
 // --- LEXER ---
 
-t_token					*new_token(char *value, t_token_type type,
-							t_word_type word_type, int has_leading_space);
-void					add_token(t_token **tokens, char *value,
-							t_token_type type, t_word_type word_type,
-							int has_leading_space);
-void					handle_token(char *input, int *i, t_token **tokens);
+typedef struct s_token_ctx
+{
+	int			has_leading_space;
+	t_token		*old_tokens;
+	int			token_count_before;
+	int			token_count_after;
+	t_token		*tmp;
+} t_token_ctx;
+
+t_token					*new_token(t_token_args args);
+void					add_token(t_token **tokens, t_token_args args);
+void					handle_token_word(char *input, int *i, t_token **tokens);
+void					handle_token_operator(char *input, int *i, t_token **tokens, t_token_type type);
+t_word_type				get_word_type(char quote);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
 void					extract_word(char *input, int *i, t_token **tokens);
 t_token_type			get_token_type(char *input, int *i);
+int						count_tokens(t_token *tokens);
+void					set_leading_space(int *has_leading_space, char *input, int i);
+void					reset_token_counts(t_token **old_tokens, int *token_count_before, int *token_count_after, t_token *tokens);
+void					handle_token_cleanup(t_token **tokens, t_token *old_tokens, int token_count_before, int token_count_after);
+void					extract_word_quoted(char *input, int *i, t_token **tokens, int has_leading_space);
+void					extract_word_unquoted(char *input, int *i, t_token **tokens, int has_leading_space);
 
 // --- PARSER ---
 
