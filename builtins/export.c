@@ -6,13 +6,13 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:09:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/06/26 09:58:47 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/09 16:29:20 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int env_found(t_env *env, char *name)
+int	env_found(t_env *env, char *name)
 {
 	while (env)
 	{
@@ -23,22 +23,22 @@ int env_found(t_env *env, char *name)
 	return (0);
 }
 
-void parse_arg(char *name, char *value, t_env *env)
+void	parse_arg(char *name, char *value, t_env *env)
 {
 	while (env)
 	{
 		if (!ft_strcmp(name, env->name))
 		{
 			env->value = value;
-			break;
+			break ;
 		}
 		env = env->next;
 	}
 }
 
-int argv_parsed(char *name)
+int	argv_parsed(char *name)
 {
-	int i;
+	int	i;
 
 	if (!name || !name[0])
 		return (1);
@@ -54,13 +54,13 @@ int argv_parsed(char *name)
 	return (0);
 }
 
-int add_new_node(t_env *env, char *args)
+int	add_new_node(t_env *env, char *args)
 {
-	t_env *new_env;
-	char *equal_position;
-	char *name;
-	char *value;
-	t_env *cur;
+	t_env	*new_env;
+	char	*equal_position;
+	char	*name;
+	char	*value;
+	t_env	*cur;
 
 	equal_position = ft_strchr(args, '=');
 	if (!equal_position)
@@ -101,9 +101,9 @@ int add_new_node(t_env *env, char *args)
 	return (0);
 }
 
-int ft_export(t_env *env, char **args)
+int	ft_export(t_env *env, char **args)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!env)

@@ -6,15 +6,15 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/06 14:16:48 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/09 16:29:13 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void free_redir(t_redir *redir)
+void	free_redir(t_redir *redir)
 {
-	t_redir *tmp;
+	t_redir	*tmp;
 
 	while (redir)
 	{
@@ -26,9 +26,9 @@ void free_redir(t_redir *redir)
 	}
 }
 
-void free_args(t_command *cmd)
+void	free_args(t_command *cmd)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (cmd->args[i])
@@ -36,9 +36,9 @@ void free_args(t_command *cmd)
 	free(cmd->args);
 }
 
-void free_command_list(t_command *cmd)
+void	free_command_list(t_command *cmd)
 {
-	t_command *tmp;
+	t_command	*tmp;
 
 	if (!cmd)
 		return ;
@@ -64,7 +64,7 @@ void free_command_list(t_command *cmd)
 	}
 }
 
-int is_numeric(const char *str)
+int	is_numeric(const char *str)
 {
 	if (!str || *str == '\0')
 		return (0);
@@ -79,14 +79,36 @@ int is_numeric(const char *str)
 	return (1);
 }
 
-void ft_exit(char **args, t_info *info)
+long long	ft_atoll(const char *str)
 {
-	int exit_code;
+	long long	result;
+	long		i;
+	long		sign;
+
+	result = 0;
+	i = 0;
+	sign = 1;
+	while ((str[i] >= 9 && str[i] <= 13) || (str[i] == 32))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			sign *= -1;
+		i++;
+	}
+	while (ft_isdigit(str[i]))
+		result = (result * 10) + (str[i++] - '0');
+	return (result * sign);
+}
+
+void	ft_exit(char **args, t_info *info)
+{
+	int	exit_code;
 
 	exit_code = 0;
 	if (args && args[1])
 	{
-		if (!is_numeric(args[1]))
+		if (!is_numeric(args[1]) || ft_atoll(args[1]) > 9223372036854775807)
 		{
 			ft_putstr_fd("exit: numeric argument required\n", 2);
 			singleton(1, 2);
@@ -96,7 +118,7 @@ void ft_exit(char **args, t_info *info)
 		{
 			ft_putstr_fd("exit: too many arguments\n", 2);
 			singleton(1, 1);
-			return;
+			return ;
 		}
 		else
 			exit_code = ft_atoi(args[1]) % 256;

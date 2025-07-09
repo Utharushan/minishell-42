@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 07:33:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/01 15:02:40 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/09 16:28:55 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int	handle_plus_equal(t_env *env, char *arg)
 			free(name);
 			free(value);
 			free(plus_equal);
-			return(1);
+			return (1);
 		}
 		add_env_back(&env, new_env);
 	}

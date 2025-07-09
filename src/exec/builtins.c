@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 20:44:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 21:16:06 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/09 13:50:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	run_builtins(t_command *cmds, t_info *info)
 		{
 			ft_putnbr_fd(singleton(0, 0), 1);
 			ft_putchar_fd('\n', 1);
+			singleton(1, 0);
 		}
 		else
 			singleton(1, ft_echo(cmds));

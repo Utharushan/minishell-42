@@ -22,18 +22,19 @@ int	check_syntax_errors(t_token *tokens)
 	t_token *err_tok = NULL;
 	while (tokens)
 	{
-		if ((tokens->type == TOKEN_PIPE || tokens->type == TOKEN_AMP) &&
+		if ((tokens->type == TOKEN_PIPE || tokens->type == TOKEN_AMP
+			|| tokens->type == TOKEN_SEMICOLON) &&
 			(!prev || !tokens->next || tokens->next->type == TOKEN_EOF))
 		{
 			err_tok = tokens;
-			break;
+			break ;
 		}
 		if (tokens->type == TOKEN_PIPE)
 		{
 			if (tokens->next && tokens->next->type == TOKEN_PIPE)
 			{
 				err_tok = tokens->next;
-				break;
+				break ;
 			}
 		}
 		if (tokens->type == TOKEN_AMP)
@@ -41,7 +42,15 @@ int	check_syntax_errors(t_token *tokens)
 			if (tokens->next && tokens->next->type == TOKEN_AMP)
 			{
 				err_tok = tokens->next;
-				break;
+				break ;
+			}
+		}
+		if (tokens->type == TOKEN_SEMICOLON)
+		{
+			if (tokens->next && tokens->next->type == TOKEN_SEMICOLON)
+			{
+				err_tok = tokens->next;
+				break ;
 			}
 		}
 		prev = tokens;
@@ -54,6 +63,8 @@ int	check_syntax_errors(t_token *tokens)
 			ft_putstr_fd("|", 2);
 		else if (err_tok->type == TOKEN_AMP)
 			ft_putstr_fd("&", 2);
+		else if (err_tok->type == TOKEN_SEMICOLON)
+			ft_putstr_fd(";", 2);
 		ft_putstr_fd("'\n", 2);
 		return (1);
 	}

@@ -228,6 +228,14 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 			}
 			continue ;
 		}
+		else if (tokens->type == TOKEN_SEMICOLON)
+		{
+			cmd->next_op = OP_NONE;
+			cmd->next = new_command();
+			cmd = cmd->next;
+			tokens = tokens->next;
+			continue ;
+		}
 		else if (tokens->type == TOKEN_REDIRECT_IN
 			|| tokens->type == TOKEN_REDIRECT_OUT
 			|| tokens->type == TOKEN_REDIRECT_APPEND)

@@ -15,7 +15,7 @@
 
 #include "../includes/minishell.h"
 
-char *ft_getenv(t_env *env, const char *name)
+char	*ft_getenv(t_env *env, const char *name)
 {
 	while (env)
 	{
@@ -26,7 +26,7 @@ char *ft_getenv(t_env *env, const char *name)
 	return (NULL);
 }
 
-void ft_setenv(t_env *env, const char *name, const char *value)
+void	ft_setenv(t_env *env, const char *name, const char *value)
 {
 	while (env)
 	{
@@ -35,16 +35,16 @@ void ft_setenv(t_env *env, const char *name, const char *value)
 			free(env->value);
 			env->value = ft_strdup(value);
 			if (!env->value)
-				return;
-			return;
+				return ;
+			return ;
 		}
 		env = env->next;
 	}
 }
 
-int count_env(t_env *tmp)
+int	count_env(t_env *tmp)
 {
-	int count;
+	int	count;
 
 	count = 0;
 	while (tmp)
@@ -55,20 +55,20 @@ int count_env(t_env *tmp)
 	return (count);
 }
 
-void free_envp(char **envp, int i)
+void	free_envp(char **envp, int i)
 {
 	while (i > 0)
 		free(envp[--i]);
 	free(envp);
 }
 
-char **env_to_envp(t_env *env)
+char	**env_to_envp(t_env *env)
 {
-	int count;
-	int i;
-	t_env *tmp;
-	char **envp;
-	char *tmp_str;
+	int		count;
+	int		i;
+	t_env	*tmp;
+	char	**envp;
+	char	*tmp_str;
 
 	i = 0;
 	tmp = env;
@@ -81,17 +81,11 @@ char **env_to_envp(t_env *env)
 	{
 		tmp_str = ft_strjoin(tmp->name, "=");
 		if (!tmp_str)
-		{
-			free_envp(envp, i);
-			return (NULL);
-		}
+			return (free_envp(envp, i), NULL);
 		envp[i] = ft_strjoin(tmp_str, tmp->value);
 		free(tmp_str);
 		if (!envp[i])
-		{
-			free_envp(envp, i);
-			return (NULL);
-		}
+			return (free_envp(envp, i), NULL);
 		i++;
 		tmp = tmp->next;
 	}
@@ -99,10 +93,10 @@ char **env_to_envp(t_env *env)
 	return (envp);
 }
 
-char **get_path_dirs(t_env *env)
+char	**get_path_dirs(t_env *env)
 {
-	char *path_value;
-	char **path_dirs;
+	char	*path_value;
+	char	**path_dirs;
 
 	path_value = ft_getenv(env, "PATH");
 	if (!path_value)
@@ -115,4 +109,3 @@ char **get_path_dirs(t_env *env)
 	}
 	return (path_dirs);
 }
-
