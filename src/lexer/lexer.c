@@ -133,6 +133,10 @@ t_token_type	get_token_type(char *input, int *i)
 	{
 		return (TOKEN_AMP);
 	}
+	else if (input[*i] == ';')
+	{
+		return (TOKEN_SEMICOLON);
+	}
 	return (TOKEN_WORD);
 }
 
