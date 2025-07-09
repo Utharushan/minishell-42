@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:09:21 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/05 23:32:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/09 16:28:32 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,7 @@ int	cd_and_update(char *path, t_env *env)
 		ft_setenv(env, "PWD", cwd);
 	else
 	{
-		ft_putstr_fd("chdir: error retrieving current directory: No such file or directory\n",
-			2);
+		ft_putstr_fd("chdir: error retrieving current directory\n", 2);
 		return (1);
 	}
 	return (0);
