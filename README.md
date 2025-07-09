@@ -2,4 +2,4 @@
 
 TODO :
 
-gérer les ; dans le parsing
+norminette and leak verifs in parsing
