@@ -1,116 +1,68 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:39:52 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/03/31 13:39:52 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/09 21:54:40 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-/*
-Handles the extraction and addition of a token from the input string at position *i.
-Determines the token type and calls extract_word or adds a token accordingly.
-*/
 void	handle_token(char *input, int *i, t_token **tokens)
 {
-    t_token_type	type;
-    int				length;
-    int				has_leading_space = 0;
-    t_token *old_tokens = *tokens;
-    int token_count_before = 0;
-	int token_count_after = 0;
-    t_token *tmp = *tokens;
+	t_token_type	type;
+	t_token_ctx		ctx;
 
-    while (tmp)
+	set_leading_space(&ctx.has_leading_space, input, *i);
+	reset_token_counts(&ctx.old_tokens, &ctx.token_count_before,
+		&ctx.token_count_after, *tokens);
+	type = get_token_type(input, i);
+	if (type == TOKEN_WORD)
+		handle_token_word(input, i, tokens);
+	else
+		handle_token_operator(input, i, tokens, type);
+	ctx.tmp = *tokens;
+	while (ctx.tmp)
 	{
-		token_count_before++;
-		tmp = tmp->next;
+		ctx.token_count_after++;
+		ctx.tmp = ctx.tmp->next;
 	}
-    if (*i > 0 && ft_isspace(input[*i - 1]))
-        has_leading_space = 1;
-
-    type = get_token_type(input, i);
-    if (type == TOKEN_WORD)
-    {
-        extract_word(input, i, tokens);
-        if (*tokens == NULL && old_tokens != NULL)
-            free_token_list(old_tokens);
-    }
-    else
-    {
-        if (type == TOKEN_HEREDOC || type == TOKEN_REDIRECT_APPEND)
-        {
-            length = 2;
-            add_token(tokens, ft_substr(input, *i - 1, length), type, WORD_UNQUOTED, has_leading_space);
-            *i += 1;
-        }
-        else
-        {
-            length = 1;
-            add_token(tokens, ft_substr(input, *i, length), type, WORD_UNQUOTED, has_leading_space);
-            *i += length;
-        }
-        tmp = *tokens;
-        while (tmp)
-		{
-			token_count_after++;
-			tmp = tmp->next;
-		}
-        if (token_count_after == token_count_before && old_tokens != NULL)
-        {
-            free_token_list(old_tokens);
-            *tokens = NULL;
-        }
-    }
+	handle_token_cleanup(tokens, ctx.old_tokens, ctx.token_count_before,
+		ctx.token_count_after);
 }
 
-/*
-Tokenizes the input string into a linked list of tokens.
-Skips whitespace and processes each token using handle_token.
-Appends a TOKEN_EOF at the end.
-Returns the head of the token list.
-*/
 t_token	*lexer(char *input)
 {
-    t_token	*tokens;
-    int		i;
+	t_token	*tokens;
+	int		i;
 
-    tokens = NULL;
-    i = 0;
-    while (input[i])
-    {
-        if (ft_isspace(input[i]))
-        {
-            i++;
-            continue ;
-        }
-        handle_token(input, &i, &tokens);
-        if (tokens == NULL)
-            return (NULL);
-    }
-    add_token(&tokens, NULL, TOKEN_EOF, WORD_UNQUOTED, 1);
-    if (tokens == NULL)
-        return (NULL);
-    return (tokens);
+	tokens = NULL;
+	i = 0;
+	while (input[i])
+	{
+		if (ft_isspace(input[i]))
+		{
+			i++;
+			continue ;
+		}
+		handle_token(input, &i, &tokens);
+		if (tokens == NULL)
+			return (NULL);
+	}
+	add_token(&tokens, (t_token_args){NULL, TOKEN_EOF, WORD_UNQUOTED, 1});
+	if (tokens == NULL)
+		return (NULL);
+	return (tokens);
 }
 
-/*
-Determines the type of token at the current position in the input string.
-Handles special cases for heredoc and append redirections.
-Advances the index for multi-character tokens.
-Returns the detected token type.
-*/
 t_token_type	get_token_type(char *input, int *i)
 {
 	if (input[*i] == '|')
-	{
 		return (TOKEN_PIPE);
-	}
 	else if (input[*i] == '<')
 	{
 		if (input[*i + 1] == '<')
@@ -130,61 +82,30 @@ t_token_type	get_token_type(char *input, int *i)
 		return (TOKEN_REDIRECT_OUT);
 	}
 	else if (input[*i] == '&')
-	{
 		return (TOKEN_AMP);
-	}
+	else if (input[*i] == ';')
+		return (TOKEN_SEMICOLON);
 	return (TOKEN_WORD);
 }
 
-/*
-Extracts a word token from the input string starting at position *i.
-Continues until a special character or whitespace is found.
-Adds the extracted word as a token and updates the index.
-*/
 void	extract_word(char *input, int *i, t_token **tokens)
 {
-	int start;
-	char quote;
-	int has_leading_space = 0;
+	int		has_leading_space;
 
+	has_leading_space = 0;
 	if (*i == 0)
 		has_leading_space = 0;
 	else if (ft_isspace(input[*i - 1]))
 		has_leading_space = 1;
-
 	if (input[*i] == '\'' || input[*i] == '"')
-	{
-		quote = input[*i];
-		start = *i;
-		(*i)++;
-		while (input[*i] && input[*i] != quote)
-			(*i)++;
-		if (input[*i] == quote)
-		{
-			(*i)++;
-			add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD,
-				(quote == '\'') ? WORD_SINGLE_QUOTED : WORD_DOUBLE_QUOTED, has_leading_space);
-			if (*tokens == NULL)
-				return;
-		}
-		else
-		{
-			ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
-			ft_putchar_fd(quote, 2);
-			ft_putstr_fd("'\n", 2);
-			*tokens = NULL;
-		}
-	}
+		extract_word_quoted(input, i, tokens, has_leading_space);
 	else
-	{
-		start = *i;
-		while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"'
-			&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '&'
-			&& input[*i] != '(' && input[*i] != ')' && input[*i] != ';')
-			(*i)++;
-		add_token(tokens, ft_substr(input, start, *i - start), TOKEN_WORD, WORD_UNQUOTED, has_leading_space);
-		if (*tokens == NULL)
-			return ;
-	}
+		extract_word_unquoted(input, i, tokens, has_leading_space);
 }
 
+void	set_leading_space(int *has_leading_space, char *input, int i)
+{
+	*has_leading_space = 0;
+	if (i > 0 && ft_isspace(input[i - 1]))
+		*has_leading_space = 1;
+}
