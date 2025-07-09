@@ -213,7 +213,7 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 			}
 			continue ;
 		}
-		else if (tokens->type == TOKEN_PIPE)
+		else if (tokens->type == TOKEN_PIPE || tokens->type == TOKEN_SEMICOLON)
 		{
 			cmd = handle_pipe(cmd);
 			tokens = tokens->next;

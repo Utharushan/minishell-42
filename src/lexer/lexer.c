@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:39:52 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/07 22:57:41 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/09 21:54:40 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ t_token_type	get_token_type(char *input, int *i)
 	}
 	else if (input[*i] == '&')
 		return (TOKEN_AMP);
+	else if (input[*i] == ';')
+		return (TOKEN_SEMICOLON);
 	return (TOKEN_WORD);
 }
 

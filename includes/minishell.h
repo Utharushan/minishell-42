@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/07 22:57:06 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/09 21:54:34 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ typedef enum e_token_type
 	TOKEN_REDIRECT_APPEND,
 	TOKEN_HEREDOC,
 	TOKEN_AMP,
+	TOKEN_SEMICOLON,
 	TOKEN_EOF
 }						t_token_type;
 
