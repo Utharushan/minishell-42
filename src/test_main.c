@@ -15,18 +15,18 @@
 
 #include "../includes/minishell.h"
 
+
 int			g_signal_status = 0;
 
-int	singleton(int type, int value)
+int singleton(int type, int value)
 {
-	static int	nb;
+    static int nb = 0;
 
-	nb = 0;
-	if (type == 0)
-		return (nb);
-	else
-		nb = value;
-	return (nb);
+    if (type == 0)
+        return nb;
+    else
+        nb = value;
+    return (nb);
 }
 
 int	handle_input_error(char *input, t_env *env)
@@ -69,8 +69,7 @@ int	execute_commands(t_command *cmds, t_env *env)
 	return (0);
 }
 
-void	process_input(char *input, t_token *tokens,
-	t_command *cmds, t_env **env)
+void	process_input(char *input, t_token *tokens, t_command *cmds, t_env **env)
 {
 	if (!check_input(input))
 	{
@@ -110,5 +109,4 @@ int	main(int argc, char **argv, char **envp)
 	free_env_list(env);
 	return (singleton(0, 0));
 }
-// valgrind --leak-check=full --trace-children=yes --track-fds=yes
-// --suppressions=ignore_leak_readline.supp ./minishell
+// valgrind --leak-check=full --trace-children=yes --track-fds=yes --suppressions=ignore_leak_readline.supp ./minishell
