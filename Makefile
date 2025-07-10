@@ -6,7 +6,7 @@
 #    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/07 22:38:07 by tuthayak         ###   ########.fr        #
+#    Updated: 2025/07/10 20:38:57 by tuthayak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/lexer/lexer_helpers.c \
 			  $(SRC_DIR)/parser/parser.c \
 			  $(SRC_DIR)/parser/syntax_error_handling.c \
+			  $(SRC_DIR)/parser/syntax_error_utils.c 
 			  $(SRC_DIR)/parser/expansion.c \
 			  $(SRC_DIR)/test_main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
