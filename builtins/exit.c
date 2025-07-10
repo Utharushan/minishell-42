@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:43:37 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/09 16:29:13 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/10 22:12:09 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,52 +79,13 @@ int	is_numeric(const char *str)
 	return (1);
 }
 
-long long	ft_atoll(const char *str)
-{
-	long long	result;
-	long		i;
-	long		sign;
-
-	result = 0;
-	i = 0;
-	sign = 1;
-	while ((str[i] >= 9 && str[i] <= 13) || (str[i] == 32))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
-			sign *= -1;
-		i++;
-	}
-	while (ft_isdigit(str[i]))
-		result = (result * 10) + (str[i++] - '0');
-	return (result * sign);
-}
-
 void	ft_exit(char **args, t_info *info)
 {
 	int	exit_code;
 
-	exit_code = 0;
-	if (args && args[1])
-	{
-		if (!is_numeric(args[1]) || ft_atoll(args[1]) > 9223372036854775807)
-		{
-			ft_putstr_fd("exit: numeric argument required\n", 2);
-			singleton(1, 2);
-			free_info_and_exit(info, singleton(0, 0));
-		}
-		else if (args[2])
-		{
-			ft_putstr_fd("exit: too many arguments\n", 2);
-			singleton(1, 1);
-			return ;
-		}
-		else
-			exit_code = ft_atoi(args[1]) % 256;
-	}
-	else
-		exit_code = singleton(0, 0);
+	exit_code = parse_exit_args(args, info);
+	if (exit_code == -1)
+		return ;
 	if (isatty(STDIN_FILENO))
 		ft_putstr_fd("exit\n", 1);
 	singleton(1, exit_code);

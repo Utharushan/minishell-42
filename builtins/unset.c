@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 11:22:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/09 16:33:44 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/10 23:10:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,22 @@ void	free_tmp(t_env *tmp)
 	free(tmp);
 }
 
+static void	remove_env_node(t_env **env, t_env *prev, t_env *cur)
+{
+	t_env	*tmp;
+
+	tmp = cur;
+	if (!prev)
+		*env = cur->next;
+	else
+		prev->next = cur->next;
+	free_tmp(tmp);
+}
+
 int	ft_unset(t_env **env, char *name)
 {
 	t_env	*cur;
 	t_env	*prev;
-	t_env	*tmp;
 
 	if (!name)
 		return (0);
@@ -33,13 +44,8 @@ int	ft_unset(t_env **env, char *name)
 	{
 		if (!ft_strcmp(cur->name, name))
 		{
-			tmp = cur;
-			if (!prev)
-				*env = cur->next;
-			else
-				prev->next = cur->next;
-			cur = cur->next;
-			return (free_tmp(tmp), 0);
+			remove_env_node(env, prev, cur);
+			return (0);
 		}
 		else
 		{

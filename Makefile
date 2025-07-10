@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
+#    By: ebella <ebella@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/10 20:47:55 by tuthayak         ###   ########.fr        #
+#    Updated: 2025/07/10 23:12:42 by ebella           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,7 +51,10 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(BUILTINS_DIR)/env_utils.c \
 			  $(BUILTINS_DIR)/export.c \
 			  $(BUILTINS_DIR)/unset.c \
-			  $(BUILTINS_DIR)/export_utils.c 
+			  $(BUILTINS_DIR)/export_utils.c \
+			  $(BUILTINS_DIR)/env_utils_2.c \
+			  $(BUILTINS_DIR)/export_utils_2.c
+SRCS		+= $(BUILTINS_DIR)/exit_utils.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 

@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/09 16:33:03 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/10 22:01:08 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,40 +51,42 @@ void	add_env_back(t_env **env, t_env *new)
 	tmp->next = new;
 }
 
-t_env	*init_env(char **envp, t_env *env)
+static t_env	*create_env(char *env_str)
 {
-	int		i;
 	char	*equal_position;
 	char	*name;
 	char	*value;
 	t_env	*new_env;
 
+	equal_position = ft_strchr(env_str, '=');
+	if (!equal_position)
+		return (NULL);
+	name = extract_env_name(env_str, equal_position);
+	if (!name)
+		return (NULL);
+	value = extract_env_value(equal_position);
+	if (!value)
+	{
+		free(name);
+		return (NULL);
+	}
+	new_env = new_env_node(name, value);
+	free(name);
+	free(value);
+	return (new_env);
+}
+
+t_env	*init_env(char **envp, t_env *env)
+{
+	int		i;
+	t_env	*new_env;
+
 	i = 0;
 	while (envp[i])
 	{
-		equal_position = ft_strchr(envp[i], '=');
-		if (equal_position)
-		{
-			name = ft_substr(envp[i], 0, equal_position - envp[i]);
-			if (!name)
-			{
-				free(equal_position);
-				return (env);
-			}
-			value = ft_strdup(equal_position + 1);
-			if (!value)
-			{
-				free(equal_position);
-				free(name);
-				return (env);
-			}
-			new_env = new_env_node(name, value);
-			free(name);
-			free(value);
-			if (!new_env)
-				continue ;
+		new_env = create_env(envp[i]);
+		if (new_env)
 			add_env_back(&env, new_env);
-		}
 		i++;
 	}
 	return (env);

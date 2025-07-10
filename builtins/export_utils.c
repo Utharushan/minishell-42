@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 07:33:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/09 16:28:55 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/10 23:02:37 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,36 +50,39 @@ void	append_env_value(t_env *env, char *name, char *to_append)
 	}
 }
 
-int	handle_plus_equal(t_env *env, char *arg)
+static int	parse_plus_equal_syntax(char *arg, char **name, char **value)
 {
 	char	*plus_equal;
-	char	*name;
-	char	*value;
-	t_env	*new_env;
 
 	plus_equal = find_plus_equal(arg);
 	if (!plus_equal)
 		return (1);
-	name = ft_substr(arg, 0, plus_equal - arg);
-	if (!name)
+	*name = ft_substr(arg, 0, plus_equal - arg);
+	if (!*name)
+		return (1);
+	*value = ft_strdup(plus_equal + 2);
+	if (!*value)
 	{
-		free(plus_equal);
+		free(*name);
 		return (1);
 	}
-	value = ft_strdup(plus_equal + 2);
-	if (!value)
+	if (argv_parsed(*name) != 0)
 	{
-		free(plus_equal);
-		free(name);
+		free(*name);
+		free(*value);
 		return (1);
 	}
-	if (argv_parsed(name) != 0)
-	{
-		free(name);
-		free(plus_equal);
-		free(value);
+	return (0);
+}
+
+int	handle_plus_equal(t_env *env, char *arg)
+{
+	char	*name;
+	char	*value;
+	t_env	*new_env;
+
+	if (parse_plus_equal_syntax(arg, &name, &value) != 0)
 		return (1);
-	}
 	if (env_found(env, name))
 		append_env_value(env, name, value);
 	else
@@ -89,10 +92,11 @@ int	handle_plus_equal(t_env *env, char *arg)
 		{
 			free(name);
 			free(value);
-			free(plus_equal);
 			return (1);
 		}
 		add_env_back(&env, new_env);
 	}
+	free(name);
+	free(value);
 	return (0);
 }

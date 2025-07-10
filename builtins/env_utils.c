@@ -62,37 +62,6 @@ void	free_envp(char **envp, int i)
 	free(envp);
 }
 
-char	**env_to_envp(t_env *env)
-{
-	int		count;
-	int		i;
-	t_env	*tmp;
-	char	**envp;
-	char	*tmp_str;
-
-	i = 0;
-	tmp = env;
-	count = count_env(tmp);
-	envp = malloc(sizeof(char *) * (count + 1));
-	if (!envp)
-		return (NULL);
-	tmp = env;
-	while (tmp)
-	{
-		tmp_str = ft_strjoin(tmp->name, "=");
-		if (!tmp_str)
-			return (free_envp(envp, i), NULL);
-		envp[i] = ft_strjoin(tmp_str, tmp->value);
-		free(tmp_str);
-		if (!envp[i])
-			return (free_envp(envp, i), NULL);
-		i++;
-		tmp = tmp->next;
-	}
-	envp[i] = NULL;
-	return (envp);
-}
-
 char	**get_path_dirs(t_env *env)
 {
 	char	*path_value;

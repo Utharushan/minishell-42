@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/10 20:37:07 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/10 23:23:22 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>
+# include <limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
@@ -77,9 +78,9 @@ typedef struct s_token_args
 {
 	char			*value;
 	t_token_type	type;
-	t_word_type	word_type;
-	int			has_leading_space;
-} t_token_args;
+	t_word_type		word_type;
+	int				has_leading_space;
+}						t_token_args;
 
 typedef struct s_token
 {
@@ -147,23 +148,34 @@ typedef struct s_token_ctx
 	int			token_count_before;
 	int			token_count_after;
 	t_token		*tmp;
-} t_token_ctx;
+}						t_token_ctx;
 
 t_token					*new_token(t_token_args args);
 void					add_token(t_token **tokens, t_token_args args);
-void					handle_token_word(char *input, int *i, t_token **tokens);
-void					handle_token_operator(char *input, int *i, t_token **tokens, t_token_type type);
+void					handle_token_word(char *input, int *i,
+							t_token **tokens);
+void					handle_token_operator(char *input, int *i,
+							t_token **tokens, t_token_type type);
 t_word_type				get_word_type(char quote);
 t_token					*lexer(char *input);
 t_token_type			get_token_type(char *input, int *i);
 void					extract_word(char *input, int *i, t_token **tokens);
 t_token_type			get_token_type(char *input, int *i);
 int						count_tokens(t_token *tokens);
-void					set_leading_space(int *has_leading_space, char *input, int i);
-void					reset_token_counts(t_token **old_tokens, int *token_count_before, int *token_count_after, t_token *tokens);
-void					handle_token_cleanup(t_token **tokens, t_token *old_tokens, int token_count_before, int token_count_after);
-void					extract_word_quoted(char *input, int *i, t_token **tokens, int has_leading_space);
-void					extract_word_unquoted(char *input, int *i, t_token **tokens, int has_leading_space);
+void					set_leading_space(int *has_leading_space,
+							char *input, int i);
+void					reset_token_counts(t_token **old_tokens,
+							int *token_count_before,
+							int *token_count_after, t_token *tokens);
+void					handle_token_cleanup(t_token **tokens,
+							t_token *old_tokens,
+							int token_count_before, int token_count_after);
+void					extract_word_quoted(char *input, int *i,
+							t_token **tokens,
+							int has_leading_space);
+void					extract_word_unquoted(char *input, int *i,
+							t_token **tokens,
+							int has_leading_space);
 
 // --- PARSER ---
 
@@ -269,6 +281,17 @@ int						singleton(int type, int value);
 void					handle_signal_termination(int status);
 t_token					*get_syntax_error_token(t_token *tokens);
 void					print_syntax_error(t_token *err_tok);
-
+char					*extract_env_value(char *equal_pos);
+char					*extract_env_name(char *env_str, char *equal_pos);
+int						count_env(t_env *tmp);
+void					free_envp(char **envp, int i);
+int						parse_exit_args(char **args, t_info *info);
+int						add_new_node(t_env *env, char *args);
+int						update_or_create_env(t_env *env, char *name,
+							char *value);
+int						parse_export(char *args, char **name,
+							char **value);
+int						is_numeric(const char *str);
+int						export_arg(t_env *env, char *arg);
 
 #endif

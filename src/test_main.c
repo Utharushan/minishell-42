@@ -19,9 +19,8 @@ int			g_signal_status = 0;
 
 int	singleton(int type, int value)
 {
-	static int	nb;
+	static int	nb = 0;
 
-	nb = 0;
 	if (type == 0)
 		return (nb);
 	else
