@@ -20,13 +20,13 @@ int			g_signal_status = 0;
 
 int singleton(int type, int value)
 {
-    static int nb = 0;
+	static int	nb = 0;
 
-    if (type == 0)
-        return nb;
-    else
-        nb = value;
-    return (nb);
+	if (type == 0)
+		return (nb);
+	else
+		nb = value;
+	return (nb);
 }
 
 int	handle_input_error(char *input, t_env *env)
