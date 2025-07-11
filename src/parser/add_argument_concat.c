@@ -12,20 +12,17 @@
 
 #include "../../includes/minishell.h"
 
-int	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
+static char	*concat_tokens(t_token **tokens, t_env *env)
 {
 	char	*arg;
 	char	*tmp;
-	int		first;
-	int		count;
-	int		i;
-	char	**new_args;
 	char	*expanded;
+	int		first;
 
 	first = 1;
 	arg = ft_strdup("");
 	if (!arg)
-		return (0);
+		return (NULL);
 	while (*tokens && (*tokens)->type == TOKEN_WORD)
 	{
 		if (!first && (*tokens)->has_leading_space)
@@ -39,23 +36,46 @@ int	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
 		*tokens = (*tokens)->next;
 		first = 0;
 	}
+	return (arg);
+}
+
+static char	**grow_args_concat(char **old_args, char *new_arg, int count)
+{
+	char	**new_args;
+	int		i;
+
+	new_args = malloc(sizeof(char *) * (count + 2));
+	if (!new_args)
+		return (NULL);
+	i = 0;
+	while (i < count)
+	{
+		new_args[i] = old_args[i];
+		i++;
+	}
+	new_args[count] = ft_strdup(new_arg);
+	new_args[count + 1] = NULL;
+	return (new_args);
+}
+
+int	add_argument_concat(t_command *cmd, t_token **tokens, t_env *env)
+{
+	int		count;
+	char	*arg;
+	char	**new_args;
+
 	count = 0;
 	while (cmd->args && cmd->args[count])
 		count++;
-	new_args = malloc(sizeof(char *) * (count + 2));
+	arg = concat_tokens(tokens, env);
+	if (!arg)
+		return (0);
+	new_args = grow_args_concat(cmd->args, arg, count);
 	if (!new_args)
 	{
 		free(arg);
 		return (0);
 	}
-	i = 0;
-	while (i < count)
-	{
-		new_args[i] = cmd->args[i];
-		i++;
-	}
-	new_args[count] = ft_strdup(arg);
-	new_args[count + 1] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;
 	free(arg);

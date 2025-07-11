@@ -12,24 +12,34 @@
 
 #include "../../includes/minishell.h"
 
-int	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
+static t_redir	*create_redir(int type, char *file, int heredoc_expand)
 {
 	t_redir	*new;
-	t_redir	*tmp;
 
 	new = malloc(sizeof(t_redir));
 	if (!new)
-		return (0);
+		return (NULL);
 	new->file = ft_strdup(file);
 	if (!new->file)
 	{
 		free(new);
-		return (0);
+		return (NULL);
 	}
 	new->type = type;
 	new->heredoc_expand = heredoc_expand;
 	new->heredoc_fd = -1;
 	new->next = NULL;
+	return (new);
+}
+
+int	add_redir(t_command *cmd, int type, char *file, int heredoc_expand)
+{
+	t_redir	*new;
+	t_redir	*tmp;
+
+	new = create_redir(type, file, heredoc_expand);
+	if (!new)
+		return (0);
 	if (!cmd->redir)
 		cmd->redir = new;
 	else
