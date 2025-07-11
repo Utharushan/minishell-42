@@ -6,7 +6,7 @@
 #    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/11 19:43:27 by tuthayak         ###   ########.fr        #
+#    Updated: 2025/07/11 20:53:31 by tuthayak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,11 +24,16 @@ BUILTINS_DIR	= builtins
 SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/lexer/lexer_utils.c \
 			  $(SRC_DIR)/lexer/lexer_helpers.c \
-			  $(SRC_DIR)/parser/parser.c \
 			  $(SRC_DIR)/parser/syntax_error_handling.c \
 			  $(SRC_DIR)/parser/syntax_error_utils.c \
 			  $(SRC_DIR)/parser/expansion.c \
 			  $(SRC_DIR)/parser/expansion_utils.c \
+			  $(SRC_DIR)/parser/add_redir.c \
+			  $(SRC_DIR)/parser/new_command.c \
+			  $(SRC_DIR)/parser/add_argument.c \
+			  $(SRC_DIR)/parser/handle_pipe.c \
+			  $(SRC_DIR)/parser/add_argument_concat.c \
+			  $(SRC_DIR)/parser/parse_tokens.c \
 			  $(SRC_DIR)/test_main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
 			  $(SRC_DIR)/exec/info_management.c \
