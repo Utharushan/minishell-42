@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/11 21:56:21 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/11 22:18:11 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,5 +299,10 @@ int						add_redir(t_command *cmd, int type, char *file,
 							int heredoc_expand);
 int						add_argument_concat(t_command *cmd, t_token **tokens,
 							t_env *env);
+int						is_directory(char *path);
+int						handle_redirection_tokens(t_command *cmd,
+							t_token **tokens, t_command *head);
+int						handle_heredoc_tokens(t_command *cmd, t_token **tokens,
+							t_command *head);
 
 #endif
