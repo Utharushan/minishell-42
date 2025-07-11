@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/11 19:07:03 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/11 20:09:48 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,8 @@ char					*expand_token_value(const char *str,
 							t_word_type word_type, t_env *env, int last_status);
 char					*expand_token_value_unquoted(const char *str,
 							t_env *env, int last_status);
-char					*expand_var(const char *str, int *i, t_env *env, int last_status);
+char					*expand_var(const char *str, int *i, t_env *env,
+							int last_status);
 // --- UTILS TEST MAIN ---
 
 void					print_tokens(t_token *tokens);
