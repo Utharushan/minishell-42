@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/11 20:51:20 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/11 21:56:21 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,9 @@ int						parse_export(char *args, char **name,
 							char **value);
 int						is_numeric(const char *str);
 int						export_arg(t_env *env, char *arg);
-int						add_redir(t_command *cmd, int type, char *file, int heredoc_expand);
-int						add_argument_concat(t_command *cmd, t_token **tokens, t_env *env);
+int						add_redir(t_command *cmd, int type, char *file,
+							int heredoc_expand);
+int						add_argument_concat(t_command *cmd, t_token **tokens,
+							t_env *env);
 
 #endif
