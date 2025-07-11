@@ -1,15 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_tokens.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/11 21:27:01 by tuthayak          #+#    #+#             */
+/*   Updated: 2025/07/11 21:27:01 by tuthayak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 t_command	*parse_tokens(t_token *tokens, t_env *env)
 {
-	if (check_syntax_errors(tokens))
-	{
-		return (NULL);
-	}
-	t_command *cmd;
-	t_command *head;
-	t_token_type type;
+	t_command		*cmd;
+	t_command		*head;
+	t_token_type	type;
+	struct stat		st;
+	int				expand;
+	char			*delim;
+	int				len;
 
+	if (check_syntax_errors(tokens))
+		return (NULL);
 	cmd = new_command();
 	head = cmd;
 	if (tokens && tokens->type == TOKEN_WORD)
@@ -21,7 +35,6 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 		}
 		if (cmd->args && cmd->args[0])
 		{
-			struct stat st;
 			if (stat(cmd->args[0], &st) == 0 && S_ISDIR(st.st_mode))
 			{
 				ft_putstr_fd(cmd->args[0], 2);
@@ -84,12 +97,12 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 				free_command_list(head);
 				return (NULL);
 			}
-			int expand = (tokens->word_type == WORD_UNQUOTED);
-			char *delim = tokens->value;
+			expand = (tokens->word_type == WORD_UNQUOTED);
+			delim = tokens->value;
 			if (tokens->word_type == WORD_SINGLE_QUOTED
 				|| tokens->word_type == WORD_DOUBLE_QUOTED)
 			{
-				int len = ft_strlen(delim);
+				len = ft_strlen(delim);
 				if (len >= 2 && ((delim[0] == '\'' && delim[len - 1] == '\'')
 						|| (delim[0] == '"' && delim[len - 1] == '"')))
 					delim = ft_substr(delim, 1, len - 2);
@@ -109,4 +122,4 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 		tokens = tokens->next;
 	}
 	return (head);
-} 
+}
