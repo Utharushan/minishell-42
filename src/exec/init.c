@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:04:42 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/06 14:59:53 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/12 13:15:44 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,20 @@ int	check_input(char *input)
 	if (input[i] == '\0')
 		return (1);
 	return (0);
+}
+
+void	process_input(char *input, t_token *tokens,
+			t_command *cmds, t_env **env)
+{
+	if (!check_input(input))
+	{
+		cmds = init(tokens, cmds, input, *env);
+		if (!cmds)
+			return ;
+		if (handle_command_not_found(cmds, *env))
+			return ;
+		execute_commands(cmds, *env);
+	}
+	else
+		free(input);
 }

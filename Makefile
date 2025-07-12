@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
+#    By: ebella <ebella@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/11 22:15:56 by tuthayak         ###   ########.fr        #
+#    Updated: 2025/07/12 13:20:38 by ebella           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= minishell
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror -g -O0
+CFLAGS		= -Wall -Wextra -Werror
 INCLUDES	= -Iincludes -Ilibftprintf/inc
 LIBFTPRINTF	= libftprintf/libftprintf.a
 LIBFTPRINTF_DIR	= libftprintf
@@ -35,7 +35,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/parser/add_argument_concat.c \
 			  $(SRC_DIR)/parser/parse_tokens.c \
 			  $(SRC_DIR)/parser/parse_tokens_utils.c \
-			  $(SRC_DIR)/test_main.c \
+			  $(SRC_DIR)/main.c \
 			  $(SRC_DIR)/exec/exec_command.c \
 			  $(SRC_DIR)/exec/info_management.c \
 			  $(SRC_DIR)/exec/child_process.c \

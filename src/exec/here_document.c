@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:46:46 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/06 14:38:01 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/12 13:05:12 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,13 @@ int	heredoc_loop(const char *delim, int heredoc_expand, t_env *env, int fd)
 	{
 		line = readline("> ");
 		if (!line)
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited ", 2);
+			ft_putstr_fd("by end-of-file (wanted `", 2);
+			ft_putstr_fd((char *)delim, 2);
+			ft_putendl_fd("')", 2);
 			break ;
+		}
 		if (g_signal_status == 130 || !ft_strcmp(line, delim))
 		{
 			free(line);

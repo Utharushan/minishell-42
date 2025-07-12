@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/11 22:18:11 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/12 13:18:21 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,5 +304,9 @@ int						handle_redirection_tokens(t_command *cmd,
 							t_token **tokens, t_command *head);
 int						handle_heredoc_tokens(t_command *cmd, t_token **tokens,
 							t_command *head);
+void					process_input(char *input, t_token *tokens,
+							t_command *cmds, t_env **env);
+int						execute_commands(t_command *cmds, t_env *env);
+int						handle_command_not_found(t_command *cmds, t_env *env);
 
 #endif

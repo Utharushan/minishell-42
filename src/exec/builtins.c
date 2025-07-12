@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 20:44:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/09 13:50:51 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/10 22:11:28 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,25 @@ void	run_builtins(t_command *cmds, t_info *info)
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return ;
 	if (!ft_strncmp(cmds->args[0], "cd", 3))
-		singleton(1, ft_cd(cmds, info->env));
+		g_signal_status = ft_cd(cmds, info->env);
 	else if (!ft_strncmp(cmds->args[0], "echo", 5))
 	{
 		if (cmds->args[1] && !ft_strncmp(cmds->args[1], "$?", 3))
 		{
-			ft_putnbr_fd(singleton(0, 0), 1);
+			ft_putnbr_fd(g_signal_status, 1);
 			ft_putchar_fd('\n', 1);
-			singleton(1, 0);
 		}
 		else
-			singleton(1, ft_echo(cmds));
+			g_signal_status = ft_echo(cmds);
 	}
 	else if (!ft_strncmp(cmds->args[0], "pwd", 4))
-		singleton(1, ft_pwd());
+		g_signal_status = ft_pwd();
 	else if (!ft_strncmp(cmds->args[0], "env", 4))
-		singleton(1, ft_env(info->env));
+		g_signal_status = ft_env(info->env);
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
-		singleton(1, ft_export(info->env, cmds->args));
+		g_signal_status = ft_export(info->env, cmds->args);
 	else if (!ft_strncmp(cmds->args[0], "unset", 6))
-		singleton(1, ft_unset(&info->env, cmds->args[1]));
+		g_signal_status = ft_unset(&info->env, cmds->args[1]);
 	else if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, info);
 }
@@ -85,6 +84,6 @@ void	exec_child_builtin(t_command *cmds, t_info *info)
 	else
 	{
 		run_builtins(cmds, info);
-		free_info_and_exit(info, singleton(0, 0));
+		free_info_and_exit(info, g_signal_status);
 	}
 }
