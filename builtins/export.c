@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:09:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/10 23:23:01 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 12:13:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ int	parse_export(char *args, char **name, char **value)
 	}
 	if (argv_parsed(*name) != 0)
 	{
+		export_error(args);
 		free(*name);
 		free(*value);
 		return (1);

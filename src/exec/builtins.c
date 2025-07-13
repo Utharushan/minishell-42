@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 20:44:43 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/13 00:02:05 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:17:11 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	run_builtins(t_command *cmds, t_info *info)
 	else if (!ft_strncmp(cmds->args[0], "export", 7))
 		singleton(1, ft_export(info->env, cmds->args));
 	else if (!ft_strncmp(cmds->args[0], "unset", 6))
-		singleton(1, ft_unset(&info->env, cmds->args[1]));
+		singleton(1, ft_unset(&info->env, cmds->args));
 	else if (!ft_strncmp(cmds->args[0], "exit", 5))
 		ft_exit(cmds->args, info);
 }
@@ -85,6 +85,6 @@ void	exec_child_builtin(t_command *cmds, t_info *info)
 	else
 	{
 		run_builtins(cmds, info);
-		free_info_and_exit(info, g_signal_status);
+		free_info_and_exit(info, singleton(0, 0));
 	}
 }

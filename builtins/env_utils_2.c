@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 22:01:13 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/10 22:09:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:01:33 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char	*extract_env_name(char *env_str, char *equal_pos)
 	char	*name;
 
 	name = ft_substr(env_str, 0, equal_pos - env_str);
+	if (!name)
+		return (NULL);
 	return (name);
 }
 
@@ -25,6 +27,8 @@ char	*extract_env_value(char *equal_pos)
 	char	*value;
 
 	value = ft_strdup(equal_pos + 1);
+	if (!value)
+		return (NULL);
 	return (value);
 }
 
@@ -37,6 +41,11 @@ static char	*create_env_string(t_env *env_node)
 	if (!tmp_str)
 		return (NULL);
 	result = ft_strjoin(tmp_str, env_node->value);
+	if (!result)
+	{
+		free(tmp_str);
+		return (NULL);
+	}
 	free(tmp_str);
 	return (result);
 }

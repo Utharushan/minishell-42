@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 07:33:20 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/10 23:02:37 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 12:13:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ static int	parse_plus_equal_syntax(char *arg, char **name, char **value)
 	{
 		free(*name);
 		free(*value);
+		
 		return (1);
 	}
 	return (0);

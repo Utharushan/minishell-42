@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/06 14:20:08 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:35:02 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ void	run_pipe(t_command *cmds, t_env *env)
 		return ;
 	if (handle_parent_builtin_if_needed(cmds, info))
 	{
-		free_info(info);
+		free_info_child(info);
 		return ;
 	}
 	exec_pipe(cmds, info);
-	free_info(info);
+	free_info_child(info);
 }

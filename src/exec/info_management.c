@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/06 14:31:46 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:34:26 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,20 +32,6 @@ t_info	*init_info(t_command *cmds, t_env *env)
 	info->cmds = cmds;
 	info->first_cmds = cmds;
 	return (info);
-}
-
-void	free_info(t_info *info)
-{
-	if (!info)
-		return ;
-	if (info->pid)
-		free(info->pid);
-	if (info->first_cmds)
-	{
-		close_all_heredoc_fds(info->first_cmds);
-		free_command_list(info->first_cmds);
-	}
-	free(info);
 }
 
 void	free_info_child(t_info *info)

@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 11:22:04 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/10 23:10:26 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 13:52:16 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	free_tmp(t_env *tmp)
 	free(tmp);
 }
 
-static void	remove_env_node(t_env **env, t_env *prev, t_env *cur)
+int		remove_env_node(t_env **env, t_env *prev, t_env *cur)
 {
 	t_env	*tmp;
 
@@ -29,28 +29,31 @@ static void	remove_env_node(t_env **env, t_env *prev, t_env *cur)
 	else
 		prev->next = cur->next;
 	free_tmp(tmp);
+	return (1);
 }
 
-int	ft_unset(t_env **env, char *name)
+int	ft_unset(t_env **env, char **name)
 {
 	t_env	*cur;
 	t_env	*prev;
+	int		i;
 
 	if (!name)
 		return (0);
-	cur = *env;
-	prev = NULL;
-	while (cur)
+	i = 0;
+	while (name[++i])
 	{
-		if (!ft_strcmp(cur->name, name))
+		cur = *env;
+		prev = NULL;
+		while (cur && cur->name)
 		{
-			remove_env_node(env, prev, cur);
-			return (0);
-		}
-		else
-		{
-			prev = cur;
-			cur = cur->next;
+				if (!ft_strcmp(cur->name, name[i]) && remove_env_node(env, prev, cur))
+					break;
+				else
+				{
+					prev = cur;
+					cur = cur->next;
+				}
 		}
 	}
 	return (0);

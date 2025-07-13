@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 12:45:03 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/10 22:01:08 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:11:51 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,12 @@ static t_env	*create_env(char *env_str)
 		return (NULL);
 	name = extract_env_name(env_str, equal_position);
 	if (!name)
-		return (NULL);
+		return (free(equal_position), NULL);
 	value = extract_env_value(equal_position);
 	if (!value)
 	{
 		free(name);
+		free(equal_position);
 		return (NULL);
 	}
 	new_env = new_env_node(name, value);
