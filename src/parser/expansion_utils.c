@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 19:05:47 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/13 12:57:01 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/13 13:05:56 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,13 @@ static char	*handle_escaped_dollar(const char *result, int *i)
 	return (append_char(result, '$'));
 }
 
-char	*expand_token_value_unquoted(const char *str, t_env *env,
-	int last_status)
+static char	*expand_token_value_unquoted_loop(const char *str, t_env *env,
+	int last_status, char *result)
 {
-	char	*result;
 	int		i;
 	char	*exp;
 	char	*tmp;
 
-	result = ft_strdup("");
 	i = 0;
 	while (str[i])
 	{
@@ -89,5 +87,15 @@ char	*expand_token_value_unquoted(const char *str, t_env *env,
 		result = append_char(result, str[i]);
 		i++;
 	}
+	return (result);
+}
+
+char	*expand_token_value_unquoted(const char *str, t_env *env,
+	int last_status)
+{
+	char	*result;
+
+	result = ft_strdup("");
+	result = expand_token_value_unquoted_loop(str, env, last_status, result);
 	return (result);
 }
