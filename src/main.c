@@ -84,7 +84,6 @@ int	main(int argc, char **argv, char **envp)
 		setup_signals();
 		input = readline("minishell> ");
 		handle_input_error(input, env);
-		add_history(input);
 		process_input(input, tokens, cmds, &env);
 	}
 	free_env_list(env);

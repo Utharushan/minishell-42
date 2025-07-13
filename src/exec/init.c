@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 21:04:42 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/12 13:15:44 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 17:35:18 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ void	process_input(char *input, t_token *tokens,
 {
 	if (!check_input(input))
 	{
+		add_history(input);
 		cmds = init(tokens, cmds, input, *env);
 		if (!cmds)
 			return ;

@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 22:30:00 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/07 23:02:13 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/13 17:34:57 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,7 @@ void	extract_word_unquoted(char *input, int *i, t_token **tokens,
 	while (input[*i] && !ft_isspace(input[*i])
 		&& input[*i] != '\'' && input[*i] != '"'
 		&& input[*i] != '|' && input[*i] != '<'
-		&& input[*i] != '>' && input[*i] != '&'
-		&& input[*i] != '(' && input[*i] != ')'
-		&& input[*i] != ';')
+		&& input[*i] != '>' && input[*i] != '&')
 		(*i)++;
 	add_token(tokens, (t_token_args){ft_substr(input, start, *i - start),
 		TOKEN_WORD, WORD_UNQUOTED, has_leading_space});
