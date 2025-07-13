@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/13 13:13:11 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 15:48:47 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,8 +245,6 @@ char					**env_to_envp(t_env *env);
 char					**get_path_dirs(t_env *env);
 void					free_env_list(t_env *env);
 void					free_token_list(t_token *tokens);
-int						validate_quotes(const char *input, int start,
-							char quote);
 void					sigint_handler(int sig);
 void					restore_heredoc_signals(void);
 int						prepare_heredocs(t_command *cmds, t_env *env);

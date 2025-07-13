@@ -12,6 +12,57 @@
 
 #include "../../includes/minishell.h"
 
+static int	is_invalid_start_end(t_token *tok, t_token *prev)
+{
+	if ((tok->type == TOKEN_PIPE || tok->type == TOKEN_AMP
+			|| tok->type == TOKEN_SEMICOLON)
+		&& (!prev || !tok->next || tok->next->type == TOKEN_EOF))
+		return (1);
+	return (0);
+}
+
+static int	is_double_operator(t_token *tok)
+{
+	if ((tok->type == TOKEN_PIPE || tok->type == TOKEN_SEMICOLON)
+		&& tok->next && (tok->next->type == TOKEN_PIPE
+			|| tok->next->type == TOKEN_SEMICOLON))
+		return (1);
+	if ((tok->type == TOKEN_AMP || tok->type == TOKEN_SEMICOLON)
+		&& tok->next && (tok->next->type == TOKEN_AMP
+			|| tok->next->type == TOKEN_SEMICOLON))
+		return (1);
+	return (0);
+}
+
+t_token	*get_syntax_error_token(t_token *tokens)
+{
+	t_token	*prev;
+
+	prev = NULL;
+	while (tokens)
+	{
+		if (is_invalid_start_end(tokens, prev))
+			return (tokens);
+		if (is_double_operator(tokens))
+			return (tokens->next);
+		prev = tokens;
+		tokens = tokens->next;
+	}
+	return (NULL);
+}
+
+void	print_syntax_error(t_token *err_tok)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	if (err_tok->type == TOKEN_PIPE)
+		ft_putstr_fd("|", 2);
+	else if (err_tok->type == TOKEN_AMP)
+		ft_putstr_fd("&", 2);
+	else if (err_tok->type == TOKEN_SEMICOLON)
+		ft_putstr_fd(";", 2);
+	ft_putstr_fd("'\n", 2);
+}
+
 int	check_syntax_errors(t_token *tokens)
 {
 	t_token	*err_tok;
@@ -21,40 +72,6 @@ int	check_syntax_errors(t_token *tokens)
 	{
 		print_syntax_error(err_tok);
 		return (1);
-	}
-	return (0);
-}
-
-void	handle_redirection(t_command *cmd, t_token **tokens)
-{
-	t_token_type	type;
-
-	type = (*tokens)->type;
-	*tokens = (*tokens)->next;
-	if (!(*tokens) || (*tokens)->type != TOKEN_WORD)
-		return ;
-	if (type == TOKEN_REDIRECT_IN)
-	{
-		if (cmd->input)
-			free(cmd->input);
-		cmd->input = ft_strdup((*tokens)->value);
-	}
-	else
-	{
-		if (cmd->output)
-			free(cmd->output);
-		cmd->output = ft_strdup((*tokens)->value);
-		cmd->append = (type == TOKEN_REDIRECT_APPEND);
-	}
-}
-
-int	validate_quotes(const char *input, int start, char quote)
-{
-	while (input[start])
-	{
-		if (input[start] == quote)
-			return (1);
-		start++;
 	}
 	return (0);
 }

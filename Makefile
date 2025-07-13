@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ebella <ebella@student.42.fr>              +#+  +:+       +#+         #
+#    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/12 13:20:38 by ebella           ###   ########.fr        #
+#    Updated: 2025/07/13 13:58:30 by tuthayak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,6 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/lexer/lexer_utils.c \
 			  $(SRC_DIR)/lexer/lexer_helpers.c \
 			  $(SRC_DIR)/parser/syntax_error_handling.c \
-			  $(SRC_DIR)/parser/syntax_error_utils.c \
 			  $(SRC_DIR)/parser/expansion.c \
 			  $(SRC_DIR)/parser/expansion_utils.c \
 			  $(SRC_DIR)/parser/add_redir.c \
