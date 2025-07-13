@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 19:05:47 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/11 19:57:25 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/13 12:57:01 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ char	*expand_token_value_unquoted(const char *str, t_env *env,
 	char	*result;
 	int		i;
 	char	*exp;
+	char	*tmp;
 
 	result = ft_strdup("");
 	i = 0;
@@ -79,7 +80,9 @@ char	*expand_token_value_unquoted(const char *str, t_env *env,
 		if (str[i] == '$')
 		{
 			exp = expand_var(str, &i, env, last_status);
+			tmp = result;
 			result = ft_strjoin(result, exp);
+			free(tmp);
 			free(exp);
 			continue ;
 		}
