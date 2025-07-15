@@ -6,7 +6,7 @@
 #    By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/06 16:04:15 by tuthayak          #+#    #+#              #
-#    Updated: 2025/07/13 13:58:30 by tuthayak         ###   ########.fr        #
+#    Updated: 2025/07/15 22:40:12 by tuthayak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ SRCS		= $(SRC_DIR)/lexer/lexer.c \
 			  $(SRC_DIR)/parser/parse_tokens.c \
 			  $(SRC_DIR)/parser/parse_tokens_utils.c \
 			  $(SRC_DIR)/main.c \
+			  $(SRC_DIR)/main_utils.c \
 			  $(SRC_DIR)/exec/exec_command.c \
 			  $(SRC_DIR)/exec/info_management.c \
 			  $(SRC_DIR)/exec/child_process.c \

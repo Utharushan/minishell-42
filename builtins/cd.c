@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:09:21 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/09 16:28:32 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 16:09:04 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	cd_and_update(char *path, t_env *env)
 		ft_putstr_fd("cd: ", 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(": No such file or directory\n", 2);
+		singleton(1, 1);
 		return (1);
 	}
 	if (getcwd(cwd, sizeof(cwd)))
