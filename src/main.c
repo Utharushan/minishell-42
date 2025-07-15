@@ -25,18 +25,6 @@ int	singleton(int type, int value)
 	return (nb);
 }
 
-int	handle_input_error(char *input, t_env *env)
-{
-	if (!input)
-	{
-		ft_putstr_fd("exit", 1);
-		if (env)
-			free_env_list(env);
-		exit(singleton(0, 0));
-	}
-	return (0);
-}
-
 int	handle_command_not_found(t_command *cmds, t_env *env)
 {
 	if ((!cmds->next && cmds->args && cmds->args[0]
@@ -65,11 +53,29 @@ int	execute_commands(t_command *cmds, t_env *env)
 	return (0);
 }
 
+static void	minishell_loop(t_token *tokens, t_command *cmds, t_env **env)
+{
+	char	*input;
+
+	while (1)
+	{
+		setup_signals();
+		input = readline("minishell> ");
+		handle_input_error(input, *env);
+		if (check_unclosed_quotes(input))
+		{
+			print_unclosed_quotes_error(input);
+			free(input);
+			continue ;
+		}
+		process_input(input, tokens, cmds, env);
+	}
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_token		*tokens;
 	t_command	*cmds;
-	char		*input;
 	t_env		*env;
 
 	(void)argc;
@@ -79,13 +85,7 @@ int	main(int argc, char **argv, char **envp)
 	env = init_env(envp, NULL);
 	if (!env)
 		return (1);
-	while (1)
-	{
-		setup_signals();
-		input = readline("minishell> ");
-		handle_input_error(input, env);
-		process_input(input, tokens, cmds, &env);
-	}
+	minishell_loop(tokens, cmds, &env);
 	free_env_list(env);
 	return (singleton(0, 0));
 }

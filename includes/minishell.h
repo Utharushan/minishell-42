@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 16:02:28 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/13 15:48:47 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/15 22:30:32 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,5 +306,8 @@ void					process_input(char *input, t_token *tokens,
 							t_command *cmds, t_env **env);
 int						execute_commands(t_command *cmds, t_env *env);
 int						handle_command_not_found(t_command *cmds, t_env *env);
+int						check_unclosed_quotes(const char *line);
+void					print_unclosed_quotes_error(const char *input);
+int						handle_input_error(char *input, t_env *env);
 
 #endif
