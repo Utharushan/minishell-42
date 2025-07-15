@@ -6,7 +6,7 @@
 /*   By: tuthayak <tuthayak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 21:27:01 by tuthayak          #+#    #+#             */
-/*   Updated: 2025/07/12 23:57:56 by tuthayak         ###   ########.fr       */
+/*   Updated: 2025/07/15 21:59:10 by tuthayak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,5 +101,12 @@ t_command	*parse_tokens(t_token *tokens, t_env *env)
 	}
 	if (!parse_token_loop(cmd, &tok_ptr, env, head))
 		return (NULL);
+	if (cmd->args && cmd->args[0] && !ft_strncmp(cmd->args[0], "cd", 3)
+		&& cmd->args[2])
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		free_command_list(head);
+		return (NULL);
+	}
 	return (head);
 }
