@@ -75,7 +75,7 @@ char	*expand_var(const char *str, int *i, t_env *env, int last_status)
 	char	*name;
 
 	start = ++(*i);
-	if (str[start - 1] == '?')
+	if (str[start] == '?')
 	{
 		(*i)++;
 		return (ft_itoa(last_status));

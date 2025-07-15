@@ -6,7 +6,7 @@
 /*   By: ebella <ebella@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 22:30:00 by ebella            #+#    #+#             */
-/*   Updated: 2025/07/13 15:23:31 by ebella           ###   ########.fr       */
+/*   Updated: 2025/07/13 16:11:56 by ebella           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	handle_child_process(t_command *cmds, t_info *info)
 	setup_child_fds(cmds, info);
 	close_unused_heredoc_fds(cmds, info->first_cmds);
 	if (command_redirections(cmds) == 0)
-		free_info_and_exit(info, 130);
+		free_info_and_exit(info, 1);
 	close_all_heredoc_fds(info->first_cmds);
 	if (is_builtins(cmds) == 0)
 		exec_child_builtin(cmds, info);
