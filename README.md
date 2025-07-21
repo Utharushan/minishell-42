@@ -1,4 +1,4 @@
-# 🐚 Minishell – 42cursus
+# 🐚 Minishell
 
 > A simplified Unix shell implementation, developed as part of the 42 School curriculum.
 
